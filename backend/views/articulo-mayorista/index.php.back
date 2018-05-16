@@ -1,0 +1,49 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+
+/* @var $this yii\web\View */
+/* @var $searchModel backend\models\search\ArticuloMayoristaSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = 'Articulo Mayoristas';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="articulo-mayorista-index">
+
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <p>
+        <?php echo Html::a('Create Articulo Mayorista', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?php echo GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'id',
+            'sku',
+            'sku_fabricante',
+            'seccion',
+            'linea',
+            // 'marca',
+            // 'serie',
+            // 'precio',
+            // 'alto',
+            // 'largo',
+            // 'ancho',
+            // 'moneda',
+            // 'almacen',
+            // 'existencia',
+            // 'disponible',
+            // 'ultima_modificacion',
+            // 'id_usuario_modifico',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
+</div>

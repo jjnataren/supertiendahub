@@ -16,10 +16,12 @@ class BackendAsset extends AssetBundle
     public $baseUrl = '@web';
 
     public $css = [
-        'css/style.css'
+        'css/style.css',
+        'js/DataTables/datatables.min.css'
     ];
     public $js = [
-        'js/app.js'
+        'js/app.js',
+        'js/DataTables/datatables.min.js'
     ];
 
     public $depends = [

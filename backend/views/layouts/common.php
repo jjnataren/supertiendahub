@@ -158,7 +158,7 @@ $i= 0;
     <header class="main-header">
         <a href="<?php echo Yii::$app->urlManagerFrontend->createAbsoluteUrl('/') ?>" class="logo">
             <!-- Add the class icon to your logo image or logo icon to add the margining -->
-            <?php echo "LCC"; ?>
+            <?php echo "SUPER TIENDA"; ?>
         </a>
         <!-- Header Navbar: style can be found in header.less -->
         <nav class="navbar navbar-static-top" role="navigation">
@@ -283,29 +283,53 @@ $i= 0;
                         'badgeBgClass' => 'label-success',
                     ],
                         [
-                        'label'=>Yii::t('backend', 'Talleres'),
+                        'label'=>Yii::t('backend', 'Administración'),
                         'options'=>['class'=>'header'],
                         'icon'=>'<i class="fa fa-paint-brush"></i>',
                         ],
                     
                     [
-                        'label' => Yii::t('backend', 'Categorías'),
-                        'url' => ['/categoria/index'],
+                        'label' => Yii::t('backend', 'Mi tienda'),
+                        'url' => ['/articulo-mayorista/index-tienda'],
                         'icon' => '<i class="fa fa-sitemap"></i>',
                         
                         'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['categoria']),
+                        'active' => in_array(\Yii::$app->controller->id,['articulo-mayorista/index-tienda']),
                      
                         
                     ],
                 		
+                    
+                    [
+                        'label'=>Yii::t('backend', 'Proveedor PCH'),
+                        'url' => ['/articulo-mayorista/index'],
+                        'icon'=>'<i class="fa fa-cart-arrow-down"></i>',
+                        'options'=>['class'=>'treeview'],
+                        'active' => in_array(\Yii::$app->controller->id,['articulo-mayorista/index']),
+                    ],
                 		[
-                		'label'=>Yii::t('backend', 'Talleres'),
+                		'label'=>Yii::t('backend', 'Mercado Libre'),
                 		'url' => '#',
-                		'icon'=>'<i class="fa fa-video-camera"></i>',
+                		'icon'=>'<i class="fa fa-truck"></i>',
                 		'options'=>['class'=>'treeview'],
                 		'items'=>$menuTalleres,
                 		],
+                    
+                    [
+                        'label'=>Yii::t('backend', 'PrestaShop'),
+                        'url' => '#',
+                        'icon'=>'<i class="fa fa-sellsy"></i>',
+                        'options'=>['class'=>'treeview'],
+                        'items'=>$menuTalleres,
+                    ],
+                    
+                        [
+                            'label'=>Yii::t('backend', 'Amazon'),
+                            'url' => '#',
+                            'icon'=>'<i class="fa fa-amazon"></i>',
+                            'options'=>['class'=>'treeview'],
+                            'items'=>$menuTalleres,
+                        ],
                     
                     [
                         'label' => Yii::t('backend', 'Ingresos'),
