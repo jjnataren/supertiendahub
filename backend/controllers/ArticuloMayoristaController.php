@@ -37,10 +37,11 @@ class ArticuloMayoristaController extends Controller
         
         //TODO: Build a common SOAP Client for PHC .
         //TODO: Get soap body params by environment vars .
-        $wsdl = "http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl";
+        $wsdl = "http://localhost:8088/servidor.php?wsdl";
         $params = "<cliente>50527</cliente><llave>487478</llave>";
         $client = new \SoapClient($wsdl);        
-        return $this->renderPartial('_phc_mayorista_response',['soap_response'=> $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos]);
+        //$valores = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+        return $this->renderPartial('_phc_mayorista_response',['soap_response'=> $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos]);
     }
 
     
@@ -52,10 +53,10 @@ class ArticuloMayoristaController extends Controller
         
         //TODO: Build a common SOAP Client for PHC .
         //TODO: Get soap body params by environment vars .
-        $wsdl = "http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl";
+        $wsdl = "http://localhost:8088/servidor.php?wsdl";
         $params = "<cliente>50527</cliente><llave>487478</llave>";
         $client = new \SoapClient($wsdl);
-        $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
+        $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
         //TODO: Optimize search proccess 
         
         $articles = [];
@@ -73,7 +74,7 @@ class ArticuloMayoristaController extends Controller
         }
         
         
-        return $this->renderPartial('_sync_phc_resume.php',['articles'=> $articles]);
+        return $this->renderPartial('_sync_phc_resume',['articles'=> $articles]);
     }
     
     /**
@@ -101,6 +102,40 @@ class ArticuloMayoristaController extends Controller
     }
     
     
+    
+    /**
+     * Imports set of articles to dw.
+     * @return mixed
+     */
+    public function actionGenerateSnap(){
+        
+        if (Yii::$app->request->post()){
+            
+            //TODO: Build a common SOAP Client for PHC .
+            $wsdl = "http://localhost:8088/servidor.php?wsdl";
+            $client = new \SoapClient($wsdl);
+            
+            
+            $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+            
+            
+        
+                ArticuloMayoristaSnap::updateAllCounters(['actual'=>0]);
+                
+                $snapModel = new ArticuloMayoristaSnap();
+                $snapModel->fecha_creacion =date ('Y-m-d H:i:s');
+                $snapModel->nombre = 'PHC'.date('YmdHis');
+                $snapModel->data = json_encode($soap_response);
+                $snapModel->actual = true;
+                $snapModel->disponible = true;
+                $snapModel->numero_registros = count($soap_response);
+                $snapModel->save();
+            
+        }
+        
+        
+    }
+    
     /**
      * Imports set of articles to dw.
      * @return mixed
@@ -110,14 +145,13 @@ class ArticuloMayoristaController extends Controller
         if (Yii::$app->request->post()){
             
             //TODO: Build a common SOAP Client for PHC .
-            $wsdl = "http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl";
+            $wsdl = "http://localhost:8088/servidor.php?wsdl";
             $client = new \SoapClient($wsdl);
        
-            $params = new \SoapVar("<cliente>50527</cliente><llave>487478</llave>", XSD_ANYXML);
             
-            $values = $client->ObtenerListaArticulos($params);
-            $soap_response = $values->datos;
+            $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
             
+        
             
             $transaction = ArticuloMayoristaSnap::getDb()->beginTransaction();
             try {

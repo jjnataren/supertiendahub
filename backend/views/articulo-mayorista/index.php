@@ -22,6 +22,8 @@ $this->registerJs(
 
 
         $('#soaprequest').click(function() {
+
+          $('#phcMayoristaArt').html(\"<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>\");    
    
    $.ajax({
         type: \"POST\",
@@ -52,6 +54,8 @@ $this->registerJs(
 
        $('#syncrequest').click(function() {
    
+       
+
    $.ajax({
         type: \"POST\",
         url: \"/articulo-mayorista/sync-phc-resume\",
@@ -59,7 +63,15 @@ $this->registerJs(
           
         }, success: function(result) {
             
+                    
+                
                      $('#phcMayoristaSync').html(result);   
+
+                        var totalChanges = $('#totalChanges').val();
+                
+                        
+
+                      $('#globalStatus').html((totalChanges>0)?'No sincronizado':'Sincronizado');      
 
                        $('#comparegrid').DataTable({
                         'scrollX': true,                       
@@ -73,9 +85,9 @@ $this->registerJs(
     });
 });
 
-
+$('#syncrequest').trigger('click');
  $('#soaprequest').trigger('click');
- $('#syncrequest').trigger('click');
+ 
 
 ",
     View::POS_READY,
@@ -141,7 +153,13 @@ $this->registerJs(
                <dd><?= date('d/m/Y') ?></dd>
                 
                 <dt>Estatus</dt>
-                <dd>No sincronizado</dd>
+                <dd>
+                    <div id="globalStatus">
+                    	
+     					 <i class="fa fa-spinner fa-spin"></i>
+     					
+      				</div>
+  				</dd>
              
               </dl>
              </div> 
@@ -163,7 +181,7 @@ $this->registerJs(
                <div class="box box-info with-border">
             <div class="box-header with-border">
             	<i class="fa fa-th"></i>
-              <h3 class="box-title">Precios actuales de Articulos <?php echo date("d/M/Y ")?></h3>
+              <h3 class="box-title">Precios publicados en PHC Mayoristas  <?php echo date("d/M/Y H:i:s ")?></h3>
 
               <div class="box-tools pull-right">
               <?php echo Html::a('<i class="fa fa-pencil"></i>', ['update', 'id' => 1], ['class' => 'btn']) ?>
@@ -190,7 +208,7 @@ $this->registerJs(
        			 
        		
        			 
-       			  <?php echo Html::a('<i class="fa fa-download"></i> Importar', ['import'], [
+       			  <?php echo Html::a('<i class="fa fa-camera"></i> Generar imagen', ['import'], [
                     'class' => 'btn btn-primary',
                     'data' => [
                         'confirm' => 'Al importar un nuevo snapshot podra comparar los productos entre las otras tiendas, sin embargo se descartara el snapshot anterior. ¿Desea continuar?',
@@ -206,10 +224,56 @@ $this->registerJs(
 
 
 
+	<div class="col-md-12">
+               <div class="box box-info with-border">
+            <div class="box-header with-border">
+            	<i class="fa fa-th"></i>
+              <h3 class="box-title">Resumen de cambios</h3>
+
+              <div class="box-tools pull-right">
+              <?php echo Html::a('<i class="fa fa-refresh"></i>', ['sync-phc-resume'], ['class' => 'btn']) ?>
+              <?php echo Html::a('<i class="fa fa-trash"></i>', ['#'], [
+                    'class' => 'btn',
+                    'data' => [
+                        'confirm' => '¿Confirmar eliminar?',
+                        'method' => 'post',
+                    ],
+                ]) ?>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="phcMayoristaSync">
+			
+				<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
+		
+   			 </div>
+    
+     <div class="box-footer">
+       			 
+       		
+       			 
+       			 <?php echo Html::a('<i class="fa fa-refresh"></i> Sincronizar SUPER TIENDA y PHC', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
+       			 
+       			  <?php echo Html::a('<i class="fa fa-print"></i> Imprimir', ['print-report'], [
+                    'class' => 'btn btn-primary',
+                    'data' => [
+                        'method' => 'get',
+                    ],
+                ]) ?>
+       			 
+     </div>
+    
+    </div>
+    </div>
+
+
 
  
      <div class="col-md-12">
-               <div class="box box-info with-border">
+               <div class="box box-primary with-border">
             <div class="box-header with-border">
             	<i class="fa fa-th"></i>
               <h3 class="box-title">Precios guardados en SUPER TIENDA HUB <?php echo date("d/M/Y H:i:s ")?></h3>
@@ -332,8 +396,9 @@ $this->registerJs(
         
         'columns' => [
 
-            'fecha_creacion',
+           
             'nombre',
+            'fecha_creacion',
             'actual',
             'numero_registros',   
             
@@ -384,50 +449,7 @@ $this->registerJs(
     </div>
 
 
-     <div class="col-md-12">
-               <div class="box box-info with-border">
-            <div class="box-header with-border">
-            	<i class="fa fa-th"></i>
-              <h3 class="box-title">Resumen de cambios</h3>
-
-              <div class="box-tools pull-right">
-              <?php echo Html::a('<i class="fa fa-refresh"></i>', ['sync-phc-resume'], ['class' => 'btn']) ?>
-              <?php echo Html::a('<i class="fa fa-trash"></i>', ['#'], [
-                    'class' => 'btn',
-                    'data' => [
-                        'confirm' => '¿Confirmar eliminar?',
-                        'method' => 'post',
-                    ],
-                ]) ?>
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body" id="phcMayoristaSync">
-			
-				<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
-		
-   			 </div>
-    
-     <div class="box-footer">
-       			 
-       		
-       			 
-       			 <?php echo Html::a('<i class="fa fa-refresh"></i> Buscar cambios', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
-       			 
-       			  <?php echo Html::a('<i class="fa fa-print"></i> Imprimir', ['print-report'], [
-                    'class' => 'btn btn-primary',
-                    'data' => [
-                        'method' => 'get',
-                    ],
-                ]) ?>
-       			 
-     </div>
-    
-    </div>
-    </div>
+     
 
 </div>
 
