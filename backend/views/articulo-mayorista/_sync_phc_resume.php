@@ -1,7 +1,10 @@
 <?php
 Yii::$app->formatter->locale = 'es-MX';
 
-if ($articles): ?>
+$changes=[];
+?>
+
+
 			
 						
 				 <div class="col-md-9">		
@@ -10,7 +13,7 @@ if ($articles): ?>
 						<tr>
 							
 								<th>sku</th>
-								<th>Seccion</th>
+								<th>Descripción</th>
 								<th />
 								<th>Precio SUPER TIENDA</th>
 								<th>Precio PHC Mayorista</th>
@@ -18,9 +21,11 @@ if ($articles): ?>
 						</tr>
 					</thead>
 					<tbody>
+					
+						<?php if($articles): ?>
 						<?php    foreach($articles as $key=>$item): ?>
 						
-							<?php ?>
+				
 						
     						<tr class="<?= ($art_status =  !isset($item['dbmodel']) ? 'info' : ( ($item['dbmodel']->precio < $item['model']->precio) ?'success':'warning' )) ?>" >
     						     <td><?= $key ?></td>
@@ -33,8 +38,20 @@ if ($articles): ?>
     							 <?php $changes[] = $art_status; ?>
     						</tr>	
 						<?php endforeach;?>
+					 
+					 <?php else:?>
+					 
+					 
+					 	<tr class="info" >
+    						    
+    						     <td colspan="6"><h4>Sin cambios.</h4></td>
+    						     
+    					</tr>	
+					 
+					 <?php endif;?>
 					</tbody>
 				</table>
+			
 				</div>
 				
 				      <div class="col-md-3"> 
@@ -64,7 +81,7 @@ if ($articles): ?>
 						</p>
 						<p> 		 
                        		  <span class="label label-warning">
-                               <?=$vals['warning']?>            
+                               <?=isset($vals['warning'])?$vals['warning']:0?>             
                              </span> &nbsp; &nbsp;
                        			<i class="fa fa-level-down"></i> Bajaron de precio   
 					
@@ -73,7 +90,7 @@ if ($articles): ?>
 						</div>
 						</div>
 					 	
- <?php endif;?>
+
  
  
  

@@ -8,12 +8,14 @@ use Yii;
  * This is the model class for table "tbl_articulo_mayorista".
  *
  * @property string $sku
+ * @property string $descripcion
  * @property string $sku_fabricante
  * @property string $seccion
  * @property string $linea
  * @property string $marca
  * @property string $serie
- * @property double $precio
+ * @property string $precio
+ * @property double $peso
  * @property double $alto
  * @property double $largo
  * @property double $ancho
@@ -42,10 +44,11 @@ class ArticuloMayorista extends \yii\db\ActiveRecord
     {
         return [
             [['sku'], 'required'],
-            [['precio', 'alto', 'largo', 'ancho'], 'number'],
+            [['precio', 'peso', 'alto', 'largo', 'ancho'], 'number'],
             [['almacen', 'existencia', 'disponible', 'id_usuario_modifico', 'id_snap'], 'integer'],
             [['ultima_modificacion'], 'safe'],
             [['sku', 'sku_fabricante', 'seccion', 'linea', 'marca', 'serie'], 'string', 'max' => 200],
+            [['descripcion'], 'string', 'max' => 300],
             [['moneda'], 'string', 'max' => 45],
             [['sku'], 'unique'],
         ];
@@ -58,12 +61,14 @@ class ArticuloMayorista extends \yii\db\ActiveRecord
     {
         return [
             'sku' => 'Sku',
+            'descripcion' => 'Descripcion',
             'sku_fabricante' => 'Sku Fabricante',
             'seccion' => 'Seccion',
             'linea' => 'Linea',
             'marca' => 'Marca',
             'serie' => 'Serie',
             'precio' => 'Precio',
+            'peso' => 'Peso',
             'alto' => 'Alto',
             'largo' => 'Largo',
             'ancho' => 'Ancho',

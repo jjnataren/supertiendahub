@@ -67,8 +67,10 @@ class ArticuloMayoristaController extends Controller
             $model->attributes = get_object_vars($articulo);
             
             $dbModel = ArticuloMayorista::findOne($model->sku);
+     
             
-            if (  !$dbModel || $dbModel->precio !==  $model->precio)            
+            
+            if (  !$dbModel || $dbModel->precio*1 !==  $model->precio*1)            
                 $articles[$model->sku] = ['dbmodel'=>$dbModel, 'model'=>$model];
             
         }
@@ -88,7 +90,6 @@ class ArticuloMayoristaController extends Controller
         
         $searchSnapModel = new ArticuloMayoristaSnapSearch();
         $snapDataProvider = $searchSnapModel->search(Yii::$app->request->queryParams);
-        
      
         $soap_response = [];
             
@@ -115,10 +116,7 @@ class ArticuloMayoristaController extends Controller
             $wsdl = "http://localhost:8088/servidor.php?wsdl";
             $client = new \SoapClient($wsdl);
             
-            
             $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
-            
-            
         
                 ArticuloMayoristaSnap::updateAllCounters(['actual'=>0]);
                 
@@ -129,12 +127,97 @@ class ArticuloMayoristaController extends Controller
                 $snapModel->actual = true;
                 $snapModel->disponible = true;
                 $snapModel->numero_registros = count($soap_response);
-                $snapModel->save();
+                
+                
+                
+                if($snapModel->save())
+                    Yii::$app->session->setFlash('alert', [
+                        'options' => ['class' => 'alert-success'],
+                        'body' => 'Se ha generado una nueva imagen <i class="fa fa-camera">  '.$snapModel->nombre.'</i> de articulos pulicados en PHC Mayoristas.'
+                    ]);else
+                    Yii::$app->session->setFlash('alert', [
+                        'options' => ['class' => 'alert-danger'],
+                        'body' => 'No fue posible genera la imagen, intente mas tarde.'
+                    ]);
+                    
+                //TODO: builds a particular alert into main menu                   
+                
+                
+                
+                return $this->redirect(['index']);
             
         }
         
-        
     }
+    
+    
+    /**
+     * Sets a SNAPSHOT as current to compare to
+     */
+    public function actionSelectSnap(){
+        
+        if (Yii::$app->request->get()){
+            
+            $id = Yii::$app->request->get('id');
+            
+            
+            $transaction = ArticuloMayoristaSnap::getDb()->beginTransaction();
+           
+            try {
+            
+            ArticuloMayoristaSnap::updateAll(['actual'=>false]);
+            
+            $model = ArticuloMayoristaSnap::findOne($id);
+            
+            $model->actual = true;
+            
+            $model->save();
+            
+            ArticuloMayorista::deleteAll();
+            
+            $soap_response = json_decode( $model->data);
+            
+            
+            foreach ($soap_response as $articulo){
+                
+                $articuloModel =  new ArticuloMayorista();
+                $articuloModel->attributes = get_object_vars($articulo);
+                $articuloModel->save();
+                
+            }
+            
+            $transaction->commit();
+            
+            
+            Yii::$app->session->setFlash('alert', [
+                'options' => ['class' => 'alert-success'],
+                'body' => ' Se ha seleccionado la imagen <i class="fa fa-camera">    '.$model->nombre.'</i> como actual.'
+            ]);
+            
+            } catch(\Exception $e) {
+                $transaction->rollBack();
+                
+                Yii::$app->session->setFlash('alert', [
+                    'options' => ['class' => 'alert-danger'],
+                    'body' => 'No se ha podido establecer la imagen deseada '
+                ]);
+                
+            } catch(\Throwable $e) {
+                $transaction->rollBack();
+                
+                Yii::$app->session->setFlash('alert', [
+                    'options' => ['class' => 'alert-danger'],
+                    'body' => 'No se ha podido establecer la imagen deseada '
+                ]);
+            }
+        
+        }
+        
+        return $this->redirect(['index']);
+    
+    }
+    
+    
     
     /**
      * Imports set of articles to dw.

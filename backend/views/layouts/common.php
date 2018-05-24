@@ -332,7 +332,7 @@ $i= 0;
                         ],
                     
                     [
-                        'label' => Yii::t('backend', 'Ingresos'),
+                        'label' => Yii::t('backend', 'Fluctuación'),
                         'url' => '#',
                         'icon' => '<i class="fa fa-balance-scale"></i>',
 
