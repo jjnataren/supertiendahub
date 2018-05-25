@@ -6,7 +6,7 @@
  * Time: 1:19
  */
 
-namespace app\models;
+namespace backend\models\client;
 
 use yii\authclient\OAuth2;
 use yii\httpclient\Client;

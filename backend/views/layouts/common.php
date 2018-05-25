@@ -317,10 +317,10 @@ $i= 0;
                     
                     [
                         'label'=>Yii::t('backend', 'PrestaShop'),
-                        'url' => '#',
+                        'url' => ['/articulo-prestashop/index'],
                         'icon'=>'<i class="fa fa-sellsy"></i>',
                         'options'=>['class'=>'treeview'],
-                        'items'=>$menuTalleres,
+                        'active' => 'articulo-prestashop/index' == \Yii::$app->controller->id,
                     ],
                     
                         [

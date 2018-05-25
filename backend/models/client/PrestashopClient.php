@@ -6,7 +6,7 @@
  * Time: 1:20
  */
 
-namespace app\models;
+namespace backend\models\client;
 
 
 class PrestashopClient
