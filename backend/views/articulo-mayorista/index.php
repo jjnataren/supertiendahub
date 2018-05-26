@@ -3,6 +3,7 @@
 use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\web\View;
+use backend\models\ArticuloMayoristaSnap;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\search\CategoriaSearch */
@@ -104,7 +105,7 @@ $('#syncrequest').trigger('click');
  <div class="col-md-12">
                <div class="box box-info with-border">
             <div class="box-header with-border">
-            	<i class="fa fa-th"></i>
+            	<i class="fa fa-cart-arrow-down"></i>
               <h3 class="box-title">Proveedor</h3>
 
               <div class="box-tools pull-right">
@@ -206,16 +207,6 @@ $('#syncrequest').trigger('click');
     
      <div class="box-footer">
        			 
-       		
-       			 
-       			  <?php echo Html::a('<i class="fa fa-camera"></i> Generar imagen', ['generate-snap'], [
-                    'class' => 'btn btn-primary',
-                    'data' => [
-                        'confirm' => 'Al importar un nuevo snapshot podra comparar los productos entre las otras tiendas, sin embargo se descartara el snapshot anterior. ¿Desea continuar?',
-                        'method' => 'post',
-                    ],
-                ]) ?>
-       			 
      </div>
     
     </div>
@@ -255,7 +246,10 @@ $('#syncrequest').trigger('click');
        			 
        		
        			 
-       			 <?php echo Html::a('<i class="fa fa-refresh"></i> Sincronizar SUPER TIENDA y PHC', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
+       			 <?php echo Html::a('<i class="fa fa-refresh"></i> Actualizar', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
+       			 
+       			  <?php echo Html::a('<i class="fa fa-refresh"></i> Sincronizar SUPER TIENDA y PHC', ['import'], ['class' => 'btn btn-success']) ?>
+       			
        			 
        			  <?php echo Html::a('<i class="fa fa-print"></i> Imprimir', ['print-report'], [
                     'class' => 'btn btn-primary',
@@ -276,7 +270,7 @@ $('#syncrequest').trigger('click');
                <div class="box box-primary with-border">
             <div class="box-header with-border">
             	<i class="fa fa-th"></i>
-              <h3 class="box-title">Precios guardados en SUPER TIENDA HUB <?php echo date("d/M/Y H:i:s ")?></h3>
+              <h3 class="box-title">Articulos actuales en SUPER TIENDA HUB  [<b><?=ArticuloMayoristaSnap::findOne(['actual'=>1])->nombre?></b>]</h3>
 
               <div class="box-tools pull-right">
               <?php echo Html::a('<i class="fa fa-pencil"></i>', ['update', 'id' => 1], ['class' => 'btn']) ?>
@@ -307,10 +301,9 @@ $('#syncrequest').trigger('click');
         'columns' => [
 
             'sku',
-            'marca',
-            'serie',
+            'descripcion',
             'precio',
-            'disponible',
+            'marca',
                 
             
             
@@ -356,6 +349,17 @@ $('#syncrequest').trigger('click');
     ]); ?>
     
     </div>
+    
+    <div class="box-footer">
+      <?php echo Html::a('<i class="fa fa-camera"></i> Generar imagen', ['generate-snap'], [
+                    'class' => 'btn btn-primary',
+                    'data' => [
+                        'confirm' => 'Se descartara la imagen anterior. ¿Desea continuar?',
+                        'method' => 'post',
+                    ],
+                ]) ?>
+                
+     </div>           
     </div>
     </div>
 

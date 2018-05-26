@@ -302,10 +302,21 @@ $i= 0;
                     
                     [
                         'label'=>Yii::t('backend', 'Proveedor PCH'),
-                        'url' => ['/articulo-mayorista/index'],
+                        'url' => ['#'],
                         'icon'=>'<i class="fa fa-cart-arrow-down"></i>',
                         'options'=>['class'=>'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['articulo-mayorista/index']),
+                        'active' =>  strpos($currentUrl,'articulo-mayorista')  ,
+                        'items' => [
+                            ['label' => 'Inicio',
+                                'url' => ['/articulo-mayorista/index'],
+                                'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                'active' => strpos(   $currentUrl   , 'articulo-mayorista/index')],
+                            ['label' => 'Configuración', 
+                                'url' => ['/articulo-mayorista/super-tienda-config'], 
+                                'icon' => '<i class="fa fa-angle-double-right"></i>', 
+                                'active' => strpos(   $currentUrl   , 'articulo-mayorista/super-tienda-config')],
+                        ]
+                        
                     ],
                 		[
                 		'label'=>Yii::t('backend', 'Mercado Libre'),
@@ -349,17 +360,6 @@ $i= 0;
                     
                     
                     [
-                        'label' => Yii::t('backend', 'Cuotas'),
-                        'url' => ['/cuota/index'],
-                        'icon' => '<i class="fa fa-calendar-check-o "></i>',
-                        
-                        'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['categoria']),
-                        
-                        
-                    ],
-                    
-                    [
                         'label' => Yii::t('backend', 'Content'),
                         'url' => '#',
                         'icon' => '<i class="fa fa-edit"></i>',
@@ -383,41 +383,7 @@ $i= 0;
                         ]
                     ],
                     
-                    [
-                        'label' => Yii::t('backend', 'Alumnos'),
-                        'url' =>  ['/alumno/index'],
-                        'icon' => '<i class="fa fa-graduation-cap"></i>',
-                        'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['alumno']),
-                      
-                    ],
-                    [
-                        'label' => Yii::t('backend', 'Pagos'),
-                        'url' =>  ['/pago-taller-cuota/create'],
-                        'icon' => '<i class="fa fa-credit-card"></i>',
-                        'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['page','article','article-category','widget-text','widget-menu','widget-carousel']),
-                        'items' => [
-                            ['label' => Yii::t('backend', 'Pago inscripción'), 'url' => ['/pago-taller-cuota/create?id=1'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'pago-taller-cuota')],
-                        ]
-                        
-                    ],
-                    [
-                        'label' => Yii::t('backend', 'Instructores'),
-                        'url' =>  ['/instructor/index'],
-                        'icon' => '<i class="fa fa-black-tie"></i>',
-                        'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['instructor']),
-                        
-                    ],
-                    [
-                        'label' => Yii::t('backend', 'Aulas'),
-                        'url' =>  ['/aula/index'],
-                        'icon' => '<i class="fa fa-building"></i>',
-                        'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['aula']),
-                        
-                    ],
+                   
                     
                     [
                         'label' => Yii::t('backend', 'System'),

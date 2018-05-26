@@ -22,4 +22,26 @@ return [
             'templateFile' => '@common/rbac/views/migration.php'
         ],
     ],
+ 
+    'components' => [
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.gmail.com',
+                'username' => 'jesus.nataren@gmail.com',
+                'password' => 'Quetzal198Karen621',
+                'port' => '465',
+                'encryption' => 'ssl',
+                'streamOptions' => [
+                    'ssl' => [
+                        'allow_self_signed' => true,
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ],
+                ]
+            ],
+        ],
+    ],
+    
 ];

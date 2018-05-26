@@ -10,6 +10,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use backend\models\ArticuloMayoristaSnap;
 use backend\models\search\ArticuloMayoristaSnapSearch;
+use backend\models\search\KeyStorageItemSearch;
+use common\models\KeyStorageItem;
 
 /**
  * ArticuloMayoristaController implements the CRUD actions for ArticuloMayorista model.
@@ -28,6 +30,31 @@ class ArticuloMayoristaController extends Controller
         ];
     }
 
+    
+    /**
+     * Updates an existing KeyStorageItem model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdateConfig($id)
+    {
+        
+        
+        if (($model = KeyStorageItem::findOne($id)) === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+        
+        
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['super-tienda-config']);
+        } else {
+            return $this->render('update_config', [
+                'model' => $model,
+            ]);
+        }
+    }
+    
     
     /**
      * Performs a soap call to PHC Mayoristas.
@@ -79,6 +106,30 @@ class ArticuloMayoristaController extends Controller
         return $this->renderPartial('_sync_phc_resume',['articles'=> $articles]);
     }
     
+    
+    /**
+     * Lists all KeyStorageItem models.
+     * @return mixed
+     */
+    public function actionSuperTiendaConfig()
+    {
+        $searchModel = new KeyStorageItemSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->sort = [
+            'defaultOrder' => ['key' => SORT_DESC]
+        ];
+        $dataProvider->query->andWhere('`key` like "config.phc%"');
+        
+        return $this->render('supertienda_config', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+    
+    
+    
+    
+    
     /**
      * Lists all ArticuloMayorista models.
      * @return mixed
@@ -113,12 +164,21 @@ class ArticuloMayoristaController extends Controller
         if (Yii::$app->request->post()){
             
             //TODO: Build a common SOAP Client for PHC .
-            $wsdl = "http://localhost:8088/servidor.php?wsdl";
-            $client = new \SoapClient($wsdl);
+           // $wsdl = "http://localhost:8088/servidor.php?wsdl";
+           // $client = new \SoapClient($wsdl);
             
-            $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+          //  $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
         
-                ArticuloMayoristaSnap::updateAllCounters(['actual'=>0]);
+                $articles = ArticuloMayorista::findBySql('select * from tbl_articulo_mayorista')->all();
+                
+                $soap_response = [];
+                foreach ($articles as $article){
+                    
+                    $soap_response[] = $article->attributes;
+                    
+                }
+            
+                ArticuloMayoristaSnap::updateAll(['actual'=>0]);
                 
                 $snapModel = new ArticuloMayoristaSnap();
                 $snapModel->fecha_creacion =date ('Y-m-d H:i:s');
@@ -133,7 +193,7 @@ class ArticuloMayoristaController extends Controller
                 if($snapModel->save())
                     Yii::$app->session->setFlash('alert', [
                         'options' => ['class' => 'alert-success'],
-                        'body' => 'Se ha generado una nueva imagen <i class="fa fa-camera">  '.$snapModel->nombre.'</i> de articulos pulicados en PHC Mayoristas.'
+                        'body' => 'Se ha generado una nueva imagen <i class="fa fa-camera">  '.$snapModel->nombre.'</i> de articulos.'
                     ]);else
                     Yii::$app->session->setFlash('alert', [
                         'options' => ['class' => 'alert-danger'],
@@ -239,7 +299,32 @@ class ArticuloMayoristaController extends Controller
             $transaction = ArticuloMayoristaSnap::getDb()->beginTransaction();
             try {
                 
-                ArticuloMayoristaSnap::updateAllCounters(['actual'=>0]);
+                
+                
+                $articles = ArticuloMayorista::findBySql('select * from tbl_articulo_mayorista')->all();
+                
+                $currentSnap = [];
+                foreach ($articles as $article){
+                    
+                    $currentSnap[] = $article->attributes;
+                    
+                }
+                
+               
+                
+                $snapModel = new ArticuloMayoristaSnap();
+                $snapModel->fecha_creacion =date ('Y-m-d H:i:s');
+                $snapModel->nombre = 'PHC'.date('YmdHis');
+                $snapModel->data = json_encode($currentSnap);
+                $snapModel->actual = false;
+                $snapModel->disponible = true;
+                $snapModel->numero_registros = count($currentSnap);
+                $snapModel->save();
+                
+                
+                
+                
+                ArticuloMayoristaSnap::updateAll(['actual'=>0]);
                 
                 $snapModel = new ArticuloMayoristaSnap();
                 $snapModel->fecha_creacion =date ('Y-m-d H:i:s');
@@ -250,6 +335,8 @@ class ArticuloMayoristaController extends Controller
                 $snapModel->numero_registros = count($soap_response);
                 $snapModel->save();
                 
+                ArticuloMayorista::deleteAll();
+                
                 foreach ($soap_response as $articulo){
                     
                     $model =  new ArticuloMayorista();
@@ -259,12 +346,17 @@ class ArticuloMayoristaController extends Controller
                 }
                 
                 Yii::$app->getSession()->setFlash('success', [
+                    'body'=>'Se ha guardado una nueva imagen del estado actual [ '.$snapModel->nombre.' ] ',
+                    'options'=>['class'=>'alert-success']
+                ]);
+                
+                Yii::$app->getSession()->setFlash('success', [
                     'body'=>'Se han importado '.count($soap_response).' articulos correctamente a SUPERTIENDA HUB',
                     'options'=>['class'=>'alert-success']
                 ]);
                 
                 Yii::$app->getSession()->setFlash('success', [
-                    'body'=>'Se ha generado una nueva imagen[ '.$snapModel->nombre.' ] del servicio de PHC Mayoristas',
+                    'body'=>'Se ha generado una nueva imagen con los articulos importados [ '.$snapModel->nombre.' ] ',
                     'options'=>['class'=>'alert-success']
                 ]);
                 

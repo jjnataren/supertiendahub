@@ -1,7 +1,6 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\Search\ArticuloPrestashopSearch */
@@ -69,25 +68,7 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                 <h3 class="box-title">Precios guardados en SUPERTIENDA HUB <?php echo date('d/M/Y H:i:s ')?></h3>
             </div>
             <div class="box-body">
-                <?php try {
-                    echo GridView::widget([
-                        'dataProvider' => $dataProvider,
-                        'filterModel' => $searchModel,
-                        'columns' => [
-                            ['class' => 'yii\grid\SerialColumn'],
 
-                            'sku',
-                            'id_prestashop',
-                            'marca',
-                            'serie',
-                            'precio',
-
-                            ['class' => 'yii\grid\ActionColumn'],
-                        ],
-                    ]);
-                } catch (Exception $e) {
-                    echo 'Ocurrio u error al cargar productos.';
-                } ?>
             </div>
         </div>
     </div>

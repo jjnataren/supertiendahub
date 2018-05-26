@@ -23,6 +23,7 @@ $config = [
             ]
         ]
     ],
+   
     'components' => [
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -38,6 +39,7 @@ $config = [
             'enableAutoLogin' => true,
             'as afterLogin' => common\behaviors\LoginTimestampBehavior::class
         ],
+       
     ],
     'modules' => [
         'i18n' => [
@@ -151,7 +153,8 @@ if (YII_ENV_DEV) {
                 ],
                 'template' => 'yii2-starter-kit',
                 'messageCategory' => 'backend'
-            ]
+            ],
+           
         ]
     ];
 }

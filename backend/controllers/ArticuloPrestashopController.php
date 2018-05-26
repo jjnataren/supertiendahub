@@ -2,15 +2,13 @@
 
 namespace backend\controllers;
 
-use backend\models\client\PrestashopClient;
-use backend\models\client\PrestaShopWebserviceException;
-use backend\models\ArticuloMayorista;
-use Yii;
 use backend\models\ArticuloPrestashop;
+use backend\models\jobs\PrestashopUpdateJob;
 use backend\models\Search\ArticuloPrestashopSearch;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * ArticuloPrestashopController implements the CRUD actions for ArticuloPrestashop model.
@@ -38,47 +36,12 @@ class ArticuloPrestashopController extends Controller
     public function actionSynchronize()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return \Yii::$app->queue->push(new PrestashopUpdateJob());
+    }
 
-        $client = new PrestashopClient('http://sevende.tv/Tienda16/prestashop', '5V9BYMW9JKEC67C6TVVTM7DGACFMJBZZ');
-        $opt = array('resource' => 'products');
-        $articles = ArticuloMayorista::find()->all();
-        $prestashop = array();
-        foreach ($articles as $article) {
-            $opt['reference'] = $article->sku;
-            try {
-                $xml = $client->get($opt)->children();
-
-                if ($xml->children()[0] !== null) {
-                    $xml = $xml->children();
-                    $id = $this->xml_attribute($xml, 'id');
-                    $articlePrestashop = null;
-                    if (ArticuloPrestashop::findOne($article->sku) !== null) {
-                        $articlePrestashop = ArticuloPrestashop::findOne($article->sku);
-                        $opt = array('resource' => 'products', 'id' => $id);
-                        $articleXml = $client->get($opt);
-
-                        if ($articlePrestashop->precio !== $articleXml->price) {
-                            $articlePrestashop->cambio = 1;
-                        }
-
-                    } else {
-                        $articlePrestashop = new ArticuloPrestashop();
-                        $articlePrestashop->sku = $article->sku;
-                        $articlePrestashop->id_prestashop = $id;
-                        $articlePrestashop->marca = $article->marca;
-                        $articlePrestashop->serie = $article->serie;
-                        $articlePrestashop->cambio = 0;
-                    }
-
-                    $prestashop[] = $articlePrestashop;
-                    $articlePrestashop->save();
-                }
-
-            } catch (PrestaShopWebserviceException $e) {
-            }
-        }
-
-        return $prestashop;
+    public function actionStatus($id) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return \Yii::$app->queue->isDone($id);
     }
 
     /**
