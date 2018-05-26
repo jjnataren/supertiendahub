@@ -19,21 +19,21 @@ Yii::$app->formatter->locale = 'es-MX';
 
 $this->registerJs(
     "
-
-
+    
+    
         $('#soaprequest').click(function() {
-
-          $('#phcMayoristaArt').html(\"<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>\");    
-   
+    
+          $('#phcMayoristaArt').html(\"<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>\");
+    
    $.ajax({
         type: \"POST\",
         url: \"/articulo-mayorista/soap-req\",
         data: {
-          
+    
         }, success: function(result) {
-            
-                     $('#phcMayoristaArt').html(result);   
-
+    
+                     $('#phcMayoristaArt').html(result);
+    
                        $('#datagrid').DataTable({
                         'scrollX': true,
                         'language': {
@@ -44,51 +44,51 @@ $this->registerJs(
                                     'infoFiltered': '(filtered from _MAX_ total records)'
                                 }
                             });
-           
+    
         }, error: function(result) {
-             $('#phcMayoristaArt').html(result);   
+             $('#phcMayoristaArt').html(result);
         }
     });
 });
-
-
+    
+    
        $('#syncrequest').click(function() {
-   
-       
-
+    
+    
+    
    $.ajax({
         type: \"POST\",
         url: \"/articulo-mayorista/sync-phc-resume\",
         data: {
-          
+    
         }, success: function(result) {
-            
-                    
-                
-                     $('#phcMayoristaSync').html(result);   
-
+    
+    
+    
+                     $('#phcMayoristaSync').html(result);
+    
                         var totalChanges = $('#totalChanges').val();
-                
-                        
-
-                      $('#globalStatus').html((totalChanges>0)?'No sincronizado':'Sincronizado');      
-
+    
+    
+    
+                      $('#globalStatus').html((totalChanges>0)?'No sincronizado':'Sincronizado');
+    
                        $('#comparegrid').DataTable({
-                        'scrollX': true,                       
+                        'scrollX': true,
                             });
-           
+    
         }, error: function(result) {
-         
-             $('#phcMayoristaSync').html(result);   
-
+    
+             $('#phcMayoristaSync').html(result);
+    
         }
     });
 });
-
+    
 $('#syncrequest').trigger('click');
  $('#soaprequest').trigger('click');
- 
-
+    
+    
 ",
     View::POS_READY,
     'documentOnLoad'
@@ -208,7 +208,7 @@ $('#syncrequest').trigger('click');
        			 
        		
        			 
-       			  <?php echo Html::a('<i class="fa fa-camera"></i> Generar imagen', ['import'], [
+       			  <?php echo Html::a('<i class="fa fa-camera"></i> Generar imagen', ['generate-snap'], [
                     'class' => 'btn btn-primary',
                     'data' => [
                         'confirm' => 'Al importar un nuevo snapshot podra comparar los productos entre las otras tiendas, sin embargo se descartara el snapshot anterior. ¿Desea continuar?',
@@ -227,7 +227,7 @@ $('#syncrequest').trigger('click');
 	<div class="col-md-12">
                <div class="box box-info with-border">
             <div class="box-header with-border">
-            	<i class="fa fa-th"></i>
+            	<i class="fa fa-line-chart"></i>
               <h3 class="box-title">Resumen de cambios</h3>
 
               <div class="box-tools pull-right">
@@ -404,9 +404,28 @@ $('#syncrequest').trigger('click');
             
             
 
+         
+            
             ['class' => 'yii\grid\ActionColumn',
-                'options'=>['class'=>'skip-export']
-            ],
+                'template' => '{view}',
+                'buttons' => [
+                    
+                    'view' => function ($url, $model, $key) {
+                         //Html::a('borrar', ['cuota-taller/delete','id'=>$key], ['class' => 'bg-red label']);
+                        return Html::a('<i class="fa fa-tachometer"></i> Seleccionar', ['select-snap', 'id'=>$model->id], 
+                            [
+                                'class' => 'btn btn-primary',
+                                'data-pjax' => '0',
+                                'data' => [
+                                'confirm' => '¿Al seleccionar esta imagen podra compara los precios con las demas tiendas?',
+                                'method' => 'post',
+                            ]
+                        ]);
+                    }
+                    ]
+                    
+                    
+            ]
             
         ],
         'toolbar' =>  [
@@ -419,15 +438,7 @@ $('#syncrequest').trigger('click');
         ],
         
       
-        'beforeHeader'=>[
-            [
-                'columns'=>[
-                    ['content'=>'Precios de la ultima imagen tomada', 'options'=>['colspan'=>3, 'class'=>'text text-left']],
-                    ['content'=>Yii::$app->formatter->asDate(date('Y-m-d')), 'options'=>['colspan'=>2, 'class'=>'text-center']],
-                ],
-              //  'options'=>['class'=>'skip-export'] // remove this row from export
-            ]
-        ],
+       
         
         
         
