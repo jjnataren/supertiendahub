@@ -2,9 +2,13 @@
 
 namespace backend\controllers;
 
+use backend\models\ArticuloMayorista;
 use backend\models\ArticuloPrestashop;
-use backend\models\jobs\PrestashopUpdateJob;
+use backend\models\client\PrestashopClient;
+use backend\models\client\PrestaShopWebserviceException;
+use backend\models\search\ArticuloMayoristaSearch;
 use backend\models\Search\ArticuloPrestashopSearch;
+use backend\models\Search\ArticuloPrestashopSnapSearch;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -36,12 +40,96 @@ class ArticuloPrestashopController extends Controller
     public function actionSynchronize()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return \Yii::$app->queue->push(new PrestashopUpdateJob());
+        $client = new PrestashopClient('http://sevende.tv/Tienda16/prestashop', '5V9BYMW9JKEC67C6TVVTM7DGACFMJBZZ');
+        $articles = ArticuloMayorista::find()->all();
+        $prestashop = array();
+        foreach ($articles as $article)
+        {
+            try
+            {
+                $opt = array('resource' => 'products');
+                $opt['filter[reference]'] = $article->sku;
+                $xml = $client->get($opt)->children();
+
+                if ($xml->children()[0] !== null)
+                {
+                    $xml = $xml->children();
+                    $id = $this->xml_attribute($xml->attributes(), 'id');
+                    $articlePrestashop = null;
+
+                    $optArticle = array('resource' => 'products', 'id' => $id);
+                    $articleXml = $client->get($optArticle)->product;
+
+                    $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $article->sku])->one();
+                    if ($articlePrestashop !== null)
+                    {
+                        if ($article->precio !== (double)$articleXml->price)
+                        {
+                            $articlePrestashop->cambio = 1;
+                            $prestashop[] = $articlePrestashop;
+                        }
+                    }
+                    else
+                    {
+                        $articlePrestashop = new ArticuloPrestashop();
+                        $articlePrestashop->sku = $article->sku;
+                        $articlePrestashop->id_prestashop = $id;
+                        $articlePrestashop->marca = $article->marca;
+                        $articlePrestashop->serie = $article->serie;
+                        $articlePrestashop->cambio = 0;
+                        $articlePrestashop->precio = (double) $articleXml->price;
+                    }
+
+                    $articlePrestashop->save();
+                }
+            } catch (PrestaShopWebserviceException $e) {
+            }
+        }
+        return $prestashop;
     }
 
-    public function actionStatus($id) {
+    public function actionUpdatePrices()
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return \Yii::$app->queue->isDone($id);
+        $request = \Yii::$app->request;
+
+        if ($request->isAjax && $request->isPost)
+        {
+            foreach ($request->bodyParams as $product)
+            {
+                $client = new PrestashopClient('http://sevende.tv/Tienda16/prestashop', '5V9BYMW9JKEC67C6TVVTM7DGACFMJBZZ');
+
+                $opt = array('resource' => 'products');
+                $opt['id'] = $product['id_prestashop'];
+
+                try {
+                    $article = ArticuloMayoristaSearch::find()->where(['sku' => $product['sku']])->one();
+                    $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $product['sku']])->one();
+                    $xml = $client->get($opt);
+                    $children = $xml->children()->children();
+                    unset($children->manufacturer_name, $children->quantity);
+                    $children->price = $article->precio;
+                    $articlePrestashop->precio = $article->precio;
+                    $articlePrestashop->cambio = 0;
+
+                    $opt = array('resource' => 'products');
+                    $opt['putXml'] = $xml->asXML();
+                    $opt['id'] = $product['id_prestashop'];
+
+                    try
+                    {
+                        $client->edit($opt);
+                    }
+                    catch (PrestaShopWebserviceException $e) {}
+
+                    $articlePrestashop->save();
+                } catch (PrestaShopWebserviceException $e) {
+                    return $e;
+                }
+            }
+        }
+
+        return 'ok';
     }
 
     /**
@@ -53,9 +141,14 @@ class ArticuloPrestashopController extends Controller
         $searchModel = new ArticuloPrestashopSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $searchModelSnap = new ArticuloPrestashopSnapSearch();
+        $dataProviderSnap = $searchModelSnap->search(Yii::$app->request->queryParams);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'searchModelSnap' => $searchModelSnap,
+            'dataProviderSnap' => $dataProviderSnap,
         ]);
     }
 

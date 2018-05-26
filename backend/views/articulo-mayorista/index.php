@@ -248,7 +248,10 @@ $('#syncrequest').trigger('click');
        			 
        			 <?php echo Html::a('<i class="fa fa-refresh"></i> Actualizar', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
        			 
-       			  <?php echo Html::a('<i class="fa fa-refresh"></i> Sincronizar SUPER TIENDA y PHC', ['import'], ['class' => 'btn btn-success']) ?>
+       			  <?php echo Html::a('<i class="fa fa-refresh"></i> Sincronizar SUPER TIENDA y PHC', ['import'], ['class' => 'btn btn-success','data' => [
+                        'confirm' => 'Al sincronizar las fuentes de datos, se descartaran los precios de la versión anterior, sin embargo se guardara un respaldo del estado actual.',
+                        'method' => 'post',
+                    ],]) ?>
        			
        			 
        			  <?php echo Html::a('<i class="fa fa-print"></i> Imprimir', ['print-report'], [
@@ -302,7 +305,13 @@ $('#syncrequest').trigger('click');
 
             'sku',
             'descripcion',
-            'precio',
+            [
+                'attribute'=>'precio',
+                'content'=>function($data){
+                    return   Yii::$app->formatter->asCurrency($data->precio);
+                }
+                ],
+            
             'marca',
                 
             
@@ -315,7 +324,6 @@ $('#syncrequest').trigger('click');
         ],
         'toolbar' =>  [
             ['content'=>
-                Html::a('<i class="fa fa-plus"></i>', ['create'], ['data-pjax'=>0, 'class' => 'btn btn-success', 'title'=>'Nueva']).
                 Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
             ],
             '{export}',
@@ -403,7 +411,16 @@ $('#syncrequest').trigger('click');
            
             'nombre',
             'fecha_creacion',
-            'actual',
+           
+            
+                [
+                'attribute'=>'actual',
+                'content'=>function($data){
+                    return  ($data->actual)?'Actual':'No';
+                },
+                'filter'=>[0=>'No', 1=>'Actual'],
+                ],
+            
             'numero_registros',   
             
             
@@ -434,7 +451,6 @@ $('#syncrequest').trigger('click');
         ],
         'toolbar' =>  [
             ['content'=>
-                Html::a('<i class="fa fa-plus"></i>', ['create'], ['data-pjax'=>0, 'class' => 'btn btn-success', 'title'=>'Nueva']).
                 Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
             ],
             '{export}',

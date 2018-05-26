@@ -220,7 +220,6 @@ class ArticuloMayoristaController extends Controller
             
             $id = Yii::$app->request->get('id');
             
-            
             $transaction = ArticuloMayoristaSnap::getDb()->beginTransaction();
            
             try {
@@ -241,7 +240,9 @@ class ArticuloMayoristaController extends Controller
             foreach ($soap_response as $articulo){
                 
                 $articuloModel =  new ArticuloMayorista();
+                
                 $articuloModel->attributes = get_object_vars($articulo);
+                
                 $articuloModel->save();
                 
             }
@@ -312,17 +313,16 @@ class ArticuloMayoristaController extends Controller
                 
                
                 
-                $snapModel = new ArticuloMayoristaSnap();
-                $snapModel->fecha_creacion =date ('Y-m-d H:i:s');
-                $snapModel->nombre = 'PHC'.date('YmdHis');
-                $snapModel->data = json_encode($currentSnap);
-                $snapModel->actual = false;
-                $snapModel->disponible = true;
-                $snapModel->numero_registros = count($currentSnap);
-                $snapModel->save();
+                $snapModelCurrent = new ArticuloMayoristaSnap();
+                $snapModelCurrent->fecha_creacion =date ('Y-m-d H:i:s');
+                $snapModelCurrent->nombre = 'PHC'.date('YmdHis');
+                $snapModelCurrent->data = json_encode($currentSnap);
+                $snapModelCurrent->actual = 0;
+                $snapModelCurrent->disponible = true;
+                $snapModelCurrent->numero_registros = count($currentSnap);
+                $snapModelCurrent->save();
                 
-                
-                
+                sleep(2);
                 
                 ArticuloMayoristaSnap::updateAll(['actual'=>0]);
                 
@@ -447,7 +447,14 @@ class ArticuloMayoristaController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            
+            
+            Yii::$app->session->setFlash('alert', [
+                'options' => ['class' => 'alert-success'],
+                'body' => ' Se ha actualizado el artículo ['.$model->sku.'] correctamente.'
+            ]);
+            
+            return $this->redirect(['index']);
         } else {
             return $this->render('update', [
                 'model' => $model,

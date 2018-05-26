@@ -1,4 +1,9 @@
 <?php
+
+
+
+Yii::$app->formatter->locale = 'es-MX';
+
  if ($soap_response): ?>
 			
 			
@@ -21,6 +26,8 @@
 								<td>
 									<?php if (is_array($val)):?>
 									<?php renderArrayToTable($val);?>
+									<?php elseif($key==='precio'):?>
+									<?php echo Yii::$app->formatter->asCurrency($val)?>
 									<?php else:?>
 									<?php echo $val?>
 									<?php endif;?>									

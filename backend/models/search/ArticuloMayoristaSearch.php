@@ -18,7 +18,7 @@ class ArticuloMayoristaSearch extends ArticuloMayorista
     public function rules()
     {
         return [
-            [['id', 'almacen', 'existencia', 'disponible', 'id_usuario_modifico'], 'integer'],
+            [[ 'almacen', 'existencia', 'disponible', 'id_usuario_modifico'], 'integer'],
             [['sku', 'sku_fabricante', 'seccion', 'linea', 'marca', 'serie', 'moneda', 'ultima_modificacion'], 'safe'],
             [['precio', 'alto', 'largo', 'ancho'], 'number'],
         ];
@@ -53,7 +53,6 @@ class ArticuloMayoristaSearch extends ArticuloMayorista
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
             'precio' => $this->precio,
             'alto' => $this->alto,
             'largo' => $this->largo,

@@ -30,7 +30,10 @@ $config = [
         ],
         'request' => [
             'cookieValidationKey' => env('BACKEND_COOKIE_VALIDATION_KEY'),
-            'baseUrl' => env('BACKEND_BASE_URL')
+            'baseUrl' => env('BACKEND_BASE_URL'),
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
         ],
         'user' => [
             'class' => yii\web\User::class,

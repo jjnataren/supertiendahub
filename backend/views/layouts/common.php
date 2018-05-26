@@ -318,20 +318,20 @@ $i= 0;
                         ]
                         
                     ],
-                		[
-                		'label'=>Yii::t('backend', 'Mercado Libre'),
-                		'url' => '#',
-                		'icon'=>'<i class="fa fa-truck"></i>',
-                		'options'=>['class'=>'treeview'],
-                		'items'=>$menuTalleres,
-                		],
+                    [
+                        'label'=>Yii::t('backend', 'Mercado Libre'),
+                        'url' => ['/articulo-meli/index'],
+                        'icon'=>'<i class="fa fa-truck"></i>',
+                        'options'=>['class'=>'treeview'],
+                        'active'=>'articulo-meli/index' === \Yii::$app->controller->id,
+                    ],
                     
                     [
                         'label'=>Yii::t('backend', 'PrestaShop'),
                         'url' => ['/articulo-prestashop/index'],
                         'icon'=>'<i class="fa fa-sellsy"></i>',
                         'options'=>['class'=>'treeview'],
-                        'active' => 'articulo-prestashop/index' == \Yii::$app->controller->id,
+                        'active' => 'articulo-prestashop/index' === \Yii::$app->controller->id,
                     ],
                     
                         [
