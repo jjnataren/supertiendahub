@@ -35,13 +35,22 @@ class MeliOAuth2Client extends OAuth2
         return $this->api($this->userId, 'GET');
     }
 
-    public function get($uri)
+    public function get($uri, $params=[])
     {
         if (!$this->accessToken->getIsValid()) {
             $this->refreshAccessToken($this->accessToken);
         }
+        if (\count($params) > 0) {
+            $uri .= '?';
+            foreach ($params as $param) {
+                $uri .= $param . '&';
+            }
+            $uri .= 'access_token=' . $this->accessToken->getToken();
+        } else {
+            $uri .= '?access_token=' . $this->accessToken->getToken();
+        }
         return $this->createApiRequest()
-            ->setUrl($uri . '?access_token=' . $this->accessToken->getToken())
+            ->setUrl($uri)
             ->setMethod('GET')
             ->send();
     }

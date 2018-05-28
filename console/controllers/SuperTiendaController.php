@@ -75,7 +75,7 @@ class SuperTiendaController extends Controller {
         if (count($articles)){
                 
         \Yii::$app->mailer->compose()
-        ->setTo('jjnataren@hotmail.com')
+        ->setTo( \Yii::$app->keyStorage->get('config.phc.aviso.correo', 'jjnataren@hotmail.com'))
         ->setSubject('PHC Mayoristas ha cambiado articulos')
         ->setTextBody('PHC Mayoristas ha cambiado articulos')
         ->setHtmlBody('<h1>PHC Mayoristas ha cambiado artículos</h1>
