@@ -22,7 +22,8 @@
                             {"data": "marca"},
                             {"data": "serie"},
                             {"data": "precio"},
-                            {"data": "cambio"}
+                            {"data": "precio_original"},
+                            {"data": "cambio"},
                         ]
                     });
 

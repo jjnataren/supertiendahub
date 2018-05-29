@@ -13,6 +13,7 @@ use Yii;
  * @property string $serie
  * @property double $precio
  * @property int $cambio
+ * @property double $precio_original
  */
 class ArticuloPrestashop extends \yii\db\ActiveRecord
 {
@@ -30,7 +31,7 @@ class ArticuloPrestashop extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['sku', 'id_prestashop', 'precio', 'cambio'], 'required'],
+            [['sku', 'id_prestashop', 'precio', 'cambio', 'precio_original'], 'required'],
             [['precio', 'cambio'], 'number'],
             [['sku', 'id_prestashop', 'marca', 'serie'], 'string', 'max' => 200],
             [['id_prestashop'], 'unique'],
@@ -49,6 +50,7 @@ class ArticuloPrestashop extends \yii\db\ActiveRecord
             'serie' => 'Serie',
             'precio' => 'Precio',
             'cambio' => 'Cambio',
+            'precio_original' => 'Precio Original',
         ];
     }
 }

@@ -23,7 +23,7 @@ class ArticuloPrestashopController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['post'],
                 ],
@@ -43,6 +43,13 @@ class ArticuloPrestashopController extends Controller
         $client = new PrestashopClient('http://sevende.tv/Tienda16/prestashop', '5V9BYMW9JKEC67C6TVVTM7DGACFMJBZZ');
         $articles = ArticuloMayorista::find()->all();
         $prestashop = array();
+
+        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
+        $soapClient = new \SoapClient($wsdl);
+        $paridad = $soapClient->ObtenerParidad('50527', '487478');
+        $dollarPrice = $paridad->datos;
+
+
         foreach ($articles as $article)
         {
             try
@@ -63,7 +70,13 @@ class ArticuloPrestashopController extends Controller
                     $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $article->sku])->one();
                     if ($articlePrestashop !== null)
                     {
-                        if ($article->precio !== (double)$articleXml->price)
+                        if ($article->moneda === 'MN') {
+                            $precio = $article->precio;
+                        } else {
+                            $precio = $article->precio * (double)$dollarPrice;
+                        }
+
+                        if ($precio !== (double)$articleXml->price)
                         {
                             $articlePrestashop->cambio = 1;
                             $prestashop[] = $articlePrestashop;
@@ -78,6 +91,7 @@ class ArticuloPrestashopController extends Controller
                         $articlePrestashop->serie = $article->serie;
                         $articlePrestashop->cambio = 0;
                         $articlePrestashop->precio = (double) $articleXml->price;
+                        $articlePrestashop->precio_original = 0;
                     }
 
                     $articlePrestashop->save();
@@ -92,6 +106,11 @@ class ArticuloPrestashopController extends Controller
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $request = \Yii::$app->request;
+
+        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
+        $soapClient = new \SoapClient($wsdl);
+        $paridad = $soapClient->ObtenerParidad('50527', '487478');
+        $dollarPrice = $paridad->datos;
 
         if ($request->isAjax && $request->isPost)
         {
@@ -108,8 +127,17 @@ class ArticuloPrestashopController extends Controller
                     $xml = $client->get($opt);
                     $children = $xml->children()->children();
                     unset($children->manufacturer_name, $children->quantity);
-                    $children->price = $article->precio;
-                    $articlePrestashop->precio = $article->precio;
+
+
+                    if ($article->moneda === 'MN') {
+                        $precio = $article->precio;
+                    } else {
+                        $precio = $article->precio * (double)$dollarPrice;
+                    }
+
+                    $children->price = $precio;
+                    $articlePrestashop->precio = $precio;
+                    $articlePrestashop->precio_original = $article->precio;
                     $articlePrestashop->cambio = 0;
 
                     $opt = array('resource' => 'products');
@@ -143,13 +171,28 @@ class ArticuloPrestashopController extends Controller
 
         $searchModelSnap = new ArticuloPrestashopSnapSearch();
         $dataProviderSnap = $searchModelSnap->search(Yii::$app->request->queryParams);
+        
+        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
+        $client = new \SoapClient($wsdl);
+        $paridad = $client->ObtenerParidad('50527', '487478');
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'searchModelSnap' => $searchModelSnap,
             'dataProviderSnap' => $dataProviderSnap,
+            'dollarPrice' => $paridad->datos,
         ]);
+    }
+
+    public function actionProof() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
+        $client = new \SoapClient($wsdl);
+
+        $paridad = $client->ObtenerParidad('50527', '487478');
+
+        return $paridad->datos;
     }
 
     /**
