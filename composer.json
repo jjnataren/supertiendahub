@@ -62,7 +62,8 @@
 		"kartik-v/yii2-datecontrol": "dev-master",
 		"kartik-v/yii2-widget-timepicker": "@dev",
 		"mongosoft/yii2-soap-client": "*",
-		"richardfan1126/yii2-js-register": "*"
+		"richardfan1126/yii2-js-register": "*",
+		"miloschuman/yii2-highcharts-widget": "^6.0"
 	},
 	"require-dev" : {
 		"yiisoft/yii2-debug" : "^2.0.0",

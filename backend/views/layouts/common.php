@@ -443,6 +443,11 @@ $i= 0;
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <h1>
+            	
+             	<?php if(isset($this->params['titleIcon'])): ?>
+                    <?= $this->params['titleIcon'] ?>
+                <?php endif; ?>
+            	
                 <?php echo $this->title ?>
                 <?php if (isset($this->params['subtitle'])): ?>
                     <small><?php echo $this->params['subtitle'] ?></small>

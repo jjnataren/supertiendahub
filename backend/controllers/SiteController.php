@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\components\keyStorage\FormModel;
 use Yii;
+use backend\models\search\ArticuloSearch;
 
 /**
  * Site controller
@@ -26,6 +27,18 @@ class SiteController extends \yii\web\Controller
     {
         $this->layout = Yii::$app->user->isGuest || !Yii::$app->user->can('loginToBackend') ? 'base' : 'common';
         return parent::beforeAction($action);
+    }
+    
+    
+    public function actionDashboard(){
+        
+        
+        $searchModel = new ArticuloSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+          
+        
+        return $this->render('dashboard', [  'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,]);
     }
 
     public function actionSettings()
