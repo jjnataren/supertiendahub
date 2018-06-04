@@ -4,6 +4,7 @@ use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\web\View;
 use backend\models\ArticuloMayoristaSnap;
+use richardfan\widget\JSRegister;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\search\CategoriaSearch */
@@ -20,7 +21,7 @@ Yii::$app->formatter->locale = 'es-MX';
 
 $this->registerJs(
     "
-    
+
     
         $('#soaprequest').click(function() {
     
@@ -47,47 +48,105 @@ $this->registerJs(
                             });
     
         }, error: function(result) {
-             $('#phcMayoristaArt').html(result);
+             $('#phcMayoristaArt').html('Ha ocurrido un error intente mas tarde ...');
         }
     });
 });
     
     
        $('#syncrequest').click(function() {
-    
-    
-    
+     
+            doAjax(\"/articulo-mayorista/sync-phc-resume\");
+
+
+        
+        });
+
+
+
+function doAjax(filterUrl) {
+ 
+    $('#phcMayoristaSync').html(\"<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>\");    
+   
    $.ajax({
-        type: \"POST\",
-        url: \"/articulo-mayorista/sync-phc-resume\",
+        type: \"GET\",
+        url: filterUrl,
         data: {
     
         }, success: function(result) {
     
     
-    
                      $('#phcMayoristaSync').html(result);
     
-                        var totalChanges = $('#totalChanges').val();
+                     var totalChanges = $('#totalChanges').val();
+
+                     $('#globalStatus').html((totalChanges>0)?'No sincronizado':'Sincronizado');
     
-    
-    
-                      $('#globalStatus').html((totalChanges>0)?'No sincronizado':'Sincronizado');
-    
-                       $('#comparegrid').DataTable({
+                     $('#comparegrid').DataTable({
                         'scrollX': true,
                             });
+
+                      
+                       $('#sync_success').click(function() {
+    
+
+                            doAjax(\"/articulo-mayorista/sync-phc-resume?filter=success\");
+                            
+                        });
+
+                        $('#sync_info').click(function() {
+                            
+    
+                            doAjax(\"/articulo-mayorista/sync-phc-resume?filter=info\");
+                            
+                        });
+
+
+                        $('#sync_warning').click(function() {
+    
+                            doAjax(\"/articulo-mayorista/sync-phc-resume?filter=warning\");
+
+                            
+                        });
+
+
+                        $('#sync_all').click(function() {
+                            
+                                                    doAjax(\"/articulo-mayorista/sync-phc-resume\");
+                        
+                                                    
+                         });
+
+
+                $('[id^=phcform]').on('submit', function(e){
+                        var form = $(this);
+                        var formData = form.serialize();
+                       
+                        $.ajax({
+                            url: form.attr(\"action\"),
+                            type: form.attr(\"method\"),
+                            data: formData,
+                            success: function (data) {
+                                $('#syncrequest').trigger('click');
+                            },
+                            error: function () {
+                                alert(\"Error al actualizar.\");
+                            }
+                        });
+                        e.preventDefault();
+                    });
+
     
         }, error: function(result) {
     
-             $('#phcMayoristaSync').html(result);
+             $('#phcMayoristaArt').html('Ha ocurrido un error intente mas tarde ...');
     
         }
     });
-});
+}
     
 $('#syncrequest').trigger('click');
- $('#soaprequest').trigger('click');
+$('#soaprequest').trigger('click');
     
     
 ",
@@ -102,7 +161,7 @@ $('#syncrequest').trigger('click');
 <div class="row">
 
 
- <div class="col-md-12">
+ <div class="col-md-12" >
                <div class="box box-info with-border">
             <div class="box-header with-border">
             	<i class="fa fa-cart-arrow-down"></i>
@@ -179,6 +238,10 @@ $('#syncrequest').trigger('click');
 
 
      <div class="col-md-12">
+     
+     
+    
+				 	
                <div class="box box-info with-border">
             <div class="box-header with-border">
             	<i class="fa fa-th"></i>
@@ -215,9 +278,9 @@ $('#syncrequest').trigger('click');
 
 
 
-	<div class="col-md-12">
+	<div class="col-md-12" id="resume">
                <div class="box box-info with-border">
-            <div class="box-header with-border">
+            <div class="box-header with-border" >
             	<i class="fa fa-line-chart"></i>
               <h3 class="box-title">Resumen de cambios</h3>
 
@@ -484,5 +547,14 @@ $('#syncrequest').trigger('click');
 
 </div>
 
+ <?php JSRegister::begin(); ?>
+<script>
+    function doSomething(){
 
+		alert('hola');
+		
+        }
+</script>
+<?php JSRegister::end(); ?>
+ 
 

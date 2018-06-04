@@ -86,7 +86,34 @@ class ArticuloMayoristaController extends Controller
         $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
         //TODO: Optimize search proccess 
         
+        $paridad = $client->ObtenerParidad(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+        
+        
+        if (Yii::$app->request->post()) {
+            
+            $model = new ArticuloMayorista();
+            
+            $model->load( Yii::$app->request->post() );
+            
+            $model =  ArticuloMayorista::findOne($model->sku);
+            
+            if (!$model)
+                $model = new ArticuloMayorista();
+            
+            $model->load( Yii::$app->request->post());
+            
+            if (!$model->save() ) {
+                
+                throw new NotFoundHttpException('Error al guardar');
+            }
+            
+           
+        } 
+        
         $articles = [];
+        
+        
+        $filter =   Yii::$app->request->get('filter');
         
         foreach ($soap_response as $articulo){
             
@@ -95,15 +122,13 @@ class ArticuloMayoristaController extends Controller
             
             $dbModel = ArticuloMayorista::findOne($model->sku);
      
-            
-            
-            if (  !$dbModel || $dbModel->precio*1 !==  $model->precio*1)            
-                $articles[$model->sku] = ['dbmodel'=>$dbModel, 'model'=>$model];
-            
+                            
+                    if(  !$dbModel || $dbModel->precio*1 !==  $model->precio*1)
+                        $articles[$model->sku] = ['dbmodel'=>$dbModel, 'model'=>$model];
         }
         
         
-        return $this->renderPartial('_sync_phc_resume',['articles'=> $articles]);
+        return $this->renderPartial('_sync_phc_resume',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
     }
     
     
