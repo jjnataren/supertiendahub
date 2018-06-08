@@ -1,6 +1,8 @@
 <?php
 
 
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
 Yii::$app->formatter->locale = 'es-MX';
 
@@ -9,23 +11,23 @@ $changes=[];
 ?>
 
 
-<div class="row">
 			
 						
-				 <div class="col-md-9 col-xs-12 col-sm-12">	
+				 <div class="col-md-9">	
 				 
 				
-				<table class="table" id="comparegrid" >
+				<table class="table table-hover table-bordered" id="comparegrid"   style="width:100%">
 					<thead>
 						<tr>
 							
 								<th>sku</th>
 								<th>Descripción</th>
-								<th> </th>
+								<th />
 								<th>Precio SUPER TIENDA</th>
 								<th>Precio PHC Mayorista</th>
 								<th>Moneda</th>
-								
+								<th />
+								<th />
 						</tr>
 					</thead>
 					<tbody>
@@ -46,6 +48,39 @@ $changes=[];
     						     <!-- TODO: Asignar el valod de moneda en variable global -->
     						     <td><?= isset($item['model']->moneda)?$item['model']->moneda:'' ?> &nbsp; 
     						     <?=  (isset($item['model']->moneda) && !strcmp($item['model']->moneda, 'USD') )? Yii::$app->formatter->asCurrency( $item['model']->precio ):''?>  </td>
+    						     
+    						     <td> <?=( ($art_status == 'info')?'Nuevo': ( ($art_status=='warning')?'Bajo':'Subio' )  )?> 
+    						     
+    						        
+    						     
+    						       </td>
+    						     <td>
+    						     	
+    							<?php $form = ActiveForm::begin(['action' => ['sync-phc-resume'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
+    					
+    						     
+    						     	 <?php echo $form->field($item['model'], 'sku')->hiddenInput(['maxlength' => true])->label(false); ?>
+    						     	 <?php echo $form->field($item['model'], 'precio')->hiddenInput()->label(false); ?>
+    						     	
+    						     		<?php if ($art_status == 'info'):  ?>
+                                            <?php echo $form->field($item['model'], 'descripcion')->hiddenInput(['maxlength' => true])->label(false) ?>
+                                            <?php echo $form->field($item['model'], 'sku_fabricante')->hiddenInput(['maxlength' => true])->label(false) ?>
+                                            <?php echo $form->field($item['model'], 'linea')->hiddenInput(['maxlength' => true])->label(false) ?>
+                                            <?php echo $form->field($item['model'], 'marca')->hiddenInput(['maxlength' => true])->label(false) ?>
+                                            <?php echo $form->field($item['model'], 'serie')->hiddenInput(['maxlength' => true])->label(false)?>
+                                		<?php endif;?>				
+    						     
+    						     
+    						      <?=  Html::submitButton(($art_status == 'info')?'<i class="fa fa-cloud-download"></i> Importar ' :  
+    						             ( ($art_status == 'warning')? '<i class="fa fa-warning"></i> Actualizar' : '<i class="fa fa-thumbs-o-up"></i> Actualizar'  ),  ['class' =>'btn btn-' .$art_status ])  ?> 
+    						   
+    						    <?php ActiveForm::end(); ?>
+                           
+    							 
+    						      
+    						       </td>
+    						
+                              
                               
     						</tr>	
     						
@@ -59,7 +94,7 @@ $changes=[];
 					 
 					 	<tr class="info" >
     						    
-    						     <td colspan="7"><h4>Sin cambios.</h4></td>
+    						     <td colspan="6"><h4>Sin cambios.</h4></td>
     						     
     					</tr>	
 					 
@@ -69,7 +104,7 @@ $changes=[];
 			
 				</div>
 				
-				<div class="col-md-3"> 
+				      <div class="col-md-3"> 
 				      
 				      
 				    <div class="col-md-12"> 
@@ -141,7 +176,7 @@ $changes=[];
 						</div>			
             					 	
 						</div>
- </div>
+ 
  
 
  

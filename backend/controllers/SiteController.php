@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\components\keyStorage\FormModel;
 use Yii;
 use backend\models\search\ArticuloSearch;
+use backend\models\Search\ArticuloMeliSearch;
 
 /**
  * Site controller
@@ -35,10 +36,17 @@ class SiteController extends \yii\web\Controller
         
         $searchModel = new ArticuloSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        $searchModelML = new ArticuloMeliSearch();
+        $dataProviderML = $searchModelML->search(Yii::$app->request->queryParams);
           
         
-        return $this->render('dashboard', [  'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,]);
+        return $this->render('dashboard', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'searchModelML' => $searchModelML,
+            'dataProviderML' => $dataProviderML
+        ]);
     }
 
     public function actionSettings()

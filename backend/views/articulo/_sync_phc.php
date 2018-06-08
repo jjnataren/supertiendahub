@@ -33,7 +33,7 @@ $changes=[];
 						<?php if($articles): ?>
 						<?php    foreach($articles as $key=>$item): ?>
 						
-						<?php if (  !strcmp(  ($art_status =  !isset($item['dbmodel']) ? 'info' : ( ($item['dbmodel']->precio < $item['model']->precio) ?'success':'warning' ) ), $filter ) || !$filter  ) :?>
+						<?php if (  !strcmp(  ($art_status =  !isset($item['model']) ? 'info' : ( ($item['dbmodel']->precio < $item['model']->precio) ?'success':'warning' ) ), $filter ) || !$filter  ) :?>
 						
 						
     						<tr class="<?=$art_status  ?>" >
@@ -80,7 +80,7 @@ $changes=[];
 				      <div class="panel-body">
 				      <?php $vals = array_count_values($changes);?>
 				      <p>
-                            <span class="label label-danger">
+                            <span class="label label-default">
                                <?=$total_changes = count($articles)?> 
                                <input type="hidden" id="totalChanges" value ="<?= $total_changes ?>" >           
                              </span> &nbsp; &nbsp;
@@ -91,11 +91,19 @@ $changes=[];
                       		<i class="fa fa-angle-left pull-right"></i>
                       		<?php endif;?>	
                        
-                       		  <span class="label label-info">
+                       		  <span class="label label-danger">
                                <?=isset($vals['info'])?$vals['info']:'0'?>            
                              </span> &nbsp; &nbsp;
-                       		<i class="fa fa-opencart"></i><a href="#resume" id="sync_info" > Nuevos </a>   
+                       		<i class="fa fa-close"></i>
                        		
+                       		<?php if(isset($vals['info'] ) &&  $vals['info'] > 0 ):  ?> 
+                       		<a href="#resume" id="sync_info" > No existe info </a>   
+                       		
+                       		<?php else:?>
+                       			
+                       			No existe info
+                       				
+                       			<?php endif;?>  
                        		
 					
 						</p>
@@ -106,7 +114,16 @@ $changes=[];
                       		  <span class="label label-success">
                                <?=isset($vals['success'])?$vals['success']:0?>            
                              </span> &nbsp; &nbsp;
-                       			<i class="fa fa-level-up"></i> <a href="#resume" id="sync_success"  >Subierón de precio</a>   
+                       			<i class="fa fa-level-up"></i> 
+                       			<?php if(isset($vals['success'] ) &&  $vals['success'] > 0 ):  ?> 
+                       			
+                       				<a href="#resume" id="sync_success"  >Subierón de precio</a> 
+                       			
+                       			<?php else:?>
+                       			
+                       				Subierón de precio
+                       				
+                       			<?php endif;?>  
 					
 						</p>
 						<p> 		 
@@ -116,7 +133,17 @@ $changes=[];
                        		  <span class="label label-warning">
                                <?=isset($vals['warning'])?$vals['warning']:0?>             
                              </span> &nbsp; &nbsp;
-                       			<i class="fa fa-level-down"></i><a href="#resume"  id="sync_warning" > Bajaron de precio   </a>
+                       			<i class="fa fa-level-down"></i>
+                       			
+                       			<?php if(isset($vals['warning'] ) &&  $vals['warning'] > 0 ):  ?> 
+                       	
+	                       			<a href="#resume"  id="sync_warning" > Bajaron de precio   </a>
+                       			
+                       			<?php else:?>
+                       			
+                       				Bajaron de precio
+                       				
+                       			<?php endif;?>  
 					
 						</p>
 						</div>

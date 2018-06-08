@@ -103,6 +103,96 @@ class ArticuloController extends Controller
         return $this->redirect(['index']);
     }
 
+    
+    /**
+     * Performs a soap call to PHC Mayoristas.
+     * @return mixed
+     */
+    public function actionSyncPhcResume(){
+        
+        //TODO: Build a common SOAP Client for PHC .
+        //TODO: Get soap body params by environment vars .
+        $wsdl = "http://localhost:8088/servidor.php?wsdl";
+        $client = new \SoapClient($wsdl);
+        $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+        //TODO: Optimize search proccess
+        
+        $paridad = $client->ObtenerParidad(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+        
+        
+        if (Yii::$app->request->post()) {
+            
+            $model = new Articulo();
+            
+            $model->load( Yii::$app->request->post() );
+            
+            $model =  Articulo::findOne($model->sku);
+            
+            if (!$model)
+                $model = new Articulo();
+                
+                $model->load( Yii::$app->request->post());
+                
+                if (!$model->save() ) {
+                    
+                    throw new NotFoundHttpException('Error al guardar');
+                }
+                
+                
+        }
+        
+        $articles = [];
+        
+        
+        $filter =   Yii::$app->request->get('filter');
+        
+        
+        $articlesModel = Articulo::find()->all();
+        
+        
+        
+        
+        
+        
+        foreach ($articlesModel as $dbModel){
+            
+            
+            $objectModel = null;
+            
+            foreach ($soap_response as $object){
+                
+                if(isset($object->sku) &&  $object->sku == $dbModel->sku){
+                    
+                    $objectModel = $object;
+                    break;
+                }
+                
+                
+            }
+            
+            
+            if ($objectModel){
+                        
+            $model =  new Articulo();
+            
+            $model->attributes = get_object_vars($objectModel);
+            }else{
+                
+              $model = null;  
+            }
+            
+            if(  !$model || $dbModel->precio*1 !==  $model->precio*1)
+                $articles[$dbModel->sku] = ['dbmodel'=>$dbModel, 'model'=>$model];
+        }
+        
+        
+        if (Yii::$app->request->get('dashboard')!== null &&  Yii::$app->request->get('dashboard'))
+            return $this->renderPartial('_sync_phc',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
+            
+            return $this->renderPartial('_sync_phc_resume',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
+    }
+    
+    
     /**
      * Finds the Articulo model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

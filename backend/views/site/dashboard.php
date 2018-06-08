@@ -64,7 +64,7 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                 <div class="icon">
                                     <i class="ion ion-stats-bars"></i>
                                 </div>
-                                <a class="small-box-footer" href="#anchor_plan">
+                                <a class="small-box-footer" href="#anchor_supertienda">
                                  Ir  <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </div>
@@ -107,7 +107,7 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                     </div><!-- /.row -->
 
                     
-          <h4 class="page-header" id="anchor_comision">
+          <h4 class="page-header" id="anchor_supertienda">
          Articulos de SUPER TIENDA <small>almacenados en base de datos.</small> 
           
                        
@@ -217,7 +217,8 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
        			 						</div>
     									</div>
     									<div class="panel-footer">
-    										<?php echo Html::a('<i class="fa fa-refresh"></i> Actualizar', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
+    												
+           									<a href="#anchor_supertienda" class="btn btn-primary" id="syncrequest">Actualizar </a>
            								</div>
            							</div>
            							</div>
@@ -308,6 +309,217 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
 
                         </div>
                     </div>
+                    
+                    
+                    
+        <h4 class="page-header" id="anchor_ml">
+			
+		<i class="fa fa-truck"></i>	Mercado Libre <small>Almacen de datos, online y comparador.</small> 
+          
+                       
+          </h4>          
+                    
+               <div class="row">
+               
+               
+                    
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                            <!-- Custom Tabs (Pulled to the right) -->
+                            <div class="nav-tabs-custom">
+                                <ul class="nav nav-tabs pull-right">
+                              		<?php $i=1;?>      
+                              
+                              		<li><a data-toggle="tab" href="#tab_sync">ML HUB - ML Online</a></li>
+                                
+                              		<li><a data-toggle="tab" href="#tab_sync"><i class="fa fa-exchange"></i>  MercadoLibre HUB - SuperTienda HUB</a></li>
+                                    <li><a data-toggle="tab" href="#tab_sync"><i class="fa fa-cloud"></i>  MercadoLibre Online</a></li>
+                              	
+                                    <li class="active"><a data-toggle="tab" href="#tab_super_tienda"><i class="fa fa-database"> </i> MercadoLibre HUB</a></li>
+                                    
+                                  
+                                    <li class="pull-left header"><i class="fa fa-truck"></i> MercadoLibre HUB</li>
+                                </ul>
+                                <div class="tab-content">
+                                  
+                                    <div id="tab_super_tienda" class="tab-pane active">
+                                        
+                                      
+
+                                            <?php echo GridView::widget([
+                                                'dataProvider' => $dataProviderML,
+                                                'filterModel' => $searchModelML,
+                                                
+                                                
+                                                'columns' => [
+                                        
+                                                    'sku',
+                                                    'id_meli',
+                                                    [
+                                                        'attribute'=>'precio',
+                                                        'content'=>function($data){
+                                                            return   Yii::$app->formatter->asCurrency($data->precio);
+                                                        }
+                                                        ],
+                                                    
+                                                    'marca',
+                                                        
+                                                    
+                                                    
+                                        
+                                                    ['class' => 'yii\grid\ActionColumn',
+                                                        'options'=>['class'=>'skip-export']
+                                                    ],
+                                                    
+                                                ],
+                                                'toolbar' =>  [
+                                                    ['content'=>
+                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
+                                                    ],
+                                                    '{export}',
+                                                    '{toggleData}'
+                                                ],
+                                                
+                                              
+                                                'beforeHeader'=>[
+                                                    [
+                                                        'columns'=>[
+                                                            ['content'=>'Precios de la ultima imagen tomada', 'options'=>['colspan'=>3, 'class'=>'text text-left']],
+                                                            ['content'=>Yii::$app->formatter->asDate(date('Y-m-d')), 'options'=>['colspan'=>2, 'class'=>'text-center']],
+                                                        ],
+                                                      //  'options'=>['class'=>'skip-export'] // remove this row from export
+                                                    ]
+                                                ],
+                                                
+                                                
+                                                
+                                                'pjax' => true,
+                                                'bordered' => true,
+                                                'striped' => true,
+                                                'condensed' => true,
+                                                'responsive' => true,
+                                                'hover' => true,
+                                                'floatHeader' => true,
+                                                'floatHeaderOptions' => ['scrollingTop' => true],
+                                                'panel' => [
+                                                    'type' => GridView::TYPE_PRIMARY
+                                                ],
+                                            ]); ?>
+                                            
+                                    
+                                    <p class="text-right">
+                                    <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda" data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
+						             </button>
+                                    <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['comision-mixta-cap/dashboard','id'=>1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
+                                    </p>   
+                                     </div><!-- /.tab-pane -->
+                                     
+                                <div id="tab_sync" class="tab-pane">
+								
+    								<div class="row">
+    								<div class="col-md-12">
+    								<div class="panel">	
+    									<div class="panel-body">
+    									<div  id="phcMayoristaSync">
+    			
+    										<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
+    		
+       			 						</div>
+    									</div>
+    									<div class="panel-footer">
+    												
+           									<a href="#anchor_supertienda" class="btn btn-primary" id="syncrequest">Actualizar </a>
+           								</div>
+           							</div>
+           							</div>
+    								</div>
+    									                                
+                            	 </div>
+                                     
+                                   </div><!-- /.tab-content -->
+                            </div><!-- nav-tabs-custom -->
+                        </div>
+                        
+                        
+                        
+                     <div class="col-md-6 col-xs-12 col-sm-12">
+                            <!-- AREA CHART -->
+                            <div class="box box-primary">
+                                <div class="box-header">
+                                   <i class="glyphicon glyphicon-copyright-mark"></i>
+                                    <h3 class="box-title">Comparativa de las comisiones en la organización</h3>
+                                     <div class="box-tools pull-right">
+            <button title="ocultar/mostrar" data-toggle="tooltip" data-widget="collapse" class="btn btn-default btn-xs" data-original-title="Collapse"><i class="fa fa-minus"></i></button>
+            <button title="" data-toggle="tooltip" data-widget="remove" class="btn btn-default btn-xs" data-original-title="Remove"><i class="fa fa-times"></i></button>
+          </div>
+                                </div>
+                                <div class="box-body">
+                                <?php 
+                                
+                                $categories =['test','test2'];
+                                $establecimientos =[2,6];
+                                $integrantes = [30,10];
+                                
+                             
+                                
+                              echo Highcharts::widget([
+    'scripts' => [
+        'modules/exporting',
+        'themes/grid-light',
+    ],
+    'options' => [
+        'title' => [
+            'text' => 'Comisiones dentro de la organización',
+        ],
+        'xAxis' => [
+            'categories' =>$categories,
+        ],
+        
+        'series' => [
+           
+            [
+                'type' => 'column',
+                'name' => 'No. establecimientos',
+                'data' => $establecimientos
+            ],
+            [
+                'type' => 'column',
+                'name' => 'No. integrantes',
+                'data' => $integrantes
+            ],
+            [
+                'type' => 'spline',
+                'name' => 'Promedio establecimientos',
+                'data' => $establecimientos,
+                'marker' => [
+                    'lineWidth' => 2,
+                    'lineColor' => new JsExpression('Highcharts.getOptions().colors[3]'),
+                    'fillColor' => 'white',
+                ],
+            ],
+				[
+				'type' => 'spline',
+				'name' => 'Promedio integrantes',
+				'data' => $integrantes,
+				'marker' => [
+				'lineWidth' => 2,
+				'lineColor' => new JsExpression('Highcharts.getOptions().colors[2]'),
+				'fillColor' => 'white',
+				],
+				],
+           
+        ],
+    ]
+]);
+                                   ?>
+                                </div><!-- /.box-body -->
+                            </div><!-- /.box -->
+
+                 
+
+                        </div>
+                    </div>
+
+   
                     
   <h4 class="page-header" id="anchor_plan">
         Planes y programas <small>de capacitación, adiestramiento y productividad</small> 
@@ -592,9 +804,7 @@ data: {
 
 $('#syncrequest').click(function() {
 
-    doAjax("/articulo-mayorista/sync-phc-resume?dashboard=true");
-
-
+    doAjax("/articulo/sync-phc-resume?dashboard=true");
 
 });
 
@@ -602,7 +812,7 @@ $('#syncrequest').click(function() {
 
 function doAjax(filterUrl) {
 
-$('#phcMayoristaSync').html("<img src='img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>");    
+$('#phcMayoristaSync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>");    
 
 $.ajax({
 type: "GET",
@@ -616,31 +826,30 @@ data: {
 
              var totalChanges = $('#totalChanges').val();
 
-             $('#globalStatus').html((totalChanges>0)?'No sincronizado':'Sincronizado');
 
              $('#comparegrid').DataTable({
-                'scrollX': true,
+                
                     });
 
               
                $('#sync_success').click(function() {
 
 
-                    doAjax("/articulo-mayorista/sync-phc-resume?filter=success&dashboard=true");
+                    doAjax("/articulo/sync-phc-resume?filter=success&dashboard=true");
                     
                 });
 
                 $('#sync_info').click(function() {
                     
 
-                    doAjax("/articulo-mayorista/sync-phc-resume?filter=info&dashboard=true");
+                    doAjax("/articulo/sync-phc-resume?filter=info&dashboard=true");
                     
                 });
 
 
                 $('#sync_warning').click(function() {
 
-                    doAjax("/articulo-mayorista/sync-phc-resume?filter=warning&dashboard=true");
+                    doAjax("/articulo/sync-phc-resume?filter=warning&dashboard=true");
 
                     
                 });
@@ -648,7 +857,7 @@ data: {
 
                 $('#sync_all').click(function() {
                     
-                                            doAjax("/articulo-mayorista/sync-phc-resume?dashboard=true");
+                                            doAjax("/articulo/sync-phc-resume?dashboard=true");
                 
                                             
                  });
