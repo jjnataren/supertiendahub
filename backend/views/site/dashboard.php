@@ -93,15 +93,8 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                             <!-- small box -->
                             <div class="small-box bg-light-blue">
                                 <div class="inner">
-                                    <h3>
-                                    <i class="fa fa-sellsy"></i>
-                                    
-                                    7             
-                                      
-                                    </h3>
-                                    <p>
-                                        Cambios en PrestaShop
-                                    </p>
+                                    <h3> <i class="fa fa-sellsy"></i>  7 </h3>
+                                    <p>Cambios en PrestaShop</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-person-add"></i>
@@ -120,7 +113,10 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                        
           </h4>          
                     
-               <div class="row">     
+               <div class="row">
+               
+               
+                    
                 <div class="col-md-12 col-sm-12 col-xs-12">
                             <!-- Custom Tabs (Pulled to the right) -->
                             <div class="nav-tabs-custom">
@@ -136,7 +132,7 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                 </ul>
                                 <div class="tab-content">
                                   
-                                    <div id="#tab_super_tienda" class="tab-pane active">
+                                    <div id="tab_super_tienda" class="tab-pane active">
                                         
                                       
 
@@ -208,20 +204,26 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                     </p>   
                                      </div><!-- /.tab-pane -->
                                      
-                                        <div id="#tab_sync" class="tab-pane">
-                                        
-                                        
-                                    			
-                                    				<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
-                                    		
-                                       	
-                                        	
-                                        	<div>
-                                        	 
-       										 <?php echo Html::a('<i class="fa fa-refresh"></i> Actualizar', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
-       			
-       										</div>
-                                        </div>
+                                <div id="tab_sync" class="tab-pane">
+								
+    								<div class="row">
+    								<div class="col-md-12">
+    								<div class="panel">	
+    									<div class="panel-body">
+    									<div  id="phcMayoristaSync">
+    			
+    										<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
+    		
+       			 						</div>
+    									</div>
+    									<div class="panel-footer">
+    										<?php echo Html::a('<i class="fa fa-refresh"></i> Actualizar', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
+           								</div>
+           							</div>
+           							</div>
+    								</div>
+    									                                
+                            	 </div>
                                      
                                    </div><!-- /.tab-content -->
                             </div><!-- nav-tabs-custom -->
@@ -590,7 +592,7 @@ data: {
 
 $('#syncrequest').click(function() {
 
-    doAjax("/articulo-mayorista/sync-phc-resume");
+    doAjax("/articulo-mayorista/sync-phc-resume?dashboard=true");
 
 
 
@@ -624,21 +626,21 @@ data: {
                $('#sync_success').click(function() {
 
 
-                    doAjax("/articulo-mayorista/sync-phc-resume?filter=success");
+                    doAjax("/articulo-mayorista/sync-phc-resume?filter=success&dashboard=true");
                     
                 });
 
                 $('#sync_info').click(function() {
                     
 
-                    doAjax("/articulo-mayorista/sync-phc-resume?filter=info");
+                    doAjax("/articulo-mayorista/sync-phc-resume?filter=info&dashboard=true");
                     
                 });
 
 
                 $('#sync_warning').click(function() {
 
-                    doAjax("/articulo-mayorista/sync-phc-resume?filter=warning");
+                    doAjax("/articulo-mayorista/sync-phc-resume?filter=warning&dashboard=true");
 
                     
                 });
@@ -646,7 +648,7 @@ data: {
 
                 $('#sync_all').click(function() {
                     
-                                            doAjax("/articulo-mayorista/sync-phc-resume");
+                                            doAjax("/articulo-mayorista/sync-phc-resume?dashboard=true");
                 
                                             
                  });

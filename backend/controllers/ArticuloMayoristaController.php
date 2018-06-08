@@ -81,7 +81,6 @@ class ArticuloMayoristaController extends Controller
         //TODO: Build a common SOAP Client for PHC .
         //TODO: Get soap body params by environment vars .
         $wsdl = "http://localhost:8088/servidor.php?wsdl";
-        $params = "<cliente>50527</cliente><llave>487478</llave>";
         $client = new \SoapClient($wsdl);
         $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
         //TODO: Optimize search proccess 
@@ -128,8 +127,17 @@ class ArticuloMayoristaController extends Controller
         }
         
         
+        if (Yii::$app->request->get('dashboard')!== null &&  Yii::$app->request->get('dashboard'))
+            return $this->renderPartial('_sync_phc',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
+        
         return $this->renderPartial('_sync_phc_resume',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
     }
+    
+    
+    
+    
+    
+    
     
     
     /**
