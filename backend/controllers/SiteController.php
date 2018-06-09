@@ -6,6 +6,7 @@ use common\components\keyStorage\FormModel;
 use Yii;
 use backend\models\search\ArticuloSearch;
 use backend\models\Search\ArticuloMeliSearch;
+use backend\models\Search\ArticuloPrestashopSearch;
 
 /**
  * Site controller
@@ -41,11 +42,16 @@ class SiteController extends \yii\web\Controller
         $dataProviderML = $searchModelML->search(Yii::$app->request->queryParams);
           
         
+        $searchModelPS = new ArticuloPrestashopSearch();
+        $dataProviderPS = $searchModelPS->search(Yii::$app->request->queryParams);
+        
         return $this->render('dashboard', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'searchModelML' => $searchModelML,
-            'dataProviderML' => $dataProviderML
+            'dataProviderML' => $dataProviderML,
+            'searchModelPS' => $searchModelPS,
+            'dataProviderPS' => $dataProviderPS
         ]);
     }
 
