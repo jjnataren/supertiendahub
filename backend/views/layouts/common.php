@@ -12,145 +12,9 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\log\Logger;
 use yii\widgets\Breadcrumbs;
-use backend\models\Taller;
-use backend\models\Categoria;
-use backend\models\TallerImp;
 
 $bundle = BackendAsset::register($this);
-
 $currentUrl =  Yii::$app->request->url ;
-$talleres   = Taller::findAll(['disponible'=>1]);
-
-$categorias   = Categoria::findAll(['disponible'=>1]);
-
-/*['label' => Yii::t('backend', 'Piano'),
-'url' => ['/taller'],
-'icon' => '<i class="fa fa-angle-double-right"></i>',
-'active' => (\Yii::$app->controller->id == 'widget-carousel'),
-'items' => [
-		['label' => 'Cuotas', 'url' => ['/i18n/i18n-source-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-		['label' => 'Instancias', 'url' => ['/i18n/i18n-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-message')],
-		['label' => 'Editar', 'url' => ['/i18n/i18n-source-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-]
-],*/
-
-
-/*
- *
- * ['label'=>Yii::t('backend', 'Crear'), 'url'=>['/taller/create'], 'icon'=>'<i class="fa fa-angle-double-right"></i>'],
-                				['label'=>Yii::t('backend', 'Ver totos'), 'url'=>['/taller'], 'icon'=>'<i class="fa fa-angle-double-right"></i>'],
-                		
- * tedtsss
-*/
-
-
-$menuCategorias  =  []; 
-
-
-$menuTalleres = [];
-
-$i= 0;
-	$menuTalleres[$i]['label'] = 'Crear';
-	$menuTalleres[$i]['url'] = ['/taller/create'];
-	$menuTalleres[$i]['icon'] = '<i class="fa fa-angle-double-right"></i>';
-	$menuTalleres[$i++]['active'] = strpos(   $currentUrl   , 'taller/create');
-	
-	
-	$menuTalleres[$i]['label'] = 'Ver todos';
-	$menuTalleres[$i]['url'] = ['/taller/index'];
-	$menuTalleres[$i]['icon'] = '<i class="fa fa-angle-double-right"></i>';
-	$menuTalleres[$i++]['active'] = strpos(   $currentUrl   , 'taller/index'); 
-	
-	foreach ($categorias as $cate){
-	    
-	    $tallerItems = [];
-	    $j = 0;
-	    foreach ($cate->tallers as $tallerItem){
-	        
-	        $tallerItems[$j]['label'] = $tallerItem->nombre;
-	        $tallerItems[$j]['url'] = '/taller/dashboard?id='.$tallerItem->id;
-	        $tallerItems[$j]['icon'] = '<i class="fa fa-video-camera"></i>';
-	        $val =   ($currentUrl == '/taller/dashboard?id='.$tallerItem->id)  || ($currentUrl=='/taller/implement?id='.$tallerItem->id) ;
-	        
-	        if (strpos($currentUrl, 'taller-imp/dashboard?id=') && isset($_REQUEST['id'])){
-	            
-	               $modelTallerImp = TallerImp::findOne($_REQUEST['id']);
-	               
-	               $val = ($modelTallerImp->id_curso_base === $tallerItem->id);
-	        }
-	        
-	        
-	        $tallerItems[$j]['active'] = $val;
-	        $j++;
-	        
-	    }
-	    
-	    $menuTalleres[$i]['label'] = $cate->nombre;
-	    $menuTalleres[$i]['url'] = '#';
-	    $menuTalleres[$i]['icon'] = '<i class="fa fa-sitemap"></i>';
-	    
-	    $menuTalleres[$i++]['items'] = $tallerItems;
-	    
-	}
-
-
-/*foreach ($talleres as $taller){
-    
-    $talleresImp = TallerImp::findBySql('select * from tbl_taller_imp where id_curso_base = '.$taller->id.' and  disponible = 1 and estatus ='.Comun::$TALLER_ESTATUS_IMPARTIENDO)->all();
-    $j = 0;
-    $menuTalleresImp = [];
-    
-    foreach ($talleresImp as $imp) {
-        
-        $menuTalleresImp[$j]['label'] = $imp->id;
-        $menuTalleresImp[$j]['url'] = '/taller-imp/view?id='.$imp->id;
-        $menuTalleresImp[$j]['icon'] = '<i class="fa fa-video-camera"></i>';
-        $menuTalleresImp[$j]['active'] = (\Yii::$app->controller->id == 'widget-carousel');
-        $menuTalleresImp[$j++]['items'] =  [    
-                                                ['label' => 'Ver', 'url' => ['/taller-imp/view','id'=>$imp->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-                                                ['label' => 'Pagos', 'url' => ['/taller-imp/pagos','id'=>$imp->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-                                                ['label' => 'Editar', 'url' => ['/taller-imp/update','id'=>$imp->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-                                                ['label' => 'Cuotas', 'url' => ['/taller-imp/cuota','id'=>$imp->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-                                                ['label' => 'Horarios', 'url' => ['/taller-imp/horario','id'=>$imp->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-                                                ['label' => 'Alumnos', 'url' => ['/taller-imp/alumnos','id'=>$imp->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')]
-                                           ];
-        
-    }
-	
-    
-    $menuTalleresItems = [];
-    $menuTalleresItems[] = ['label' => 'Inicio', 'url' => ['/taller/view','id'=>$taller->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')];
-    //$menuTalleresItems[] = ['label' => 'Editar', 'url' => ['/taller/update','id'=>$taller->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')];
-    //$menuTalleresItems[] = ['label' => 'Cuotas', 'url' => ['/taller/cuota','id'=>$taller->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')];
-    //$menuTalleresItems[] = ['label' => 'Impartir', 'url' => ['/taller/implement','id'=>$taller->id], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-message')];
-    
-    
-    if (count($menuTalleresImp)){
-        $tallerImpMenu = [];
-        $tallerImpMenu['label'] = 'Impartiendo';
-        $tallerImpMenu['url'] = ['/taller/index-imp','id'=>$taller->id];
-        $tallerImpMenu['icon'] = '<i class="fa fa-angle-double-right"></i>';
-        $tallerImpMenu['active'] =  (\Yii::$app->controller->id == 'i18n-message');
-        $tallerImpMenu['items'] =  $menuTalleresImp;
-        
-        
-        $menuTalleresItems[] =  $tallerImpMenu;
-    } 
-    
-     
-    
-	$menuTalleres[$i]['label'] = $taller->nombre;
-	$menuTalleres[$i]['url'] = '/taller/update?id='.$taller->id;
-	$menuTalleres[$i]['icon'] = '<i class="fa fa-angle-double-right"></i>';
-	$menuTalleres[$i]['active'] = (\Yii::$app->controller->id == 'widget-carousel');
-	$menuTalleres[$i++]['items'] = $menuTalleresItems;
-	
-	
-}*/
-
-
-
-
 ?>
 <?php $this->beginContent('@backend/views/layouts/base.php'); ?>
 <div class="wrapper">
@@ -339,7 +203,7 @@ $i= 0;
                             'url' => '#',
                             'icon'=>'<i class="fa fa-amazon"></i>',
                             'options'=>['class'=>'treeview'],
-                            'items'=>$menuTalleres,
+                           
                         ],
                     
                   
