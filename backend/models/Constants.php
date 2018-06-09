@@ -2,7 +2,7 @@
 
 namespace backend\models;
 
-class Comun{
+class Constants{
     
     
     public static $TALLER_ESTATUS_LISTO = 1;

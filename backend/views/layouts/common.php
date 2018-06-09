@@ -342,22 +342,7 @@ $i= 0;
                             'items'=>$menuTalleres,
                         ],
                     
-                    [
-                        'label' => Yii::t('backend', 'Fluctuación'),
-                        'url' => '#',
-                        'icon' => '<i class="fa fa-balance-scale"></i>',
-
-                        'options' => ['class' => 'treeview'],                        
-                        'items' => [
-                            ['label' => Yii::t('backend', 'Talleres'), 
-                                'url' => ['/pago-taller-cuota/index'], 
-                                'icon' => '<i class="fa fa-angle-double-right"></i>', 
-                                'active' => strpos(   $currentUrl   , 'pago-taller-cuota/index')],
-                            ['label' => Yii::t('backend', 'Renta aulas'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'article')],
-                            ]
-                        
-                    ],
-                    
+                  
                     
                     [
                         'label' => Yii::t('backend', 'Content'),
