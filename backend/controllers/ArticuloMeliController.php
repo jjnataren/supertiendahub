@@ -31,6 +31,58 @@ class ArticuloMeliController extends Controller
         ];
     }
 
+    
+    
+    /**
+     * Lists all ML Items throught partial render view
+     * @return \yii\db\ActiveRecord[]|array[]|NULL[]
+     */
+    public function actionGetItemsView()
+    {
+        
+        $client = new MeliOAuth2Client();
+        $client->clientSecret = 'xajs1DIwU0qviWiR5qtujz10Mc3XVST4';
+        $client->clientId = '1018511717969029';
+        $client->tokenUrl = 'https://api.mercadolibre.com/oauth/token';
+        $client->apiBaseUrl = 'https://api.mercadolibre.com/';
+        $client->userId = '215058471';
+        
+        $client->authenticateClient();
+        
+        $articles = ArticuloMayorista::find()->all();
+        
+        $meli = array();
+        
+        $items = [];
+      
+            try
+            {
+                $url = 'users/215058471/items/search';
+                $articlesMeli = $client->get($url)->getData()['results'];
+                
+                                
+                foreach ($articlesMeli as $key=>$value ){
+                    
+                    $url = 'items/'.$value;
+                    
+                    $items[$value] = $client->get($url)->getData();
+                    
+                }
+                    
+                
+                
+                
+                
+            } catch (\Exception $e) {
+            }
+        
+            
+            
+            return $this->renderPartial('_get_items_view',['items'=> $items]);
+            
+    }
+    
+    
     public function actionSynchronize()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

@@ -13,13 +13,9 @@ $this->registerJs("$('#help2').popover('hide');", View::POS_END, 'my-options2');
 
 Yii::$app->formatter->locale = 'es-MX';
 
-
 $this->params['subtitle'] = '';
 
-$this->params['titleIcon'] = '
-  								<i class="fa fa-mixcloud fa-2x"></i>
-							  ';
-$this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json' }});", View::POS_END, 'my-options');
+$this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
 
 
 ?>
@@ -138,9 +134,7 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                                 'dataProvider' => $dataProvider,
                                                 'filterModel' => $searchModel,
                                                 
-                                                
                                                 'columns' => [
-                                        
                                                     'sku',
                                                     'descripcion',
                                                     [
@@ -152,8 +146,6 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                                     
                                                     'marca',
                                                         
-                                                    
-                                                    
                                         
                                                     ['class' => 'yii\grid\ActionColumn',
                                                         'options'=>['class'=>'skip-export']
@@ -162,13 +154,12 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
-                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
+                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>'Reiniciar grid'])
                                                     ],
                                                     '{export}',
                                                     '{toggleData}'
                                                 ],
                                                 
-                                              
                                                 'beforeHeader'=>[
                                                     [
                                                         'columns'=>[
@@ -250,21 +241,20 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                             <!-- Custom Tabs (Pulled to the right) -->
                             <div class="nav-tabs-custom">
                                 <ul class="nav nav-tabs pull-right">
-                              		<?php $i=1;?>      
                               
-                              		<li><a data-toggle="tab" href="#tab_sync">ML HUB - ML Online</a></li>
+                              		<li><a data-toggle="tab" href="#tab_ml_sync_comp_hub">ML HUB - ML Online</a></li>
                                 
-                              		<li><a data-toggle="tab" href="#tab_sync"><i class="fa fa-exchange"></i>  MercadoLibre HUB - SuperTienda HUB</a></li>
-                                    <li><a data-toggle="tab" href="#tab_sync"><i class="fa fa-cloud"></i>  MercadoLibre Online</a></li>
+                              		<li><a data-toggle="tab" href="#tab_ml_sync_comp"><i class="fa fa-exchange"></i>  MercadoLibre HUB - SuperTienda HUB</a></li>
+                                    <li><a data-toggle="tab" href="#tab_ml_request"><i class="fa fa-cloud"></i>  MercadoLibre Online</a></li>
                               	
-                                    <li class="active"><a data-toggle="tab" href="#tab_super_tienda"><i class="fa fa-database"> </i> MercadoLibre HUB</a></li>
+                                    <li class="active"><a data-toggle="tab" href="#tab_mercado_libre"><i class="fa fa-database"> </i> MercadoLibre HUB</a></li>
                                     
                                   
                                     <li class="pull-left header"><i class="fa fa-truck"></i> MercadoLibre HUB</li>
                                 </ul>
                                 <div class="tab-content">
                                   
-                                    <div id="tab_super_tienda" class="tab-pane active">
+                                    <div id="tab_mercado_libre" class="tab-pane active">
                                         
                                       
 
@@ -276,7 +266,7 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                                 'columns' => [
                                         
                                                     'sku',
-                                                    'id_meli',
+                                                    'id',
                                                     [
                                                         'attribute'=>'precio',
                                                         'content'=>function($data){
@@ -296,7 +286,7 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
-                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
+                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>'Reiniciar grid'])
                                                     ],
                                                     '{export}',
                                                     '{toggleData}'
@@ -336,21 +326,21 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                     </p>   
                                      </div><!-- /.tab-pane -->
                                      
-                                <div id="tab_sync" class="tab-pane">
+                                <div id="tab_ml_request" class="tab-pane">
 								
     								<div class="row">
     								<div class="col-md-12">
     								<div class="panel">	
     									<div class="panel-body">
-    									<div  id="phcMayoristaSync">
+    									<div  id="ml_sync">
     			
-    										<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
+    										<img src="/img/loading.gif" /> <p class="text text-info">Consultando Mercado libre ....</p>
     		
        			 						</div>
     									</div>
     									<div class="panel-footer">
     												
-           									<a href="#anchor_supertienda" class="btn btn-primary" id="syncrequest">Actualizar </a>
+           									<a href="#anchor_ml" class="btn btn-primary" id="ml_syncrequest"><i class="fa fa-refresh"></i>Actualizar </a>
            								</div>
            							</div>
            							</div>
@@ -431,7 +421,7 @@ $this->registerJs("$('#dataTable1').dataTable( {'language': {'url': '//cdn.datat
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
-                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
+                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>'Reiniciar grid'])
                                                     ],
                                                     '{export}',
                                                     '{toggleData}'
@@ -661,13 +651,54 @@ data: {
 
 $('#syncrequest').click(function() {
 
-    doAjax("/articulo/sync-phc-resume?dashboard=true");
+	doAjaxPHC("/articulo/sync-phc-resume?dashboard=true");
+
+});
+
+$('#ml_syncrequest').click(function() {
+
+    doAjaxML("/articulo-meli/get-items-view");
 
 });
 
 
 
-function doAjax(filterUrl) {
+function doAjaxML(filterUrl) {
+
+	$('#ml_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio Mercado Libre ....</p>");    
+
+	$.ajax({
+	type: "GET",
+	url: filterUrl,
+	data: {
+
+	}, success: function(result) {
+
+
+	             $('#ml_sync').html(result);
+
+	               $('#ml_data_grid').DataTable({
+	                'scrollX': false,
+	                'language': {
+	                            'lengthMenu': 'Display _MENU_ records per page',
+	                            'zeroRecords': 'Nothing found - sorry',
+	                            'info': 'Showing page _PAGE_ of _PAGES_',
+	                            'infoEmpty': 'No records available',
+	                            'infoFiltered': '(filtered from _MAX_ total records)'
+	                        }
+	                    });
+
+
+	}, error: function(result) {
+
+	     $('#ml_sync').html('Ha ocurrido un error intente mas tarde ...');
+
+	}
+	});
+	}
+
+
+function doAjaxPHC(filterUrl) {
 
 $('#phcMayoristaSync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>");    
 
@@ -732,6 +763,9 @@ data: {
 
 $( document ).ready(function() {
 	$('#syncrequest').trigger('click');
+	$('#ml_syncrequest').trigger('click');
+
+	
 });
 
 
