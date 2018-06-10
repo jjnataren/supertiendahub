@@ -6,7 +6,7 @@ use \kartik\datecontrol\Module;
 $config = [
     'homeUrl' => Yii::getAlias('@backendUrl'),
     'controllerNamespace' => 'backend\controllers',
-    'defaultRoute' => 'timeline-event/index',
+    'defaultRoute' => 'site/dashboard',
     'language' => 'es-MX',
     'controllerMap' => [
         'file-manager-elfinder' => [

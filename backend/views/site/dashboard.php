@@ -362,7 +362,7 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                     
 
                     
-                    <h4 class="page-header" id="anchor_ml">
+                    <h4 class="page-header" id="anchor_ps">
 			
 		<i class="fa fa-sellsy"></i>	PrestaShop <small>Almacen de datos, online y comparador.</small> 
           
@@ -379,19 +379,19 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                 <ul class="nav nav-tabs pull-right">
                               		<?php $i=1;?>      
                               
-                              		<li><a data-toggle="tab" href="#tab_sync">PrestaShop - PrestaShop Online</a></li>
+                              		<li><a data-toggle="tab" href="#tab_sync_ps_pson">PrestaShop - PrestaShop Online</a></li>
                                 
-                              		<li><a data-toggle="tab" href="#tab_sync"><i class="fa fa-exchange"></i>  PrestaShop HUB - SuperTienda HUB</a></li>
-                                    <li><a data-toggle="tab" href="#tab_sync"><i class="fa fa-cloud"></i>  PrestaShop Online</a></li>
+                              		<li><a data-toggle="tab" href="#tab_ps_sync_comp"><i class="fa fa-exchange"></i>  PrestaShop HUB - SuperTienda HUB</a></li>
+                                    <li><a data-toggle="tab" href="#tab_ps_request"><i class="fa fa-cloud"></i>  PrestaShop Online</a></li>
                               	
-                                    <li class="active"><a data-toggle="tab" href="#tab_super_tienda"><i class="fa fa-database"> </i> Prestashop HUB</a></li>
+                                    <li class="active"><a data-toggle="tab" href="#tab_ps_hub"><i class="fa fa-database"> </i> Prestashop HUB</a></li>
                                     
                                   
                                     <li class="pull-left header"><i class="fa fa-sellsy"></i> PrestaShop HUB</li>
                                 </ul>
                                 <div class="tab-content">
                                   
-                                    <div id="tab_super_tienda" class="tab-pane active">
+                                    <div id="tab_ps_hub" class="tab-pane active">
                                         
                                       
 
@@ -461,21 +461,21 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                     </p>   
                                      </div><!-- /.tab-pane -->
                                      
-                                <div id="tab_sync" class="tab-pane">
+                                <div id="tab_ps_request" class="tab-pane">
 								
     								<div class="row">
     								<div class="col-md-12">
     								<div class="panel">	
     									<div class="panel-body">
-    									<div  id="phcMayoristaSync">
+    									<div  id="ps_sync">
     			
-    										<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
+    										<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio ....</p>
     		
        			 						</div>
     									</div>
     									<div class="panel-footer">
     												
-           									<a href="#anchor_supertienda" class="btn btn-primary" id="syncrequest">Actualizar </a>
+           									<a href="#anchor_ps" class="btn btn-primary" id="ps_syncrequest">Actualizar </a>
            								</div>
            							</div>
            							</div>
@@ -618,35 +618,7 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
 <?php JSRegister::begin(); ?>
 <script>
 
-$('#soaprequest').click(function() {
 
-  $('#phcMayoristaArt').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>");
-
-$.ajax({
-type: 'POST',
-url: '/articulo-mayorista/soap-req',
-data: {
-
-}, success: function(result) {
-
-             $('#phcMayoristaArt').html(result);
-
-               $('#datagrid').DataTable({
-                'scrollX': true,
-                'language': {
-                            'lengthMenu': 'Display _MENU_ records per page',
-                            'zeroRecords': 'Nothing found - sorry',
-                            'info': 'Showing page _PAGE_ of _PAGES_',
-                            'infoEmpty': 'No records available',
-                            'infoFiltered': '(filtered from _MAX_ total records)'
-                        }
-                    });
-
-}, error: function(result) {
-     $('#phcMayoristaArt').html('Ha ocurrido un error intente mas tarde ...');
-}
-});
-});
 
 
 $('#syncrequest').click(function() {
@@ -661,6 +633,46 @@ $('#ml_syncrequest').click(function() {
 
 });
 
+$('#ps_syncrequest').click(function() {
+
+	doAjaxPS("/articulo-prestashop/get-items-view");
+
+});
+
+
+function doAjaxPS(filterUrl) {
+
+	$('#ps_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio en linea ....</p>");    
+
+	$.ajax({
+	type: "GET",
+	url: filterUrl,
+	data: {
+
+	}, success: function(result) {
+
+
+	             $('#ps_sync').html(result);
+
+	               $('#ps_data_grid').DataTable({
+	                'scrollX': false,
+	                'language': {
+	                            'lengthMenu': 'Display _MENU_ records per page',
+	                            'zeroRecords': 'Nothing found - sorry',
+	                            'info': 'Showing page _PAGE_ of _PAGES_',
+	                            'infoEmpty': 'No records available',
+	                            'infoFiltered': '(filtered from _MAX_ total records)'
+	                        }
+	                    });
+
+
+	}, error: function(result) {
+
+	     $('#ps_sync').html('Ha ocurrido un error intente mas tarde ...' + result);
+
+	}
+	});
+	}
 
 
 function doAjaxML(filterUrl) {
@@ -691,7 +703,7 @@ function doAjaxML(filterUrl) {
 
 	}, error: function(result) {
 
-	     $('#ml_sync').html('Ha ocurrido un error intente mas tarde ...');
+	     $('#ml_sync').html('Ha ocurrido un error intente mas tarde ...'  + result);
 
 	}
 	});
@@ -764,7 +776,8 @@ data: {
 $( document ).ready(function() {
 	$('#syncrequest').trigger('click');
 	$('#ml_syncrequest').trigger('click');
-
+	$('#ps_syncrequest').trigger('click');
+	
 	
 });
 

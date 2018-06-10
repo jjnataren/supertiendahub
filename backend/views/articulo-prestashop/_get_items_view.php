@@ -2,38 +2,37 @@
 
 
 
+
 Yii::$app->formatter->locale = 'es-MX';
 
 if ($items): ?>
 			
 			
 		
-				<table class="table table-bordered" id="ml_data_grid" class="display compact" style="width:100%">
+				<table class="table table-bordered" id="ps_data_grid" class="display compact">
 					<thead>
 						<tr>
-    						<th colspan="6>">#Total Articulos <?=count($items)?></th>
+    						<th colspan="6">#Total Articulos <?=count($items)?></th>
 						</tr>
 						<tr>
 							
 							<th>id</th>
-							<th>seller_custom_field</th>
-							<th>title</th>
+							<th>reference</th>
+							<th>name</th>
 							<th>price</th>
-							<th>thumbnail</th>
-							<th></th>
+							<th>quantity</th>
 					
 						</tr>
 					</thead>
 					<tbody>
 						<?php foreach($items as $articulo): ?>
 						<tr>
-						    
+						    <?php //TODO: take advantage of yii2 array helper?>
 							<td><?=isset($articulo['id'])?$articulo['id']:''?></td>
-							<td><?=isset($articulo['seller_custom_field'])?$articulo['seller_custom_field']:''?></td>
-							<td><?=isset($articulo['title'])?$articulo['title']:''?></td>
+							<td><?=(isset($articulo['reference']) && !is_array($articulo['reference']) ) ?$articulo['reference']:''?></td>
+							<td><?=isset($articulo['name']['language'][0])?$articulo['name']['language'][0]:''?></td>
 							<td><?=isset($articulo['price'])?$articulo['price']:''?></td>
-							<td><img src="<?=isset($articulo['thumbnail'])?$articulo['thumbnail']:''?>" ></img></td>
-							<td><a class="btn btn-info" target="_blank" href="<?=isset($articulo['permalink'])?$articulo['permalink']:''?>" ><i class="fa fa-arrow-circle-right"></i> Consultar</a></td>
+							<td><?=isset($articulo['quantity'])?$articulo['quantity']:''?></td>
 					
 						</tr>	
 					<?php endforeach;?>

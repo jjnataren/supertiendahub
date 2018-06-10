@@ -159,6 +159,41 @@ class ArticuloPrestashopController extends Controller
 
         return 'ok';
     }
+    
+    
+    
+    /**
+     * Lists all PS Items throught partial render view
+     * @return \yii\db\ActiveRecord[]|array[]|NULL[]
+     */
+    public function actionGetItemsView()
+    {
+       
+        
+                //TODO: Must get  api-base and token  by keystorage  vars 
+                $client = new PrestashopClient('http://sevende.tv/Tienda16/prestashop', '5V9BYMW9JKEC67C6TVVTM7DGACFMJBZZ');
+                
+                    
+                try {
+                   
+                    $xml = $client->get(['resource' => 'products',
+                                         'display'  => '[id,name, description,reference,price,quantity]'
+                                        ]);
+                    
+                    $items =  json_decode(  json_encode((array)$xml)
+                                            , TRUE)
+                                            ['products']['product'];
+                              
+                } catch (PrestaShopWebserviceException $e) {
+                    throw $e;
+                }
+            
+        
+        
+                return $this->renderPartial('_get_items_view',['items'=> $items]);
+    }
+    
+    
 
     /**
      * Lists all ArticuloPrestashop models.

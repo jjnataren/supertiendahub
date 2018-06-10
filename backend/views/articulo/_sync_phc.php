@@ -42,7 +42,7 @@ $changes=[];
     						     <td><?= isset($item['model']->descripcion)?$item['model']->descripcion:'' ?></td>
     						     <td><i class="fa <?=( ($art_status == 'info')?'fa-opencart': ( ($art_status=='warning')?'fa-level-down':'fa-level-up' )  )?>"></i> </td>
     						     <td><?= Yii::$app->formatter->asCurrency(isset($item['dbmodel']->precio)?$item['dbmodel']->precio:''  )?></td>
-    						     <td><?= Yii::$app->formatter->asCurrency( !strcmp($item['model']->moneda, 'USD') ?  ( isset($item['model']->precio)?$item['model']->precio:0)  * $paridad  : $item['model']->precio)?></td>
+    						     <td><?= Yii::$app->formatter->asCurrency(( isset($item['model']->precio) &&  isset($item['model']->moneda) && !strcmp($item['model']->moneda, 'USD') )  ?  ( isset($item['model']->precio)?$item['model']->precio:0)  * $paridad  : 0)?></td>
     						     <!-- TODO: Asignar el valod de moneda en variable global -->
     						     <td><?= isset($item['model']->moneda)?$item['model']->moneda:'' ?> &nbsp; 
     						     <?=  (isset($item['model']->moneda) && !strcmp($item['model']->moneda, 'USD') )? Yii::$app->formatter->asCurrency( $item['model']->precio ):''?>  </td>
