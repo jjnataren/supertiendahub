@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use yii\web\View;
 use kartik\grid\GridView;
@@ -27,11 +27,11 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                 <div class="inner">
                                     <h3>
                                       <i class="fa fa-money"></i>
-                                       <label id="label_paridad"></label> 
-                                       <label id="label_paridad_estatus"></label> 
+                                       <label id="label_paridad"></label>
+                                       <label id="label_paridad_estatus"></label>
                                     </h3>
                                     <p>
-                                                                     
+
                                        Paridad dolar PHC mayoristas
                                     </p>
                                 </div>
@@ -53,7 +53,7 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                     </h3>
                                     <p>
                                         Cambios en articulos PHC
-                                        
+
                                     </p>
                                 </div>
                                 <div class="icon">
@@ -101,46 +101,44 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                         </div><!-- ./col -->
                     </div><!-- /.row -->
 
-                    
+
           <h4 class="page-header" id="anchor_supertienda">
-         Articulos de SUPER TIENDA <small>almacenados en base de datos.</small> 
-          
-                       
-          </h4>          
-                    
+         Articulos de SUPER TIENDA <small>almacenados en base de datos.</small>
+
+
+          </h4>
+
                <div class="row">
-               
-               
-                    
+
+
+
                 <div class="col-md-12 col-sm-12 col-xs-12">
                             <!-- Custom Tabs (Pulled to the right) -->
                             <div class="nav-tabs-custom">
                                 <ul class="nav nav-tabs pull-right">
-                              		<?php $i=1;?>      
-                              
-                              
+
+
                               		<li><a data-toggle="tab" href="#tab_sync">SUPER TIENDA - PHC</a></li>
                                     <li class="active"><a data-toggle="tab" href="#tab_super_tienda">SUPER TIENDA</a></li>
-                                    
-                                  
+
+
                                     <li class="pull-left header"><i class="fa fa-mixcloud"></i> SUPER TIENDA HUB</li>
                                 </ul>
                                 <div class="tab-content">
-                                  
-                                    <div id="tab_super_tienda" class="tab-pane active">
-                                        
-                                      
 
-                                            <?php echo GridView::widget([
+                                    <div id="tab_super_tienda" class="tab-pane active">
+
+
+   										 <?php echo GridView::widget([
                                                 'dataProvider' => $dataProvider,
                                                 'filterModel' => $searchModel,
-                                                
+
                                                 'columns' => [
                                                     'sku',
                                                     'descripcion',
-                                                       
-                                                  
-                                                    
+
+
+
                                                     [
                                                         'attribute'=>'precio',
                                                         'mergeHeader' => true,
@@ -155,60 +153,96 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                         return   $data->moneda;
                                                         }
                                                      ],
-                                                    
+
+                                                     [
+                                                         'attribute'=>'tipo_utilidad_ml',
+                                                         'mergeHeader' => true,
+                                                         'content'=>function($data){
+
+                                                         return   ($data->tipo_utilidad_ml == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ml == 2)?'monto': null) ;
+
+                                                         },
+
+                                                         'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
+                                                         'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
+
+                                                         ],
+
+
                                                         [
                                                         'attribute'=>'utilidad_ml',
+                                                            'format' => ['percent'],
                                                             'header'=>'util',
                                                             'mergeHeader' => true,
                                                         'content'=>function($data){
-                                                        return   Yii::$app->formatter->asPercent($data->utilidad_ml);
+
+                                                        return  ($data->tipo_utilidad_ml == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ml):  ( ($data->tipo_utilidad_ml == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ml): null) ;
+
                                                         },
                                                         'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
                                                         'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                                        
+
                                                         ],
-                                                        
-                                                        
+
+
                                                         [
+
                                                             'header'=>'publico',
                                                             'attribute'=>'utilidad_ml',
+
                                                             'mergeHeader' => true,
                                                             'content'=>function($data){
-                                                            return  Yii::$app->formatter->asCurrency ( ($data->precio*1) * (1.00 + $data->utilidad_ml  )   ) ;
+                                                                return Yii::$app->formatter->asCurrency (($data->precio*1) +  (($data->tipo_utilidad_ml == 1) ? ($data->precio * $data->utilidad_ml) : (($data->tipo_utilidad_ml == 2) ? $data->utilidad_ml : 0)));
                                                             },
                                                             'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
                                                             'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
                                                             ],
-                                                            
-                                                        
+
+
+
+                                                            [
+                                                                'attribute'=>'tipo_utilidad_ps',
+                                                                'mergeHeader' => true,
+
+
+                                                                'content'=>function($data){
+
+                                                                return   ($data->tipo_utilidad_ps == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ps == 2)?'Monto': null) ;
+
+                                                                },
+                                                                'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
+                                                                'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
+
+                                                                ],
+
                                                         [
                                                             'attribute'=>'utilidad_ps',
                                                             'header'=>'util',
                                                             'mergeHeader' => true,
                                                             'content'=>function($data){
-                                                            return   Yii::$app->formatter->asPercent($data->utilidad_ps);
+                                                            return  ($data->tipo_utilidad_ps == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ps):  ( ($data->tipo_utilidad_ps == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ps): null) ;
                                                             },
-                                                            
-                                                            
+
+
                                                             'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
                                                             'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                                            
-                                                            
+
+
                                                         ],
                                                             [
                                                                 'header'=>'publico',
                                                                 'attribute'=>'utilidad_ps',
                                                                 'mergeHeader' => true,
                                                                 'content'=>function($data){
-                                                                return  Yii::$app->formatter->asCurrency ( ($data->precio*1) * (1.00 + $data->utilidad_ps  )   ) ;
+                                                                return Yii::$app->formatter->asCurrency (($data->precio*1) +  (($data->tipo_utilidad_ps == 1) ? ($data->precio * $data->utilidad_ps) : (($data->tipo_utilidad_ps == 2) ? $data->utilidad_ps : 0)));
                                                                 },
                                                                 'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
                                                                 'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                                                
+
                                                                 ],
-                                                                
-                                                                
-                                                                
+
+
+
                                                                     [
                                                                     'attribute'=>'existencia',
                                                                     'header'=>'PHC',
@@ -217,6 +251,7 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                                     return        $data->existencia;
                                                                     }
                                                                     ],
+
                                                                     [
                                                                         'attribute'=>'existencia_ml',
                                                                         'header'=>'MLibre',
@@ -237,18 +272,18 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                                             'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
                                                                             'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
                                                                             ],
-                                                                
+
                                                                 [
                                                                     'header'=>'Tot',
                                                                     'mergeHeader' => true,
-                                                                    
+
                                                                     'content'=>function($data){
                                                                     return   $data->existencia + $data->existencia_ml  +$data->existencia_ps;
                                                                     }
                                                                     ],
-                                    
-                                                   
-                                                    
+
+
+
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
@@ -257,21 +292,21 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                     '{export}',
                                                     '{toggleData}'
                                                 ],
-                                                
-                                               
+
+
                                                 'beforeHeader'=>[
                                                     [
                                                         'columns'=>[
                                                             ['content'=>'<i class="fa fa-mixcloud"></i> Articulo', 'options'=>['colspan'=>4, 'class'=>'text text-center',]],
-                                                            ['content'=>'<i class="fa fa-truck"></i> Me Libre', 'options'=>['colspan'=>2, 'class'=>'text text-left','style' => 'border: 1px solid #FFF159']],
-                                                            ['content'=>'<i class="fa fa-sellsy"></i> PrestaShop', 'options'=>['colspan'=>2, 'class'=>'text text-left','style' => 'border: 1px solid #FF95C5']],
+                                                            ['content'=>'<i class="fa fa-truck"></i> Me Libre', 'options'=>['colspan'=>3, 'class'=>'text text-left','style' => 'border: 1px solid #FFF159']],
+                                                            ['content'=>'<i class="fa fa-sellsy"></i> PrestaShop', 'options'=>['colspan'=>3, 'class'=>'text text-left','style' => 'border: 1px solid #FF95C5']],
                                                             ['content'=>'<i class="fa fa-database"></i> Existencias', 'options'=>['colspan'=>4, 'class'=>'text text-center' ,'style' => 'border: 2px solid']],
                                                         ],
                                                         //  'options'=>['class'=>'skip-export'] // remove this row from export
                                                     ]
                                                 ],
-                                                
-                                                
+
+
                                                 'pjax' => true,
                                                 'bordered' => true,
                                                 'striped' => true,
@@ -284,87 +319,87 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                     'type' => GridView::TYPE_PRIMARY
                                                 ],
                                             ]); ?>
-                                            
-                                    
+
+
                                     <p class="text-right">
                                     <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda" data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
 						             </button>
                                     <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['comision-mixta-cap/dashboard','id'=>1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
-                                    </p>   
+                                    </p>
                                      </div><!-- /.tab-pane -->
-                                     
+
                                 <div id="tab_sync" class="tab-pane">
-								
+
     								<div class="row">
     								<div class="col-md-12">
-    								<div class="panel">	
+    								<div class="panel">
     									<div class="panel-body">
     									<div  id="phcMayoristaSync">
-    			
+
     										<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
-    		
+
        			 						</div>
     									</div>
     									<div class="panel-footer">
-    												
+
            									<a href="#anchor_supertienda" class="btn btn-primary" id="syncrequest">Actualizar </a>
            								</div>
            							</div>
            							</div>
     								</div>
-    									                                
+
                             	 </div>
-                                     
+
                                    </div><!-- /.tab-content -->
                             </div><!-- nav-tabs-custom -->
                         </div>
-                        
-                        
-                        
-                    
+
+
+
+
                     </div>
-                    
-                    
-                    
+
+
+
         <h4 class="page-header" id="anchor_ml">
-			
-		<i class="fa fa-truck"></i>	Mercado Libre <small>Almacen de datos, online y comparador.</small> 
-          
-                       
-          </h4>          
-                    
+
+		<i class="fa fa-truck"></i>	Mercado Libre <small>Almacen de datos, online y comparador.</small>
+
+
+          </h4>
+
                <div class="row">
-               
-               
-                    
+
+
+
                 <div class="col-md-12 col-sm-12 col-xs-12">
                             <!-- Custom Tabs (Pulled to the right) -->
                             <div class="nav-tabs-custom">
                                 <ul class="nav nav-tabs pull-right">
-                              
+
                               		<li><a data-toggle="tab" href="#tab_ml_sync_comp_hub">ML HUB - ML Online</a></li>
-                                
+
                               		<li><a data-toggle="tab" href="#tab_ml_sync_comp"><i class="fa fa-exchange"></i>  MercadoLibre HUB - SuperTienda HUB</a></li>
                                     <li><a data-toggle="tab" href="#tab_ml_request"><i class="fa fa-cloud"></i>  MercadoLibre Online</a></li>
-                              	
+
                                     <li class="active"><a data-toggle="tab" href="#tab_mercado_libre"><i class="fa fa-database"> </i> MercadoLibre HUB</a></li>
-                                    
-                                  
+
+
                                     <li class="pull-left header"><i class="fa fa-truck"></i> MercadoLibre HUB</li>
                                 </ul>
                                 <div class="tab-content">
-                                  
+
                                     <div id="tab_mercado_libre" class="tab-pane active">
-                                        
-                                      
+
+
 
                                             <?php echo GridView::widget([
                                                 'dataProvider' => $dataProviderML,
                                                 'filterModel' => $searchModelML,
-                                                
-                                                
+
+
                                                 'columns' => [
-                                        
+
                                                     'sku',
                                                     'id',
                                                     [
@@ -373,16 +408,16 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                             return   Yii::$app->formatter->asCurrency($data->precio);
                                                         }
                                                         ],
-                                                    
+
                                                     'marca',
-                                                        
-                                                    
-                                                    
-                                        
+
+
+
+
                                                     ['class' => 'yii\grid\ActionColumn',
                                                         'options'=>['class'=>'skip-export']
                                                     ],
-                                                    
+
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
@@ -391,8 +426,8 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                     '{export}',
                                                     '{toggleData}'
                                                 ],
-                                                
-                                              
+
+
                                                 'beforeHeader'=>[
                                                     [
                                                         'columns'=>[
@@ -402,9 +437,9 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                       //  'options'=>['class'=>'skip-export'] // remove this row from export
                                                     ]
                                                 ],
-                                                
-                                                
-                                                
+
+
+
                                                 'pjax' => true,
                                                 'bordered' => true,
                                                 'striped' => true,
@@ -417,91 +452,91 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                     'type' => GridView::TYPE_PRIMARY
                                                 ],
                                             ]); ?>
-                                            
-                                    
+
+
                                     <p class="text-right">
                                     <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda" data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
 						             </button>
                                     <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['comision-mixta-cap/dashboard','id'=>1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
-                                    </p>   
+                                    </p>
                                      </div><!-- /.tab-pane -->
-                                     
+
                                 <div id="tab_ml_request" class="tab-pane">
-								
+
     								<div class="row">
     								<div class="col-md-12">
-    								<div class="panel">	
+    								<div class="panel">
     									<div class="panel-body">
     									<div  id="ml_sync">
-    			
+
     										<img src="/img/loading.gif" /> <p class="text text-info">Consultando Mercado libre ....</p>
-    		
+
        			 						</div>
     									</div>
     									<div class="panel-footer">
-    												
+
            									<a href="#anchor_ml" class="btn btn-primary" id="ml_syncrequest"><i class="fa fa-refresh"></i>Actualizar </a>
            								</div>
            							</div>
            							</div>
     								</div>
-    									                                
+
                             	 </div>
-                                     
+
                                    </div><!-- /.tab-content -->
                             </div><!-- nav-tabs-custom -->
                         </div>
-                        
-                        
-                        
-                     
+
+
+
+
                     </div>
 
-   
-                    
-                    
 
-                    
+
+
+
+
                     <h4 class="page-header" id="anchor_ps">
-			
-		<i class="fa fa-sellsy"></i>	PrestaShop <small>Almacen de datos, online y comparador.</small> 
-          
-                       
-          </h4>          
-                    
+
+		<i class="fa fa-sellsy"></i>	PrestaShop <small>Almacen de datos, online y comparador.</small>
+
+
+          </h4>
+
                <div class="row">
-               
-               
-                    
+
+
+
                 <div class="col-md-12 col-sm-12 col-xs-12">
                             <!-- Custom Tabs (Pulled to the right) -->
                             <div class="nav-tabs-custom">
                                 <ul class="nav nav-tabs pull-right">
-                              		<?php $i=1;?>      
-                              
+                              		<?php $i=1;?>
+
                               		<li><a data-toggle="tab" href="#tab_sync_ps_pson">PrestaShop - PrestaShop Online</a></li>
-                                
+
                               		<li><a data-toggle="tab" href="#tab_ps_sync_comp"><i class="fa fa-exchange"></i>  PrestaShop HUB - SuperTienda HUB</a></li>
                                     <li><a data-toggle="tab" href="#tab_ps_request"><i class="fa fa-cloud"></i>  PrestaShop Online</a></li>
-                              	
+
                                     <li class="active"><a data-toggle="tab" href="#tab_ps_hub"><i class="fa fa-database"> </i> Prestashop HUB</a></li>
-                                    
-                                  
+
+
                                     <li class="pull-left header"><i class="fa fa-sellsy"></i> PrestaShop HUB</li>
                                 </ul>
                                 <div class="tab-content">
-                                  
+
                                     <div id="tab_ps_hub" class="tab-pane active">
-                                        
-                                      
+
+
 
                                             <?php echo GridView::widget([
                                                 'dataProvider' => $dataProviderPS,
                                                 'filterModel' => $searchModelPS,
-                                                
-                                                
+
+
                                                 'columns' => [
-                                        
+
                                                     'sku',
                                                     'id_prestashop',
                                                     [
@@ -510,14 +545,14 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                             return   Yii::$app->formatter->asCurrency($data->precio);
                                                         }
                                                         ],
-                                                    
+
                                                     'marca',
-                                                        
-                                        
+
+
                                                     ['class' => 'yii\grid\ActionColumn',
                                                         'options'=>['class'=>'skip-export']
                                                     ],
-                                                    
+
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
@@ -526,8 +561,8 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                     '{export}',
                                                     '{toggleData}'
                                                 ],
-                                                
-                                              
+
+
                                                 'beforeHeader'=>[
                                                     [
                                                         'columns'=>[
@@ -537,9 +572,9 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                       //  'options'=>['class'=>'skip-export'] // remove this row from export
                                                     ]
                                                 ],
-                                                
-                                                
-                                                
+
+
+
                                                 'pjax' => true,
                                                 'bordered' => true,
                                                 'striped' => true,
@@ -552,57 +587,57 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                     'type' => GridView::TYPE_PRIMARY
                                                 ],
                                             ]); ?>
-                                            
-                                    
+
+
                                     <p class="text-right">
                                     <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda" data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
 						             </button>
                                     <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['comision-mixta-cap/dashboard','id'=>1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
-                                    </p>   
+                                    </p>
                                      </div><!-- /.tab-pane -->
-                                     
+
                                 <div id="tab_ps_request" class="tab-pane">
-								
+
     								<div class="row">
     								<div class="col-md-12">
-    								<div class="panel">	
+    								<div class="panel">
     									<div class="panel-body">
     									<div  id="ps_sync">
-    			
+
     										<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio ....</p>
-    		
+
        			 						</div>
     									</div>
     									<div class="panel-footer">
-    												
+
            									<a href="#anchor_ps" class="btn btn-primary" id="ps_syncrequest">Actualizar </a>
            								</div>
            							</div>
            							</div>
     								</div>
-    									                                
+
                             	 </div>
-                                     
+
                                    </div><!-- /.tab-content -->
                             </div><!-- nav-tabs-custom -->
                         </div>
-                        
-                        
-                        
-                     
-                    </div>
-                  
-                        
-  
-                        
-                 
 
-                
+
+
+
+                    </div>
+
+
+
+
+
+
+
     <h4 class="page-header">
          <i class="fa fa-info-circle"></i> Soporte y Ayuda
                         <small>Contenido de ayuda</small>
-    </h4>    
-                
+    </h4>
+
 
                 <div class="row">
 					<div class="col-md-12 col-sm-12 col-xs-12">
@@ -621,9 +656,9 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                             <div class="box-header">
                                                 <h4 class="box-title">
                                                     <a href="#collapseOne" data-parent="#accordion" data-toggle="collapse">
-                                                                                                   
+
                                                       <b>PHC Mayoristas</b>
-                                                  
+
                                                     </a>
                                                 </h4>
                                             </div>
@@ -642,38 +677,38 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                             </div>
                                             <div class="panel-collapse collapse" id="collapseTwo">
                                                 <div class="box-body">
-                                               
-                                                
+
+
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                            <div class="panel box box-info">
                                             <div class="box-header">
                                                 <h4 class="box-title">
                                                     <a href="#collapseThree" data-parent="#accordion" data-toggle="collapse">
                                                       <b> Sincronizar PrestaShop</b>
                                                     </a>
-                                                    
+
                                                 </h4>
                                             </div>
                                             <div class="panel-collapse collapse" id="collapseThree">
                                                 <div class="box-body">
-                                                
-                                        
+
+
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        
+
+
                                     </div>
                                 </div><!-- /.box-body -->
                             </div><!-- /.box -->
                         </div>
-                   
+
                     </div>
-                    
-                    
+
+
                           <div class="row">
 					<div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="box box-solid">
@@ -686,21 +721,21 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
           </div>
                                 </div><!-- /.box-header -->
                                 <div class="box-body">
-                                
-                                	
-                                	
+
+
+
                                 	<address>
 									  <strong> <?= Yii::$app->keyStorage->get('com.sisacap.empresa.contacto.nombre', '') ?></strong><br>
 									  <?= Yii::$app->keyStorage->get('com.sisacap.empresa.contacto.direccion', '') ?><br>
 									  <abbr title="Telefono de contacto">Tel:</abbr> <?= Yii::$app->keyStorage->get('com.pinfo.contacto.telefono', '0155 5551078307') ?>
 									</address>
-									
+
 									<address>
 									  <strong>Correo electronico</strong><br>
 									  <a href="mailto:#">  <?= Yii::$app->keyStorage->get('com.pinfo.contacto.email', 'admin.pinfo@pinfosoft.com.mx') ?></a>
 									  <br />
-									 
-									  
+
+
 									</address>
 									<h4>
                                 	<i class="fa fa-twitter"></i>
@@ -752,7 +787,7 @@ $('#request_paridad').click(function() {
 
 function doAjaxGetParidad(filterUrl) {
 
-	$('#ps_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio en linea ....</p>");    
+	$('#ps_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio en linea ....</p>");
 
 	$.ajax({
 	type: "GET",
@@ -775,7 +810,7 @@ function doAjaxGetParidad(filterUrl) {
 
 function doAjaxPS(filterUrl) {
 
-	$('#ps_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio en linea ....</p>");    
+	$('#ps_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio en linea ....</p>");
 
 	$.ajax({
 	type: "GET",
@@ -810,7 +845,7 @@ function doAjaxPS(filterUrl) {
 
 function doAjaxML(filterUrl) {
 
-	$('#ml_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio Mercado Libre ....</p>");    
+	$('#ml_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio Mercado Libre ....</p>");
 
 	$.ajax({
 	type: "GET",
@@ -845,7 +880,7 @@ function doAjaxML(filterUrl) {
 
 function doAjaxPHC(filterUrl) {
 
-$('#phcMayoristaSync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>");    
+$('#phcMayoristaSync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>");
 
 $.ajax({
 type: "GET",
@@ -861,22 +896,22 @@ data: {
 
 
              $('#comparegrid').DataTable({
-                
+
                     });
 
-              
+
                $('#sync_success').click(function() {
 
 
             	   doAjaxPHC("/articulo/sync-phc-resume?filter=success&dashboard=true");
-                    
+
                 });
 
                 $('#sync_info').click(function() {
-                    
+
 
                 	doAjaxPHC("/articulo/sync-phc-resume?filter=info&dashboard=true");
-                    
+
                 });
 
 
@@ -884,15 +919,15 @@ data: {
 
                 	doAjaxPHC("/articulo/sync-phc-resume?filter=warning&dashboard=true");
 
-                    
+
                 });
 
 
                 $('#sync_all').click(function() {
-                    
+
                 	doAjaxPHC("/articulo/sync-phc-resume?dashboard=true");
-                
-                                            
+
+
                  });
 
 
@@ -908,19 +943,19 @@ data: {
 
 $( document ).ready(function() {
 
-	
+
 	$('#syncrequest').trigger('click');
 	$('#ml_syncrequest').trigger('click');
 	$('#ps_syncrequest').trigger('click');
 	$('#request_paridad').trigger('click');
-	
-	
-	
-	
+
+
+
+
 });
 
 
 
 
 </script>
-<?php JSRegister::end(); ?>                                
+<?php JSRegister::end(); ?>
