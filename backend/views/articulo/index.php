@@ -43,74 +43,76 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-          
+
               <div class="col-md-3">
-				
+
               <dl>
-              
-             
+
+
                 <dt><i class="fa fa-industry"></i>  Nombre de mi tienda </dt>
                <dd>Super tienda</dd>
-                
+
                 <dt><i class="fa fa-map-marker"></i> Direccion</dt>
                 <dd>Los Reyes la paz, edo. Mex</dd>
                <dt><i class="fa fa-black-tie"></i> Responsable</dt>
                 <dd>Omar Mondragón</dd>
-                
+
                 <dt><i class="fa fa-phone"></i> Telefono contacto</dt>
                 <dd>+5255 51078305</dd>
-    
+
               </dl>
-             </div> 
-             
+             </div>
+
              <div class="col-md-3">
-				
+
               <dl>
-              
+
               	<dt><i class="fa fa-envelope"></i>Correo electrónico</dt>
                 <dd>omar@mondragon.com.mx</dd>
-             
+
                 <dt>Ultima actualización</dt>
                <dd><?= ( $articulo =  Articulo::findBySql('select * from tbl_articulo order by ultima_modificacion desc limit 1')->one() ) ? Yii::$app->formatter->asDatetime( $articulo->ultima_modificacion) :  '--'; ?></dd>
-                
+
                 <dt>Estatus</dt>
                 <dd>
                     <div id="globalStatus">
-                    	
+
      					 <i class="fa fa-spinner fa-spin"></i>
-     					
+
       				</div>
   				</dd>
-             
+
               </dl>
-             </div> 
-             
-             
-             </div> 
-             
+             </div>
+
+
+             </div>
+
               <div class="box-footer">
        			 <?php echo Html::a('<i class="fa fa-refresh"></i> Buscar cambios', ['#'], ['class' => 'btn btn-primary','id'=>'soaprequest']) ?>
             </div>
             </div>
-           
+
             <!-- /.box-body -->
           </div>
 
- 
- 
-<div class="col-md-12">    
-    
+
+
+<div class="col-md-12">
+
       <?php echo GridView::widget([
                                                 'dataProvider' => $dataProvider,
                                                 'filterModel' => $searchModel,
-                                                
+
                                                 'columns' => [
                                                     'sku',
                                                     'descripcion',
-                                                       
-                                                  
-                                                    
+
+
+
                                                     [
+                                                        'class' => 'kartik\grid\EditableColumn',
+                                                        'refreshGrid' => true,
                                                         'attribute'=>'precio',
                                                         'mergeHeader' => true,
                                                         'content'=>function($data){
@@ -124,32 +126,32 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         return   $data->moneda;
                                                         }
                                                      ],
-                                                     
+
                                                      [
                                                          'class' => 'kartik\grid\EditableColumn',
                                                          'attribute'=>'tipo_utilidad_ml',
                                                          'mergeHeader' => true,
                                                          'refreshGrid' => true,
                                                          'content'=>function($data){
-                                                             
+
                                                          return   ($data->tipo_utilidad_ml == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ml == 2)?'monto': null) ;
-                                                            
+
                                                          },
                                                          'editableOptions'=> [
                                                              'inputType' => \kartik\editable\Editable::INPUT_SELECT2,
                                                              'header' => 'Tipo utilidad',
                                                              'asPopover' => true,
-                                                             
+
                                                              'options' => [
                                                                  'data' =>  [ '1' => 'Porcentaje', '2' => 'Monto'],
                                                              ]
                                                          ],
                                                          'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
                                                          'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                                         
+
                                                          ],
-                                                     
-                                                    
+
+
                                                         [
                                                         'class' => 'kartik\grid\EditableColumn',
                                                         'attribute'=>'utilidad_ml',
@@ -158,21 +160,21 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             'refreshGrid' => true,
                                                             'mergeHeader' => true,
                                                         'content'=>function($data){
-                                                            
+
                                                         return  ($data->tipo_utilidad_ml == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ml):  ( ($data->tipo_utilidad_ml == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ml): null) ;
-                                                        
+
                                                         },
                                                         'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
                                                         'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                                        
+
                                                         ],
-                                                        
-                                                        
+
+
                                                         [
-                                                            
+
                                                             'header'=>'publico',
                                                             'attribute'=>'utilidad_ml',
-                                                          
+
                                                             'mergeHeader' => true,
                                                             'content'=>function($data){
                                                                 return Yii::$app->formatter->asCurrency (($data->precio*1) +  (($data->tipo_utilidad_ml == 1) ? ($data->precio * $data->utilidad_ml) : (($data->tipo_utilidad_ml == 2) ? $data->utilidad_ml : 0)));
@@ -180,9 +182,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
                                                             'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
                                                             ],
-                                                            
-                                                        
-                                                            
+
+
+
                                                             [
                                                                 'class' => 'kartik\grid\EditableColumn',
                                                                 'attribute'=>'tipo_utilidad_ps',
@@ -196,17 +198,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                                                         'data' =>  [ '1' => 'Porcentaje', '2' => 'Monto'],
                                                                     ]
                                                                 ],
-                                                                
+
                                                                 'content'=>function($data){
-                                                                
+
                                                                 return   ($data->tipo_utilidad_ps == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ps == 2)?'Monto': null) ;
-                                                                
+
                                                                 },
                                                                 'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
                                                                 'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                                                
+
                                                                 ],
-                                                            
+
                                                         [
                                                             'attribute'=>'utilidad_ps',
                                                             'header'=>'util',
@@ -216,15 +218,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             'content'=>function($data){
                                                             return  ($data->tipo_utilidad_ps == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ps):  ( ($data->tipo_utilidad_ps == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ps): null) ;
                                                             },
-                                                            
-                                                            
+
+
                                                             'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
                                                             'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
                                                             'editableOptions' => [
                                                                 'header' => 'Utilidad prestashop',
                                                             ]
-                                                            
-                                                            
+
+
                                                         ],
                                                             [
                                                                 'header'=>'publico',
@@ -235,11 +237,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                                                 },
                                                                 'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
                                                                 'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                                                
+
                                                                 ],
-                                                                
-                                                                
-                                                                
+
+
+
                                                                     [
                                                                     'attribute'=>'existencia',
                                                                     'header'=>'PHC',
@@ -248,7 +250,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                                     return        $data->existencia;
                                                                     }
                                                                     ],
-                                                                    
+
                                                                     [
                                                                         'attribute'=>'existencia_ml',
                                                                         'class' => 'kartik\grid\EditableColumn',
@@ -273,18 +275,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                                                             'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
                                                                             'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
                                                                             ],
-                                                                
+
                                                                 [
                                                                     'header'=>'Tot',
                                                                     'mergeHeader' => true,
-                                                                    
+
                                                                     'content'=>function($data){
                                                                     return   $data->existencia + $data->existencia_ml  +$data->existencia_ps;
                                                                     }
                                                                     ],
-                                    
-                                                   
-                                                    
+
+
+
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
@@ -293,8 +295,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     '{export}',
                                                     '{toggleData}'
                                                 ],
-                                                
-                                               
+
+
                                                 'beforeHeader'=>[
                                                     [
                                                         'columns'=>[
@@ -306,8 +308,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         //  'options'=>['class'=>'skip-export'] // remove this row from export
                                                     ]
                                                 ],
-                                                
-                                                
+
+
                                                 'pjax' => true,
                                                 'bordered' => true,
                                                 'striped' => true,

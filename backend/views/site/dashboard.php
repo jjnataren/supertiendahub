@@ -412,12 +412,6 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                     'marca',
 
 
-
-
-                                                    ['class' => 'yii\grid\ActionColumn',
-                                                        'options'=>['class'=>'skip-export']
-                                                    ],
-
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
@@ -454,11 +448,7 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                             ]); ?>
 
 
-                                    <p class="text-right">
-                                    <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda" data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
-						             </button>
-                                    <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['comision-mixta-cap/dashboard','id'=>1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
-                                    </p>
+
                                      </div><!-- /.tab-pane -->
 
                                 <div id="tab_ml_request" class="tab-pane">
@@ -484,7 +474,21 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                             	 </div>
 
                                    </div><!-- /.tab-content -->
+
+
+
+						 	<p class="text-right">
+                                    <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda" data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
+						             </button>
+                                    <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['articulo-meli/index'], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
+                                    </p>
+
                             </div><!-- nav-tabs-custom -->
+
+
+
+
+
                         </div>
 
 
