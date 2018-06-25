@@ -151,12 +151,12 @@ $currentUrl =  Yii::$app->request->url ;
                         'options'=>['class'=>'header'],
                         'icon'=>'<i class="fa fa-paint-brush"></i>',
                         ],
-
+                    
                     [
                         'label' => Yii::t('backend', 'Mi tienda'),
                         'url' => ['/articulo-mayorista/index-tienda'],
                         'icon' => '<i class="fa fa-sitemap"></i>',
-
+                        
                         'options' => ['class' => 'treeview'],
                         'active' => in_array(\Yii::$app->controller->id,['articulo/index']),
                         'items' => [
@@ -169,11 +169,11 @@ $currentUrl =  Yii::$app->request->url ;
                                 'icon' => '<i class="fa fa-cog"></i>',
                                 'active' => strpos(   $currentUrl   , 'articulo/config')],
                         ]
-
-
+                     
+                        
                     ],
-
-
+                		
+                    
                     [
                         'label'=>Yii::t('backend', 'Proveedor PCH'),
                         'url' => ['#'],
@@ -185,39 +185,67 @@ $currentUrl =  Yii::$app->request->url ;
                                 'url' => ['/articulo-mayorista/index'],
                                 'icon' => '<i class="fa fa-angle-double-right"></i>',
                                 'active' => strpos(   $currentUrl   , 'articulo-mayorista/index')],
-                            ['label' => 'Configuración',
-                                'url' => ['/articulo-mayorista/super-tienda-config'],
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
+                            ['label' => 'Configuración', 
+                                'url' => ['/articulo-mayorista/super-tienda-config'], 
+                                'icon' => '<i class="fa fa-angle-double-right"></i>', 
                                 'active' => strpos(   $currentUrl   , 'articulo-mayorista/super-tienda-config')],
                         ]
-
+                        
                     ],
                     [
                         'label'=>Yii::t('backend', 'Mercado Libre'),
-                        'url' => ['/articulo-meli/index'],
+                        'url' => ['#'],
                         'icon'=>'<i class="fa fa-truck"></i>',
                         'options'=>['class'=>'treeview'],
-                        'active'=>'articulo-meli/index' === \Yii::$app->controller->id,
+                        'active'=> strpos($currentUrl, 'articulo-meli'),
+                        'items' => [
+                            [
+                                'label' => 'Inicio',
+                                'url' => '/articulo-meli/index' ,
+                                'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                'active' => strpos(   $currentUrl   , 'articulo-meli/index'),
+                            ],
+                            [
+                                'label' => 'Configuración',
+                                'url' => '/articulo-meli-config/index' ,
+                                'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                'active' => strpos(   $currentUrl   , 'articulo-meli-config/index'),
+                            ]
+                        ]
                     ],
-
+                    
                     [
                         'label'=>Yii::t('backend', 'PrestaShop'),
-                        'url' => ['/articulo-prestashop/index'],
+                        'url' => ['#'],
                         'icon'=>'<i class="fa fa-sellsy"></i>',
                         'options'=>['class'=>'treeview'],
-                        'active' => 'articulo-prestashop/index' === \Yii::$app->controller->id,
+                        'active' => strpos($currentUrl, 'articulo-prestashop/index'),
+                        'items' => [
+                            [
+                                'label' => 'Inicio',
+                                'url' => '/articulo-prestashop/index',
+                                'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                'active' => strpos(   $currentUrl   , 'articulo-prestashop/index'),
+                            ],
+                            [
+                                'label' => 'Configuración',
+                                'url' => '/articulo-prestashop-config/index',
+                                'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                'active' => strpos(   $currentUrl   , 'articulo-prestashop-config/index'),
+                            ]
+                        ]
                     ],
-
+                    
                         [
                             'label'=>Yii::t('backend', 'Amazon'),
                             'url' => '#',
                             'icon'=>'<i class="fa fa-amazon"></i>',
                             'options'=>['class'=>'treeview'],
-
+                           
                         ],
-
-
-
+                    
+                  
+                    
                     [
                         'label' => Yii::t('backend', 'Content'),
                         'url' => '#',
@@ -230,15 +258,9 @@ $currentUrl =  Yii::$app->request->url ;
                             ['label' => Yii::t('backend', 'Article Categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'article-category')],
                             ['label' => Yii::t('backend', 'Text Widgets'), 'url' => ['/widget-text/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'widget-text')],
                             ['label' => Yii::t('backend', 'Menu Widgets'), 'url' => ['/widget-menu/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'widget-menu')],
-<<<<<<< master
                             [	'label' => Yii::t('backend', 'Carousel Widgets'),
-                            	'url' => ['/widget-carousel/index'],
-                            	'icon' => '<i class="fa fa-angle-double-right"></i>',
-=======
-                            [	'label' => Yii::t('backend', 'Carousel Widgets'), 
                             	'url' => ['/widget-carousel/index'], 
                             	'icon' => '<i class="fa fa-angle-double-right"></i>', 
->>>>>>> ed9c782 sincronizacion de cambios dreamer
                             	'active' => (\Yii::$app->controller->id == 'widget-carousel'),
                             	'items' => [
                                     ['label' => Yii::t('backend', 'i18n Source Message'), 'url' => ['/i18n/i18n-source-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
@@ -247,9 +269,9 @@ $currentUrl =  Yii::$app->request->url ;
                             ],
                         ]
                     ],
-
-
-
+                    
+                   
+                    
                     [
                         'label' => Yii::t('backend', 'System'),
                         'options' => ['class' => 'header']
@@ -308,11 +330,11 @@ $currentUrl =  Yii::$app->request->url ;
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <h1>
-
+            	
              	<?php if(isset($this->params['titleIcon'])): ?>
                     <?= $this->params['titleIcon'] ?>
                 <?php endif; ?>
-
+            	
                 <?php echo $this->title ?>
                 <?php if (isset($this->params['subtitle'])): ?>
                     <small><?php echo $this->params['subtitle'] ?></small>
