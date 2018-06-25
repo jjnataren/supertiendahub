@@ -1,0 +1,232 @@
+(function ($) {
+
+    let dataTable = null;
+    let dataTableSelection = null;
+    let dataTableUpdated = null;
+
+    let language = {
+        "sProcessing":     "Procesando...",
+        "sLengthMenu":     "Mostrar _MENU_ registros",
+        "sZeroRecords":    "No se encontraron resultados",
+        "sEmptyTable":     "Ning&uacute;n dato disponible en esta tabla",
+        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+        "sInfoPostFix":    "",
+        "sSearch":         "Buscar:",
+        "sUrl":            "",
+        "sInfoThousands":  ",",
+        "sLoadingRecords": "Cargando...",
+        "oPaginate": {
+            "sFirst":    "Primero",
+            "sLast":     "&Uacute;ltimo",
+            "sNext":     "Siguiente",
+            "sPrevious": "Anterior"
+        },
+        "oAria": {
+            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+        }
+    };
+
+    let settings = {
+        onStepChanging: function (event, currentIndex, newIndex) {
+            if (currentIndex === 0 && newIndex === 1) {
+                if (isTableEmpty(dataTable)) {
+                    return false;
+                }
+            } if (currentIndex === 1 && newIndex === 2) {
+
+            }
+            return true;
+        },
+        onStepChanged: function (event, currentIndex, priorIndex) {
+            if (currentIndex === 1 && priorIndex === 0) {
+                generarTablaSeleccion();
+            }
+        },
+        enableAllSteps: false,
+        enableKeyNavigation: false,
+        enablePagination: false,
+        forceMoveForward: true,
+        labels : {
+            cancel: 'Cancelar',
+            current: 'Actual',
+            finish: 'Terminar',
+            next: 'Siguiente',
+            previous: 'Anterior'
+        }
+    };
+
+    let generarSnapshotView = function (data) {
+        $('#snap_name').text(data.nombre);
+        $('#snap_desc').text(data.descripcion);
+        $('#snap_records_value').text(data.numero_registros);
+        $('#snap_records_date').text(data.fecha_creacion);
+    };
+
+    let generarTablaSeleccion = function () {
+        if (!$.fn.dataTable.isDataTable("#meli_table_selection")) {
+            dataTableSelection = $('#meli_table_selection').DataTable({
+                data: getCurrentSelection(),
+                columns: [
+                    {"data": "sku"},
+                    {"data": "precio"},
+                    {"data": "precio_original"},
+                ],
+                language: language
+            });
+        } else {
+            dataTableSelection.clear();
+            dataTableSelection.rows.add(getCurrentSelection());
+            dataTableSelection.draw();
+        }
+    };
+
+    let generarTablaSincronizacion = function (data) {
+        if (!$.fn.dataTable.isDataTable("#meli_table")) {
+            dataTable = $('#meli_table').DataTable({
+                data: data,
+                columns: [
+                    {"data": "sku"},
+                    {"data": "id"},
+                    {"data": "marca"},
+                    {"data": "serie"},
+                    {"data": "precio"},
+                    {"data": "precio_original"},
+                    {"data": "cambio"}
+                ],
+                language: language
+            });
+            $('#meli_table tbody').on('click', 'tr', function () {
+                $(this).toggleClass('selected');
+                if (dataTable.rows('.selected').data().length > 0) {
+                    $('#update_button').prop('disabled', false);
+                } else {
+                    $('#update_button').prop('disabled', true);
+                }
+            });
+        } else {
+            dataTable.clear();
+            dataTable.rows.add(data);
+            dataTable.draw();
+        }
+    };
+
+    let generarTablaActualizacion = function (data) {
+        if (!$.fn.dataTable.isDataTable("#meli_table_updated")) {
+            dataTableUpdated = $('#meli_table_updated').DataTable({
+                data: data,
+                columns: [
+                    {"data": "sku"},
+                    {"data": "id"},
+                    {"data": "marca"},
+                    {"data": "serie"},
+                    {"data": "precio"},
+                    {"data": "precio_original"},
+                    {"data": "cambio"}
+                ],
+                language: language
+            });
+        } else {
+            dataTableUpdated.clear();
+            dataTableUpdated.rows.add(data);
+            dataTableUpdated.draw();
+        }
+    };
+
+    let synchronizeAction = function () {
+        $.ajax({
+            url: '/articulo-meli/synchronize',
+            dataType: 'json',
+            contentType: 'json',
+            beforeSend: function () {
+                $('#synchronize_button')
+                    .html('<i class="fa fa-spinner fa-spin"></i>')
+                    .prop('disabled', true);
+            },
+            success: function (data) {
+                console.log(data);
+                generarTablaSincronizacion(data);
+            },
+            error: function (msg) {
+                console.log(msg);
+            },
+            complete: function () {
+                $('#synchronize_button')
+                    .html('<i class="fa fa-search"></i>Buscar')
+                    .prop('disabled', false);
+            }
+        });
+
+    };
+
+    let isTableEmpty = function (table) {
+        return table === null || table.data().length === 0;
+    };
+
+
+    let getCurrentSelection = function () {
+        if (dataTable !== null) {
+            return dataTable.rows('.selected').data().toArray();
+        }
+
+        return [];
+    };
+
+    let clickUpdate = function () {
+        $.ajax({
+            url: '/articulo-meli/update-prices',
+            method: 'POST',
+            dataType: 'json',
+            contentType: 'json',
+            data: JSON.stringify(dataTable.rows('.selected').data().toArray()),
+            beforeSend: function() {
+                $('#update_button')
+                    .html('<i class="fa fa-spinner fa-spin"></i>')
+                    .prop('disabled', true);
+            },
+            success: function (data) {
+                console.log(data);
+                generarTablaActualizacion(data);
+            },
+            error: function (msg) {
+                console.log(msg);
+            },
+            complete: function () {
+                $('#update_button')
+                    .html('<i class="fa fa-refresh"></i>Actualizar')
+                    .prop('disabled', true);
+                $.pjax.reload({
+                    container: '#meli_articles'
+                });
+            }
+        });
+    };
+
+    let clickSnapshot = function () {
+        $.ajax({
+            url: '/articulo-meli-snap/create-snapshot',
+            success: function (data) {
+                console.log(data);
+                generarSnapshotView(data);
+            },
+            error: function (msg) {
+                console.log(msg);
+            },
+        });
+    };
+
+    let wizardNext = function () {
+        $('#wizard').steps("next");
+    };
+
+    $('#wizard').steps(settings);
+    $('#synchronize_button').on('click', synchronizeAction);
+    $('#update_button').on('click', clickUpdate);
+    $('#snapshot_button').on('click', clickSnapshot);
+    $('#synchronize_button_next').on('click', wizardNext);
+    $('#validation_button_next').on('click', wizardNext);
+    $('#snapshot_button_next').on('click', wizardNext);
+
+})(jQuery);
