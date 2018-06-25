@@ -64,7 +64,8 @@
 		"mongosoft/yii2-soap-client": "*",
 		"richardfan1126/yii2-js-register": "*",
 		"miloschuman/yii2-highcharts-widget": "^6.0",
-        "bower-asset/jquery-steps" : "^1.1.0"
+        "bower-asset/jquery-steps" : "^1.1.0",
+		"bower-asset/sweetalert2" : "*"
 	},
 	"require-dev" : {
 		"yiisoft/yii2-debug" : "^2.0.0",

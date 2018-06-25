@@ -66,6 +66,7 @@ class ArticuloPrestashopSnapController extends Controller
      * Displays a single ArticuloPrestashopSnap model.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -85,11 +86,11 @@ class ArticuloPrestashopSnapController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
         }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -97,6 +98,7 @@ class ArticuloPrestashopSnapController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -104,11 +106,11 @@ class ArticuloPrestashopSnapController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
         }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -116,11 +118,24 @@ class ArticuloPrestashopSnapController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $snapshot = $this->findModel($id);
 
+        $snapshot->delete();
+
+        if ($snapshot->actual === 1) {
+            $snapshots = ArticuloPrestashopSnap::find()->orderBy(['fecha_creacion' => SORT_DESC])->all();
+            if (\count($snapshots) > 1) {
+                $newsnap = $snapshots[0];
+                $newsnap->actual = 1;
+                $newsnap->save();
+            }
+        }
         return $this->redirect(['index']);
     }
 
@@ -135,8 +150,8 @@ class ArticuloPrestashopSnapController extends Controller
     {
         if (($model = ArticuloPrestashopSnap::findOne($id)) !== null) {
             return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
         }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

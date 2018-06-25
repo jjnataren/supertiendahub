@@ -13,28 +13,32 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="articulo-prestashop-snap-view">
 
     <p>
-        <?php echo Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?php echo Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?php echo Html::a('Actualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?php echo Html::a('Borrar', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => '¿Realmente desea eliminar el Snapshot?',
                 'method' => 'post',
             ],
         ]) ?>
     </p>
 
-    <?php echo DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'fecha_creacion',
-            'nombre',
-            'descripcion',
-            'data:ntext',
-            'disponible',
-            'actual',
-            'numero_registros',
-        ],
-    ]) ?>
+    <?php try {
+        echo DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'id',
+                'fecha_creacion',
+                'nombre',
+                'descripcion',
+                'data:ntext',
+                'disponible',
+                'actual',
+                'numero_registros',
+            ],
+        ]);
+    } catch (Exception $e) {
+        echo 'No se pudo mostrar el detalle.';
+    } ?>
 
 </div>

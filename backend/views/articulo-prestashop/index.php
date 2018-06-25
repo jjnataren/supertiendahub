@@ -1,11 +1,12 @@
 <?php
 
+use backend\assets\SwalAsset;
 use yii\grid\SerialColumn;
 use backend\assets\StepsAsset;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\models\Search\ArticuloPrestashopSearch */
+/* @var $searchModel backend\models\search\ArticuloPrestashopSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $paridad float */
 
@@ -15,6 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 Yii::$app->formatter->locale = 'es-MX';
 
 StepsAsset::register($this);
+SwalAsset::register($this);
 
 $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 

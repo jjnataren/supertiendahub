@@ -6,9 +6,13 @@ use backend\models\Articulo;
 use backend\models\ArticuloPrestashop;
 use backend\models\client\PrestashopClient;
 use backend\models\client\PrestaShopWebserviceException;
-use backend\models\Search\ArticuloPrestashopSearch;
+use backend\models\search\ArticuloPrestashopSearch;
 use backend\models\search\ArticuloSearch;
+use common\commands\AddToTimelineCommand;
+use common\models\KeyStorageItem;
+use trntv\bus\exceptions\MissingHandlerException;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -39,7 +43,7 @@ class ArticuloPrestashopController extends Controller
     public function actionSynchronize()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $client = new PrestashopClient('http://sevende.tv/Tienda16/prestashop', '5V9BYMW9JKEC67C6TVVTM7DGACFMJBZZ');
+        $client = $this->getClient();
         $articles = Articulo::find()->all();
         $prestashop = array();
 
@@ -99,7 +103,7 @@ class ArticuloPrestashopController extends Controller
 
         if ($request->isAjax && $request->isPost) {
             foreach ($request->bodyParams as $product) {
-                $client = new PrestashopClient('http://sevende.tv/Tienda16/prestashop', '5V9BYMW9JKEC67C6TVVTM7DGACFMJBZZ');
+                $client = $this->getClient();
 
                 $opt = array('resource' => 'products');
                 $opt['id'] = $product['id_prestashop'];
@@ -149,6 +153,18 @@ class ArticuloPrestashopController extends Controller
             }
         }
 
+        try {
+            $addToTimelineCommand = new AddToTimelineCommand([
+                'category' => 'prestashop',
+                'event' => 'change',
+                'data' => ['articles' => $prestashop]
+            ]);
+
+            Yii::$app->commandBus->handle($addToTimelineCommand);
+        } catch (MissingHandlerException $igored) {
+        } catch (InvalidConfigException $igored) {
+        }
+
         return $prestashop;
     }
 
@@ -160,7 +176,7 @@ class ArticuloPrestashopController extends Controller
     public function actionGetItemsView()
     {
 
-        $client = new PrestashopClient('http://sevende.tv/Tienda16/prestashop', '5V9BYMW9JKEC67C6TVVTM7DGACFMJBZZ');
+        $client = $this->getClient();
 
 
         try {
@@ -293,6 +309,14 @@ class ArticuloPrestashopController extends Controller
             return (string)$object[$attribute];
         }
         return '';
+    }
+
+    private function getClient()
+    {
+        $security = Yii::$app->getSecurity();
+        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
+        $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
+        return new PrestashopClient($apiUrl, $key);
     }
 
 }

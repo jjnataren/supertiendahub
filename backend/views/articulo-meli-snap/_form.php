@@ -14,22 +14,12 @@ use yii\bootstrap\ActiveForm;
 
     <?php echo $form->errorSummary($model); ?>
 
-    <?php echo $form->field($model, 'fecha_creacion')->textInput() ?>
-
-    <?php echo $form->field($model, 'nombre')->textInput(['maxlength' => true]) ?>
-
     <?php echo $form->field($model, 'descripcion')->textInput(['maxlength' => true]) ?>
-
-    <?php echo $form->field($model, 'data')->textarea(['rows' => 6]) ?>
 
     <?php echo $form->field($model, 'disponible')->textInput() ?>
 
-    <?php echo $form->field($model, 'actual')->textInput() ?>
-
-    <?php echo $form->field($model, 'numero_registros')->textInput() ?>
-
     <div class="form-group">
-        <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?php echo Html::submitButton($model->isNewRecord ? 'Crear' : 'Actualizar', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

@@ -1,7 +1,11 @@
 <?php
 
-use yii\helpers\Html;
+use backend\assets\SwalAsset;
+use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\grid\SerialColumn;
+use yii\helpers\Html;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\Search\ArticuloPrestashopSnapSearch */
@@ -9,32 +13,45 @@ use yii\grid\GridView;
 
 $this->title = 'Articulo Prestashop Snaps';
 $this->params['breadcrumbs'][] = $this->title;
+
+SwalAsset::register($this);
+
+$this->registerJsFile('@web/js/swalalert.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+$this->registerJsFile('@web/js/prestashop.snap.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+
 ?>
 <div class="articulo-prestashop-snap-index">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <p>
-        <?php echo Html::a('Create Articulo Prestashop Snap', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <?php echo Html::button('Generar Snapshot', ['class' => 'btn btn-primary', 'id' => 'snapshot_button']) ?>
 
-    <?php echo GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+    <?php Pjax::begin(['id' => 'prestashop_snap']) ?>
+    <?php try {
+        echo GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'options' => [
+                'class' => 'grid-view table-responsive'
+            ],
+            'columns' => [
+                ['class' => SerialColumn::class],
 
-            'id',
-            'fecha_creacion',
-            'nombre',
-            'descripcion',
-            'data:ntext',
-            // 'disponible',
-            // 'actual',
-            // 'numero_registros',
+                'id',
+                'fecha_creacion',
+                'nombre',
+                'descripcion',
+                // 'data:ntext',
+                // 'disponible',
+                // 'actual',
+                // 'numero_registros',
 
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+                ['class' => ActionColumn::class],
+            ],
+        ]);
+    } catch (Exception $e) {
+        echo 'No se pudo mostrar la tabla.';
+    } ?>
+    <?php Pjax::end() ?>
 
 </div>

@@ -151,6 +151,11 @@
             },
             error: function (msg) {
                 console.log(msg);
+                swal({
+                   title: 'Ocurri&oacute; un error.',
+                   text: 'Por favor consulte a su proveedor',
+                   type: 'error'
+                });
             },
             complete: function () {
                 $('#synchronize_button')
@@ -192,6 +197,11 @@
             },
             error: function (msg) {
                 console.log(msg);
+                swal({
+                    title: 'Ocurri&oacute; un error.',
+                    text: 'Por favor consulte a su proveedor',
+                    type: 'error'
+                });
             },
             complete: function () {
                 $('#update_button')
@@ -213,6 +223,11 @@
             },
             error: function (msg) {
                 console.log(msg);
+                swal({
+                    title: 'Ocurri&oacute; un error.',
+                    text: 'Por favor consulte a su proveedor',
+                    type: 'error'
+                });
             },
         });
     };

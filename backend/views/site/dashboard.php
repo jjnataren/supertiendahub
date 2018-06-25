@@ -408,6 +408,12 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
                                                             return   Yii::$app->formatter->asCurrency($data->precio);
                                                         }
                                                         ],
+                                                        [
+                                                            'attribute'=>'precio_original',
+                                                            'content'=>function($data){
+                                                            return   Yii::$app->formatter->asCurrency($data->precio);
+                                                            }
+                                                            ],
 
                                                     'marca',
 

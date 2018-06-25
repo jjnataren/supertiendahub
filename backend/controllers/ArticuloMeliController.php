@@ -7,9 +7,13 @@ use backend\models\ArticuloMayorista;
 use backend\models\ArticuloMeli;
 use backend\models\client\MeliOAuth2Client;
 use backend\models\MeliModel;
-use backend\models\Search\ArticuloMeliSearch;
+use backend\models\search\ArticuloMeliSearch;
 use backend\models\search\ArticuloSearch;
+use common\commands\AddToTimelineCommand;
+use common\models\KeyStorageItem;
+use trntv\bus\exceptions\MissingHandlerException;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -40,14 +44,7 @@ class ArticuloMeliController extends Controller
     public function actionGetItemsView()
     {
 
-        $client = new MeliOAuth2Client();
-        $client->clientSecret = 'xajs1DIwU0qviWiR5qtujz10Mc3XVST4';
-        $client->clientId = '1018511717969029';
-        $client->tokenUrl = 'https://api.mercadolibre.com/oauth/token';
-        $client->apiBaseUrl = 'https://api.mercadolibre.com/';
-        $client->userId = '215058471';
-
-        $client->authenticateClient();
+        $client = $this->getClient();
 
         $articles = ArticuloMayorista::find()->all();
 
@@ -82,14 +79,7 @@ class ArticuloMeliController extends Controller
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        $client = new MeliOAuth2Client();
-        $client->clientSecret = 'xajs1DIwU0qviWiR5qtujz10Mc3XVST4';
-        $client->clientId = '1018511717969029';
-        $client->tokenUrl = 'https://api.mercadolibre.com/oauth/token';
-        $client->apiBaseUrl = 'https://api.mercadolibre.com/';
-        $client->userId = '215058471';
-
-        $client->authenticateClient();
+        $client = $this->getClient();
 
         $articles = Articulo::find()->all();
 
@@ -154,14 +144,7 @@ class ArticuloMeliController extends Controller
 
         if ($request->isAjax && $request->isPost) {
             foreach ($request->bodyParams as $product) {
-                $client = new MeliOAuth2Client();
-                $client->clientSecret = 'xajs1DIwU0qviWiR5qtujz10Mc3XVST4';
-                $client->clientId = '1018511717969029';
-                $client->tokenUrl = 'https://api.mercadolibre.com/oauth/token';
-                $client->apiBaseUrl = 'https://api.mercadolibre.com/';
-                $client->userId = '215058471';
-
-                $client->authenticateClient();
+                $client = $this->getClient();
 
                 try {
                     $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
@@ -202,6 +185,18 @@ class ArticuloMeliController extends Controller
             }
         }
 
+        try {
+            $addToTimelineCommand = new AddToTimelineCommand([
+                'category' => 'meli',
+                'event' => 'change',
+                'data' => ['articles' => $meli]
+            ]);
+
+            Yii::$app->commandBus->handle($addToTimelineCommand);
+        } catch (MissingHandlerException $igored) {
+        } catch (InvalidConfigException $igored) {
+        }
+
         return $meli;
     }
 
@@ -234,6 +229,7 @@ class ArticuloMeliController extends Controller
      * Displays a single ArticuloMeli model.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -253,11 +249,11 @@ class ArticuloMeliController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->sku]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
         }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -265,6 +261,7 @@ class ArticuloMeliController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -272,11 +269,11 @@ class ArticuloMeliController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->sku]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
         }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -284,6 +281,9 @@ class ArticuloMeliController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -303,8 +303,29 @@ class ArticuloMeliController extends Controller
     {
         if (($model = ArticuloMeli::findOne($id)) !== null) {
             return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
         }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    private function getClient()
+    {
+        $security = Yii::$app->getSecurity();
+        $clientSecret = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.secret')->value), env('SECRET_KEY'));
+        $clientId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.id')->value), env('SECRET_KEY'));
+        $tokenUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.url.token')->value), env('SECRET_KEY'));
+        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.url.api')->value), env('SECRET_KEY'));
+        $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.userid')->value), env('SECRET_KEY'));
+
+        $client = new MeliOAuth2Client();
+        $client->clientSecret = $clientSecret;
+        $client->clientId = $clientId;
+        $client->tokenUrl = $tokenUrl;
+        $client->apiBaseUrl = $apiUrl;
+        $client->userId = $userId;
+
+        $client->authenticateClient();
+
+        return $client;
     }
 }
