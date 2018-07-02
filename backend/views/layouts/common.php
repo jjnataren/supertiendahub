@@ -262,33 +262,6 @@ $currentUrl =  Yii::$app->request->url ;
                         ],
 
 
-
-                    [
-                        'label' => Yii::t('backend', 'Content'),
-                        'url' => '#',
-                        'icon' => '<i class="fa fa-edit"></i>',
-                        'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['page','article','article-category','widget-text','widget-menu','widget-carousel']),
-                        'items' => [
-                            ['label' => Yii::t('backend', 'Static pages'), 'url' => ['/page/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'page')],
-                            ['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'article')],
-                            ['label' => Yii::t('backend', 'Article Categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'article-category')],
-                            ['label' => Yii::t('backend', 'Text Widgets'), 'url' => ['/widget-text/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'widget-text')],
-                            ['label' => Yii::t('backend', 'Menu Widgets'), 'url' => ['/widget-menu/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'widget-menu')],
-                            [	'label' => Yii::t('backend', 'Carousel Widgets'),
-                            	'url' => ['/widget-carousel/index'],
-                            	'icon' => '<i class="fa fa-angle-double-right"></i>',
-                            	'active' => (\Yii::$app->controller->id == 'widget-carousel'),
-                            	'items' => [
-                                    ['label' => Yii::t('backend', 'i18n Source Message'), 'url' => ['/i18n/i18n-source-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-                                    ['label' => Yii::t('backend', 'i18n Message'), 'url' => ['/i18n/i18n-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-message')],
-                                ]
-                            ],
-                        ]
-                    ],
-
-
-
                     [
                         'label' => Yii::t('backend', 'System'),
                         'options' => ['class' => 'header']
