@@ -5,7 +5,7 @@ use backend\models\Articulo;
 use backend\models\ArticuloPrestashop;
 use backend\models\client\PrestashopClient;
 use backend\models\client\PrestaShopWebserviceException;
-use backend\models\Search\ArticuloPrestashopSearch;
+use backend\models\search\ArticuloPrestashopSearch;
 
 /**
  * Class PrestashopUpdateJob.

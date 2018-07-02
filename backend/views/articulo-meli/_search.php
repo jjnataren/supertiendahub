@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Search\ArticuloMeliSearch */
+/* @var $model backend\models\search\ArticuloMeliSearch */
 /* @var $form yii\bootstrap\ActiveForm */
 ?>
 

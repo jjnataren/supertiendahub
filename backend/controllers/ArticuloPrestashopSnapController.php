@@ -6,7 +6,7 @@ use backend\models\ArticuloPrestashop;
 use backend\models\ArticuloPrestashopSnap;
 use backend\models\client\PrestashopClient;
 use backend\models\client\PrestaShopWebserviceException;
-use backend\models\Search\ArticuloPrestashopSnapSearch;
+use backend\models\search\ArticuloPrestashopSnapSearch;
 use common\models\KeyStorageItem;
 use Yii;
 use yii\filters\VerbFilter;

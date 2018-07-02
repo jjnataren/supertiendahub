@@ -6,7 +6,7 @@ use backend\models\ArticuloMeli;
 use backend\models\ArticuloMeliSnap;
 use backend\models\client\MeliOAuth2Client;
 use backend\models\MeliModel;
-use backend\models\Search\ArticuloMeliSearch;
+use backend\models\search\ArticuloMeliSearch;
 use backend\models\search\ArticuloMeliSnapSearch;
 use common\models\KeyStorageItem;
 use Yii;

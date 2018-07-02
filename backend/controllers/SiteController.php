@@ -5,8 +5,8 @@ namespace backend\controllers;
 use common\components\keyStorage\FormModel;
 use Yii;
 use backend\models\search\ArticuloSearch;
-use backend\models\Search\ArticuloMeliSearch;
-use backend\models\Search\ArticuloPrestashopSearch;
+use backend\models\search\ArticuloMeliSearch;
+use backend\models\search\ArticuloPrestashopSearch;
 
 /**
  * Site controller

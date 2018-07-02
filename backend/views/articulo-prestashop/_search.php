@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Search\ArticuloPrestashopSearch */
+/* @var $model backend\models\search\ArticuloPrestashopSearch */
 /* @var $form yii\bootstrap\ActiveForm */
 ?>
 
