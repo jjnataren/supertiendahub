@@ -13,6 +13,7 @@ use common\models\KeyStorageItem;
 use trntv\bus\exceptions\MissingHandlerException;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\Query;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -89,6 +90,22 @@ class ArticuloPrestashopController extends Controller
         return $prestashop;
     }
 
+    private function getClient()
+    {
+        $security = Yii::$app->getSecurity();
+        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
+        $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
+        return new PrestashopClient($apiUrl, $key);
+    }
+
+    function xml_attribute($object, $attribute)
+    {
+        if (isset($object[$attribute])) {
+            return (string)$object[$attribute];
+        }
+        return '';
+    }
+
     public function actionUpdatePrices()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -123,7 +140,7 @@ class ArticuloPrestashopController extends Controller
                     }
 
                     if ($article->tipo_utilidad_ps === 1) {
-                        $utilidad = ($article->utilidad_ps / 100) + 1;
+                        $utilidad = $article->utilidad_ps + 1;
                         $precio *= $utilidad;
                     } else {
                         $utilidad = $article->utilidad_ps;
@@ -234,6 +251,22 @@ class ArticuloPrestashopController extends Controller
     }
 
     /**
+     * Finds the ArticuloPrestashop model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return ArticuloPrestashop the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = ArticuloPrestashop::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
      * Creates a new ArticuloPrestashop model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
@@ -287,36 +320,53 @@ class ArticuloPrestashopController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function actionHubPrestashop()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return (new Query())
+            ->select(['ap.sku', 'a.descripcion', 'a.precio as precio', 'ap.precio_original as precio_prestashop', 'ap.precio as precio_utilidad'])
+            ->from(['tbl_articulo a', 'tbl_articulo_prestashop ap'])
+            ->where('a.sku = ap.sku')
+            ->all();
+    }
+
     /**
-     * Finds the ArticuloPrestashop model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return ArticuloPrestashop the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws PrestaShopWebserviceException
+     * @throws InvalidConfigException
      */
-    protected function findModel($id)
+    public function actionHubOnlinePrestashop()
     {
-        if (($model = ArticuloPrestashop::findOne($id)) !== null) {
-            return $model;
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $formatter = Yii::$app->formatter;
+
+        $client = $this->getClient();
+
+        $xml = $client->get(['resource' => 'products',
+            'display' => '[id,reference,price]'
+        ]);
+
+        $items = json_decode(json_encode((array)$xml)
+            , TRUE)
+        ['products']['product'];
+
+        $results = array();
+
+        foreach ($items as $item) {
+            $articuloPrestashop = ArticuloPrestashop::find()->where(['id_prestashop' => $item['id']])->one();
+
+            $result = array(
+                'id_prestashop' => $item['id'],
+                'reference' => $item['reference'],
+                'price' => '$' . $formatter->asCurrency($item['price'], 'MXN'),
+                'price_hub' => '$' . $formatter->asCurrency($articuloPrestashop['precio'], 'MXN')
+            );
+
+            $results[] = $result;
         }
 
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    function xml_attribute($object, $attribute)
-    {
-        if (isset($object[$attribute])) {
-            return (string)$object[$attribute];
-        }
-        return '';
-    }
-
-    private function getClient()
-    {
-        $security = Yii::$app->getSecurity();
-        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
-        $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
-        return new PrestashopClient($apiUrl, $key);
+        return $results;
     }
 
 }

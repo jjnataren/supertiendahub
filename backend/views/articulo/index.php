@@ -29,13 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
               <div class="box-tools pull-right">
               <?php echo Html::a('<i class="fa fa-pencil"></i>', ['update', 'id' => 1], ['class' => 'btn']) ?>
-              <?php echo Html::a('<i class="fa fa-trash"></i>', ['#'], [
-                    'class' => 'btn',
-                    'data' => [
-                        'confirm' => '¿Confirmar eliminar?',
-                        'method' => 'post',
-                    ],
-                ]) ?>
+
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                 </button>
                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
@@ -105,7 +99,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'filterModel' => $searchModel,
 
                                                 'columns' => [
-                                                    'sku',
+
+
+                                                    [
+                                                        'attribute'=>'sku',
+                                                        'mergeHeader' => true,
+                                                        'content'=>function($data){
+                                                        return  Html::a( $data->sku, ['articulo/update','id'=>$data->sku]);
+                                                        }
+                                                        ],
+
                                                     'descripcion',
 
 

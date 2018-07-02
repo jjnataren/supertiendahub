@@ -13,11 +13,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="articulo-view">
 
     <p>
-        <?php echo Html::a('Update', ['update', 'id' => $model->sku], ['class' => 'btn btn-primary']) ?>
-        <?php echo Html::a('Delete', ['delete', 'id' => $model->sku], [
+        <?php echo Html::a('Actualizar', ['update', 'id' => $model->sku], ['class' => 'btn btn-primary']) ?>
+        <?php echo Html::a('Borrar', ['delete', 'id' => $model->sku], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => '¿Seguro que desea borrar este articulo?, ¡No podra recuperarlo! ',
                 'method' => 'post',
             ],
         ]) ?>

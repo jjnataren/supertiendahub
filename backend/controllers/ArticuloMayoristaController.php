@@ -30,7 +30,7 @@ class ArticuloMayoristaController extends Controller
         ];
     }
 
-    
+
     /**
      * Updates an existing KeyStorageItem model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -39,13 +39,13 @@ class ArticuloMayoristaController extends Controller
      */
     public function actionUpdateConfig($id)
     {
-        
-        
+
+
         if (($model = KeyStorageItem::findOne($id)) === null) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
-        
-        
+
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['super-tienda-config']);
         } else {
@@ -54,130 +54,130 @@ class ArticuloMayoristaController extends Controller
             ]);
         }
     }
-    
-    
-    
+
+
+
     /**
      * Gets paridad dollar from PHC Mayoristas
      * @return mixed
      */
     public function actionGetParidad()
     {
-        
+
         $wsdl =
         \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
-        
-        $cliente = 
+
+        $cliente =
         \Yii::$app->keyStorage->get('config.phc.webservice.cliente', '50527');
-        
+
         $llave =
         \Yii::$app->keyStorage->get('config.phc.webservice.llave', '487478');
-        
+
         $params = "<cliente>$cliente</cliente><llave>$llave</llave>";
-        
+
         $client = new \SoapClient($wsdl);
         //$valores = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
-    
+
         return json_encode( $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos );
-        
+
     }
-    
-    
+
+
     /**
      * Performs a soap call to PHC Mayoristas.
      * @return mixed
      */
     public function actionSoapReq(){
-        
+
         //TODO: Build a common SOAP Client for PHC .
         //TODO: Get soap body params by environment vars .
-        $wsdl = 
+        $wsdl =
         \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
-        
-        
+
+
         $params = "<cliente>50527</cliente><llave>487478</llave>";
-        $client = new \SoapClient($wsdl);        
+        $client = new \SoapClient($wsdl);
         //$valores = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
-        
+
         $soap = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML));
-        
+
         return $this->renderPartial('_phc_mayorista_response',['soap_response'=> $soap->datos]);
     }
 
-    
+
     /**
      * Performs a soap call to PHC Mayoristas.
      * @return mixed
      */
     public function actionSyncPhcResume(){
-        
+
         //TODO: Build a common SOAP Client for PHC .
         //TODO: Get soap body params by environment vars .
         $wsdl =
         \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
-        
-        
+
+
         $params = "<cliente>50527</cliente><llave>487478</llave>";
-        
+
         $client = new \SoapClient($wsdl);
         $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
-        //TODO: Optimize search proccess 
-        
+        //TODO: Optimize search proccess
+
         $paridad = $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
-        
-        
+
+
         if (Yii::$app->request->post()) {
-            
+
             $model = new ArticuloMayorista();
-            
+
             $model->load( Yii::$app->request->post() );
-            
+
             $model =  ArticuloMayorista::findOne($model->sku);
-            
+
             if (!$model)
                 $model = new ArticuloMayorista();
-            
+
             $model->load( Yii::$app->request->post());
-            
+
             if (!$model->save() ) {
-                
+
                 throw new NotFoundHttpException('Error al guardar');
             }
-            
-           
-        } 
-        
+
+
+        }
+
         $articles = [];
-        
-        
+
+
         $filter =   Yii::$app->request->get('filter');
-        
+
         foreach ($soap_response as $articulo){
-            
+
             $model =  new ArticuloMayorista();
             $model->attributes = get_object_vars($articulo);
-            
+
             $dbModel = ArticuloMayorista::findOne($model->sku);
-     
-                            
+
+
                     if(  !$dbModel || $dbModel->precio*1 !==  $model->precio*1)
                         $articles[$model->sku] = ['dbmodel'=>$dbModel, 'model'=>$model];
         }
-        
-        
+
+
         if (Yii::$app->request->get('dashboard')!== null &&  Yii::$app->request->get('dashboard'))
             return $this->renderPartial('_sync_phc',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
-        
+
         return $this->renderPartial('_sync_phc_resume',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
     }
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     /**
      * Lists all KeyStorageItem models.
      * @return mixed
@@ -190,17 +190,17 @@ class ArticuloMayoristaController extends Controller
             'defaultOrder' => ['key' => SORT_DESC]
         ];
         $dataProvider->query->andWhere('`key` like "config.phc%"');
-        
+
         return $this->render('supertienda_config', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
-    
-    
-    
-    
-    
+
+
+
+
+
     /**
      * Lists all ArticuloMayorista models.
      * @return mixed
@@ -209,12 +209,12 @@ class ArticuloMayoristaController extends Controller
     {
         $searchModel = new ArticuloMayoristaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        
+
         $searchSnapModel = new ArticuloMayoristaSnapSearch();
         $snapDataProvider = $searchSnapModel->search(Yii::$app->request->queryParams);
-     
+
         $soap_response = [];
-            
+
          return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -223,34 +223,34 @@ class ArticuloMayoristaController extends Controller
             'snapDataProvider'=>$snapDataProvider
         ]);
     }
-    
-    
-    
+
+
+
     /**
      * Imports set of articles to dw.
      * @return mixed
      */
     public function actionGenerateSnap(){
-        
+
         if (Yii::$app->request->post()){
-            
+
             //TODO: Build a common SOAP Client for PHC .
            // $wsdl = "http://localhost:8088/servidor.php?wsdl";
            // $client = new \SoapClient($wsdl);
-            
+
           //  $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
-        
+
                 $articles = ArticuloMayorista::findBySql('select * from tbl_articulo_mayorista')->all();
-                
+
                 $soap_response = [];
                 foreach ($articles as $article){
-                    
+
                     $soap_response[] = $article->attributes;
-                    
+
                 }
-            
+
                 ArticuloMayoristaSnap::updateAll(['actual'=>0]);
-                
+
                 $snapModel = new ArticuloMayoristaSnap();
                 $snapModel->fecha_creacion =date ('Y-m-d H:i:s');
                 $snapModel->nombre = 'PHC'.date('YmdHis');
@@ -258,9 +258,9 @@ class ArticuloMayoristaController extends Controller
                 $snapModel->actual = true;
                 $snapModel->disponible = true;
                 $snapModel->numero_registros = count($soap_response);
-                
-                
-                
+
+
+
                 if($snapModel->save())
                     Yii::$app->session->setFlash('alert', [
                         'options' => ['class' => 'alert-success'],
@@ -270,120 +270,120 @@ class ArticuloMayoristaController extends Controller
                         'options' => ['class' => 'alert-danger'],
                         'body' => 'No fue posible genera la imagen, intente mas tarde.'
                     ]);
-                    
-                //TODO: builds a particular alert into main menu                   
-                
-                
-                
+
+                //TODO: builds a particular alert into main menu
+
+
+
                 return $this->redirect(['index']);
-            
+
         }
-        
+
     }
-    
-    
+
+
     /**
      * Sets a SNAPSHOT as current to compare to
      */
     public function actionSelectSnap(){
-        
+
         if (Yii::$app->request->get()){
-            
+
             $id = Yii::$app->request->get('id');
-            
+
             $transaction = ArticuloMayoristaSnap::getDb()->beginTransaction();
-           
+
             try {
-            
+
             ArticuloMayoristaSnap::updateAll(['actual'=>false]);
-            
+
             $model = ArticuloMayoristaSnap::findOne($id);
-            
+
             $model->actual = true;
-            
+
             $model->save();
-            
+
             ArticuloMayorista::deleteAll();
-            
+
             $soap_response = json_decode( $model->data);
-            
-            
+
+
             foreach ($soap_response as $articulo){
-                
+
                 $articuloModel =  new ArticuloMayorista();
-                
+
                 $articuloModel->attributes = get_object_vars($articulo);
-                
+
                 $articuloModel->save();
-                
+
             }
-            
+
             $transaction->commit();
-            
-            
+
+
             Yii::$app->session->setFlash('alert', [
                 'options' => ['class' => 'alert-success'],
                 'body' => ' Se ha seleccionado la imagen <i class="fa fa-camera">    '.$model->nombre.'</i> como actual.'
             ]);
-            
+
             } catch(\Exception $e) {
                 $transaction->rollBack();
-                
+
                 Yii::$app->session->setFlash('alert', [
                     'options' => ['class' => 'alert-danger'],
                     'body' => 'No se ha podido establecer la imagen deseada '
                 ]);
-                
+
             } catch(\Throwable $e) {
                 $transaction->rollBack();
-                
+
                 Yii::$app->session->setFlash('alert', [
                     'options' => ['class' => 'alert-danger'],
                     'body' => 'No se ha podido establecer la imagen deseada '
                 ]);
             }
-        
+
         }
-        
+
         return $this->redirect(['index']);
-    
+
     }
-    
-    
-    
+
+
+
     /**
      * Imports set of articles to dw.
      * @return mixed
      */
     public function actionImport(){
-        
+
         if (Yii::$app->request->post()){
-            
+
             //TODO: Build a common SOAP Client for PHC .
             $wsdl = "http://localhost:8088/servidor.php?wsdl";
             $client = new \SoapClient($wsdl);
-       
-            
+
+
             $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
-            
-        
-            
+
+
+
             $transaction = ArticuloMayoristaSnap::getDb()->beginTransaction();
             try {
-                
-                
-                
+
+
+
                 $articles = ArticuloMayorista::findBySql('select * from tbl_articulo_mayorista')->all();
-                
+
                 $currentSnap = [];
                 foreach ($articles as $article){
-                    
+
                     $currentSnap[] = $article->attributes;
-                    
+
                 }
-                
-               
-                
+
+
+
                 $snapModelCurrent = new ArticuloMayoristaSnap();
                 $snapModelCurrent->fecha_creacion =date ('Y-m-d H:i:s');
                 $snapModelCurrent->nombre = 'PHC'.date('YmdHis');
@@ -392,11 +392,11 @@ class ArticuloMayoristaController extends Controller
                 $snapModelCurrent->disponible = true;
                 $snapModelCurrent->numero_registros = count($currentSnap);
                 $snapModelCurrent->save();
-                
+
                 sleep(2);
-                
+
                 ArticuloMayoristaSnap::updateAll(['actual'=>0]);
-                
+
                 $snapModel = new ArticuloMayoristaSnap();
                 $snapModel->fecha_creacion =date ('Y-m-d H:i:s');
                 $snapModel->nombre = 'PHC'.date('YmdHis');
@@ -405,61 +405,61 @@ class ArticuloMayoristaController extends Controller
                 $snapModel->disponible = true;
                 $snapModel->numero_registros = count($soap_response);
                 $snapModel->save();
-                
+
                 ArticuloMayorista::deleteAll();
-                
+
                 foreach ($soap_response as $articulo){
-                    
+
                     $model =  new ArticuloMayorista();
                     $model->attributes = get_object_vars($articulo);
                     $model->save();
-                   
+
                 }
-                
+
                 Yii::$app->getSession()->setFlash('success', [
                     'body'=>'Se ha guardado una nueva imagen del estado actual [ '.$snapModel->nombre.' ] ',
                     'options'=>['class'=>'alert-success']
                 ]);
-                
+
                 Yii::$app->getSession()->setFlash('success', [
                     'body'=>'Se han importado '.count($soap_response).' articulos correctamente a SUPERTIENDA HUB',
                     'options'=>['class'=>'alert-success']
                 ]);
-                
+
                 Yii::$app->getSession()->setFlash('success', [
                     'body'=>'Se ha generado una nueva imagen con los articulos importados [ '.$snapModel->nombre.' ] ',
                     'options'=>['class'=>'alert-success']
                 ]);
-                
-                
-                
+
+
+
                 $transaction->commit();
-                
-                
-                
+
+
+
             } catch(\Exception $e) {
                 $transaction->rollBack();
-               
+
                 Yii::$app->getSession()->setFlash('alert', [
                     'body'=>'Ha ocurrido un error al importar los datos de PHC Mayoristas <b /> Detalle: '.$e->getMessage(),
                     'options'=>['class'=>'alert-danger']
                 ]);
-                
+
             } catch(\Throwable $e) {
                 $transaction->rollBack();
-                
+
                 Yii::$app->getSession()->setFlash('alert', [
                     'body'=>'Ha ocurrido un error al importar los datos de PHC Mayoristas <b /> Detalle: '.$e->getMessage(),
                     'options'=>['class'=>'alert-danger']
                 ]);
             }
-            
-            
+
+
             return $this->redirect(['index']);
         }
-        
+
     }
-    
+
     /**
      * Lists all ArticuloMayorista models.
      * @return mixed
@@ -468,12 +468,12 @@ class ArticuloMayoristaController extends Controller
     {
         $searchModel = new ArticuloMayoristaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        
+
         return $this->render('index-tienda', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-           
-            
+
+
         ]);
     }
 
@@ -518,13 +518,13 @@ class ArticuloMayoristaController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            
-            
+
+
             Yii::$app->session->setFlash('alert', [
                 'options' => ['class' => 'alert-success'],
                 'body' => ' Se ha actualizado el artículo ['.$model->sku.'] correctamente.'
             ]);
-            
+
             return $this->redirect(['index']);
         } else {
             return $this->render('update', [

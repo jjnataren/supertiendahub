@@ -239,72 +239,72 @@ CREATE TABLE IF NOT EXISTS `tbl_articulo_mayorista_snap` (
 
 DROP TABLE IF EXISTS `tbl_articulo_meli`;
 CREATE TABLE IF NOT EXISTS `tbl_articulo_meli` (
-  `sku` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `id` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
-  `marca` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `serie` varchar(200) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `sku` varchar(200) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `id` varchar(200) COLLATE utf8_spanish2_ci NOT NULL,
+  `marca` varchar(200) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `serie` varchar(200) COLLATE utf8_spanish2_ci DEFAULT NULL,
   `precio` double DEFAULT NULL,
   `precio_original` double DEFAULT NULL,
   `cambio` int(11) DEFAULT NULL,
-  `site_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `title` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `subtitle` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `seller_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `category_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `price` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `base_price` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `original_price` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `currency_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `initial_quantity` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `available_quantity` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `sold_quantity` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `sale_terms` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `buying_mode` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `listing_type_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `start_time` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `historical_start_time` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `stop_time` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `end_time` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `expiration_time` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `condition` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `permalink` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `thumbnail` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `secure_thumbnail` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `pictures` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `video_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `descriptions` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `accepts_mercadopago` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `non_mercado_pago_payment_methods` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `shipping` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `international_delivery_mode` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `seller_address` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `seller_contact` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `location` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `geolocation` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `coverage_areas` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `attributes` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `warnings` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `listing_source` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `variations` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `status` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `sub_status` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `tags` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `warranty` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `catalog_product_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `domain_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `tbl_articulo_melicol` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `seller_custom_field` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `tbl_articulo_melicol1` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `parent_item_id` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `differential_pricing` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `deal_ids` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `automatic_relist` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `date_created` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `last_updated` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
-  `health` varchar(45) COLLATE utf8_spanish_ci DEFAULT NULL,
+  `site_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `title` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `subtitle` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `seller_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `category_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `price` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `base_price` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `original_price` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `currency_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `initial_quantity` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `available_quantity` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `sold_quantity` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `sale_terms` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `buying_mode` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `listing_type_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `start_time` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `historical_start_time` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `stop_time` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `end_time` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `expiration_time` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `condition` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `permalink` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `thumbnail` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `secure_thumbnail` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `pictures` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `video_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `descriptions` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `accepts_mercadopago` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `non_mercado_pago_payment_methods` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `shipping` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `international_delivery_mode` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `seller_address` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `seller_contact` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `location` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `geolocation` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `coverage_areas` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `attributes` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `warnings` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `listing_source` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `variations` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `status` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `sub_status` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `tags` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `warranty` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `catalog_product_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `domain_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `tbl_articulo_melicol` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `seller_custom_field` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `tbl_articulo_melicol1` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `parent_item_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `differential_pricing` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `deal_ids` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `automatic_relist` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `date_created` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `last_updated` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `health` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_meli` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 
 DROP TABLE IF EXISTS `tbl_articulo_meli_snap`;
@@ -337,14 +337,14 @@ INSERT INTO `tbl_articulo_meli` (`sku`, `id`, `marca`, `serie`, `precio`, `cambi
 DROP TABLE IF EXISTS `tbl_articulo_prestashop`;
 CREATE TABLE IF NOT EXISTS `tbl_articulo_prestashop` (
   `sku` varchar(200) NOT NULL,
-  `id_prestashop` varchar(200) NOT NULL,
-  `marca` varchar(200) DEFAULT NULL,
-  `serie` varchar(200) DEFAULT NULL,
+  `id_prestashop` varchar(200) CHARACTER SET utf8 COLLATE utf8_spanish2_ci NOT NULL,
+  `marca` varchar(200) CHARACTER SET utf8 COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `serie` varchar(200) CHARACTER SET utf8 COLLATE utf8_spanish2_ci DEFAULT NULL,
   `precio` float NOT NULL,
   `cambio` int(11) NOT NULL,
   `precio_original` double NOT NULL DEFAULT '0',
   UNIQUE KEY `id_prestashop_index` (`id_prestashop`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 -- --------------------------------------------------------
 
@@ -363,7 +363,7 @@ CREATE TABLE IF NOT EXISTS `tbl_articulo_prestashop_snap` (
   `actual` int(11) DEFAULT NULL,
   `numero_registros` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 -- --------------------------------------------------------
 
@@ -480,7 +480,7 @@ CREATE TABLE IF NOT EXISTS `tbl_key_storage_item` (
   `created_at` int(11) DEFAULT NULL,
   PRIMARY KEY (`key`),
   UNIQUE KEY `idx_key_storage_item_key` (`key`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `tbl_key_storage_item`
@@ -506,6 +506,19 @@ INSERT INTO `tbl_key_storage_item` (`key`, `value`, `comment`, `updated_at`, `cr
 ('config.phc.webservice.cliente', '50527', 'Identificador del cliente', 1528657465, 1527098083),
 ('config.phc.webservice.llave', '487478', 'Llave del cliente', 1528657465, 1527098083);
 
+
+insert into `tbl_key_storage_item` values ('config.prestashop.client.password', 'yc5uwH2HTwh61hRDclBiaGYyMDcwMDNiNTkxMjJkMmQxZGYwOTFlNzhlMDAzYjAyZDQ4NWQ2ZmY2MjRlZjE4YWVmYTMwNGViMDU2OWM4MDAsFgIG+ywUqSSNqbLvmt/xj+jDgoEK5Qp6uexZktC/MfUbRBj+j5h7Aq215n6UwYltpIeUqhLl49Gr8aLy3tuu', 'Password para conectarse a prestashop', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.prestashop.client.url.api', 'VrACX16Xy/vRBws2hxoijTA5ODdmMWQwNjlmZGZjOTM4NTU0NzhkZTZhZGJhNTE5MjMxZGY1YThlOGQxOTY5N2E5NjVjYzg0MGEyNmU3MTdiBYBblI+EM3x+f5SsUYajpfFZ4KZH3P5XoEYzrxaGO3Rj4QO7MrQoqxeitu4+KSeMx1Mh4OA4SS/xL60ghppP', 'Ruta para conectarse a prestashop', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.prestashop.client.filter', '1r6RV2P/lmzRexxlh36XiGE4ODYwZWVjM2VmZWI5ZGY2NGE4OGE4MTk5NDNiMWQwMGJhMWNiZjk2ODRkYjI3YTUwN2Q2NWZhYmEzYmUzMzdB/52Sn6V55c+efg4IkiHOXKPa3Nba5FjoAIDMK9N4OA==', 'Filtro para realizar la búsqueda en prestashop', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.prestashop.client.timeout', 'hAlYc8AUT2R2oboKmGTXxTE5ZWViYjNkMGIxOThjOGU0Y2RjNWEzOGI0NTBjZjFhNjRjZWQyOTI4YWYxNDQ4YjBlNDY5NzdkNDNkZjVmNmNMeBjnO34CtNb+t8ry1CUTCbyPeKxrX6xETuln9jn+Sg==', 'Timeout de respuesta del servicio.', 1527308303, 1527098083);
+
+insert into `tbl_key_storage_item` values ('config.meli.client.secret', 'WVuU0s9hJgEUybRTvQmFDTA1ZWY1NzQ1NGUyZTkxNzNiNjExNDIyNzU3MzU1NDBkM2I5ZGIxZGIzNzc2YjA4Y2U1ZWZiZjUzYTMwN2RjOTQTy0UgVlbQgjtCgaoYj5h5K6T6bwgZNXZfnmMwmlEyv+fLEGbs7i6LmXG2GGe2S/BdANTDZxA6XvAHg6DY533e', 'OAuth2 Client secret para Mercado Libre', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.meli.client.id', '9UQpNZsaIe/6lIaMiE7+njczNzkwNzQwMzk5NWIzMTk5NzRjYzUzNTA2ODYyNGFiODU3MjBlZDEyOTkwNWI0ZmVhMThlZWQ2MzA5NDZjZmHV7hIGz1aC0kRDmJ1WlC3/TaeT8YDcdPRfjgHQsdqUHv3I7ACJEGeTCgvOYU/TrC8=', 'OAuth2 Client Id para mercado libre', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.meli.client.userid', '/izf/+t/c30c870PirdoqjdjNDEwODA0NWIyYjViNTk3OWRlNzU0NzNmYTJmM2M5NzRjMjI2MTU3YmQwZmQ5MDQ1MmY5OWFjMmQ2ODNkNzVsKU3BGP0TeGdvwh/n5dqLpo7nx8zuoJl/dzDhTyRx5w==', 'User Id de Mercado libre', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.meli.client.url.token', 'yZ7nxPrY3YigPk8WHpBGGGVhNzM4NGMxYTQzOTAzNGEwYzg3MGNjMGEyZTYzNTQ3MDUzYjA1ZjlhOTcyMDZhN2ViNTMxMzNmZGIwNzE3ZDFgcuRI5kMvWflAj+zavq85wMU5Ct/JqQT5NSPj3gydzoWRMtoLtfsu25eFEz7aWMCBejym+XDOMPTZRvg7pjB5', 'URL para obtener token de mercado libre', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.meli.client.url.api', 'LxMT2gtcmue5Nahbe5HpWjQxNDM0YTBmMmEzZGY0MTNhN2ViYTE5MDIwZWMzMDYxZmM5YmU4NDViYmU0MjIxZTA4MTFlYjA0NGNiZTFmMTOQcd3NFZHm2DwfNGLk85BdlLGho7t9GNtdrX9OecGvrKUEYqrFxX7KzwCnD+Uz0ZQ=', 'URL para conectarse a Mercado Libre', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.meli.client.filter', 'N/lU1w8XxivpMkrmcw2BgzI3NDdjMjI5NWJlZjY4MDJhNWM3ZDg4ODkzMTQwOWM0ZDA1ZTE5YzdkZmU4MDQxOGFkNjUwOGM4ZGQ4YWRjZmYjWWx69Rb1VHIhJn6JaaollN1tSO9Yi5Ha2MzjaAQGkA==', 'Filtro de búsqueda para Mercado Libre', 1527308303, 1527098083);
+insert into `tbl_key_storage_item` values ('config.meli.client.timeout', 'W/pAfzrpmP68h0/h7aw0wTI4M2JjMzMxODJkNGU1MDcwZjU2ZmEzODVlOGIzODY2Y2FlYzJlNGU3ZWY3NjUwYzc1MThkZWE4OWI1YmU5NTJ9RU3pNU/j1YSPZwfyy08M7cVZcsBiKu3goHuqEfWt8A==', 'Timeout de respuesta del servicio', 1527308303, 1527098083);
 -- --------------------------------------------------------
 
 --

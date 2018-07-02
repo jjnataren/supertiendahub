@@ -131,7 +131,7 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <table id="prestashop_table" class="table table-bordered table-hover">
+                                <table id="prestashop_table" class="table table-bordered table-hover table-responsive">
                                     <thead>
                                     <tr>
                                         <th>SKU</th>

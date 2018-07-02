@@ -24,7 +24,10 @@ $this->registerJsFile('@web/js/prestashop.snap.js', ['depends' => [\yii\web\Jque
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <?php echo Html::button('Generar Snapshot', ['class' => 'btn btn-primary', 'id' => 'snapshot_button']) ?>
+    <div class="btn-group">
+        <?php echo Html::button('Generar Snapshot', ['class' => 'btn btn-primary', 'id' => 'snapshot_button']) ?>
+        <?php echo Html::button('Restaurar Snapshot', ['class' => 'btn btn-warning', 'id' => 'snapshot_restore_button']) ?>
+    </div>
 
     <?php Pjax::begin(['id' => 'prestashop_snap']) ?>
     <?php try {

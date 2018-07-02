@@ -3,7 +3,6 @@
 namespace backend\controllers;
 
 use backend\models\Articulo;
-use backend\models\ArticuloMayorista;
 use backend\models\ArticuloMeli;
 use backend\models\client\MeliOAuth2Client;
 use backend\models\MeliModel;
@@ -14,6 +13,7 @@ use common\models\KeyStorageItem;
 use trntv\bus\exceptions\MissingHandlerException;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\Query;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -38,17 +38,12 @@ class ArticuloMeliController extends Controller
 
 
     /**
-     * Lists all ML Items throught partial render view
-     * @return \yii\db\ActiveRecord[]|array[]|NULL[]
+     * @return string
      */
     public function actionGetItemsView()
     {
 
         $client = $this->getClient();
-
-        $articles = ArticuloMayorista::find()->all();
-
-        $meli = array();
 
         $items = [];
 
@@ -161,7 +156,7 @@ class ArticuloMeliController extends Controller
                     }
 
                     if ($article->tipo_utilidad_ml === 1) {
-                        $utilidad = ($article->utilidad_ml / 100) + 1;
+                        $utilidad = $article->utilidad_ml + 1;
                         $precio *= $utilidad;
                     } else {
                         $utilidad = $article->utilidad_ml;
@@ -328,4 +323,50 @@ class ArticuloMeliController extends Controller
 
         return $client;
     }
+
+    public function actionHubMeli()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return (new Query())
+            ->select(['am.sku', 'a.descripcion', 'a.precio as precio', 'am.precio_original as precio_meli', 'am.precio as precio_utilidad'])
+            ->from(['tbl_articulo a', 'tbl_articulo_meli am'])
+            ->where('a.sku = am.sku')
+            ->all();
+    }
+
+    /**
+     * @throws PrestaShopWebserviceException
+     * @throws InvalidConfigException
+     */
+    public function actionHubOnlineMeli()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $formatter = \Yii::$app->formatter;
+
+        $client = $this->getClient();
+        $url = 'users/215058471/items/search';
+        $ids = implode(',', $client->get($url)->getData()['results']);
+
+        $items = $client->get('items', ['ids=' . $ids])->getData();
+
+        $results = array();
+
+        foreach ($items as $item) {
+            $articuloMeli = ArticuloMeli::find()->where(['id' => $item['id']])->one();
+
+            $result = array(
+                'id_meli' => $item['id'],
+                'reference' => $item['seller_custom_field'],
+                'price' => '$' . $formatter->asCurrency($item['price'], 'MXN'),
+                'price_hub' => '$' . $formatter->asCurrency($articuloMeli['precio'], 'MXN')
+            );
+
+            $results[] = $result;
+        }
+
+        return $results;
+    }
+
 }

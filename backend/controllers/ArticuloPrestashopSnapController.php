@@ -3,13 +3,16 @@
 namespace backend\controllers;
 
 use backend\models\ArticuloPrestashop;
-use Yii;
 use backend\models\ArticuloPrestashopSnap;
+use backend\models\client\PrestashopClient;
+use backend\models\client\PrestaShopWebserviceException;
 use backend\models\Search\ArticuloPrestashopSnapSearch;
+use common\models\KeyStorageItem;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * ArticuloPrestashopSnapController implements the CRUD actions for ArticuloPrestashopSnap model.
@@ -28,7 +31,8 @@ class ArticuloPrestashopSnapController extends Controller
         ];
     }
 
-    public function actionCreateSnapshot() {
+    public function actionCreateSnapshot()
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $prestashopArticles = ArticuloPrestashop::find()->all();
         ArticuloPrestashopSnap::updateAll(['actual' => 0], 'disponible = 1');
@@ -45,6 +49,60 @@ class ArticuloPrestashopSnapController extends Controller
 
         $snapshot->data = null;
         return $snapshot;
+    }
+
+    /**
+     * @return array
+     * @throws \backend\models\client\PrestaShopWebserviceException
+     */
+    public function actionRestoreSnapshot()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $client = $this->getClient();
+        $snap = ArticuloPrestashopSnap::find()->where(['actual' => 1])->one();
+        $articles = Json::decode($snap->data);
+
+        $articlesPrestashop = array();
+
+        foreach ($articles as $article) {
+            $articlePrestashop = ArticuloPrestashop::find()->where(['sku' => $article['sku']])->one();
+
+            $opt = array('resource' => 'products');
+            $opt['id'] = $articlePrestashop->id_prestashop;
+
+            $xml = $client->get($opt);
+            $children = $xml->children()->children();
+            unset($children->manufacturer_name, $children->quantity);
+
+            $children->price = $article['precio'];
+            $articlePrestashop->precio = $article['precio'];
+            $articlePrestashop->precio_original = $article['precio_original'];
+            $articlePrestashop->cambio = 0;
+
+            $opt = array('resource' => 'products');
+            $opt['putXml'] = $xml->asXML();
+            $opt['id'] = $articlePrestashop->id_prestashop;
+
+            try {
+                $client->edit($opt);
+            } catch (PrestaShopWebserviceException $e) {
+            }
+
+            $articlePrestashop->save();
+
+            $articlesPrestashop[] = $articlePrestashop;
+        }
+
+        return $articlesPrestashop;
+    }
+
+    private function getClient()
+    {
+        $security = Yii::$app->getSecurity();
+        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
+        $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
+        return new PrestashopClient($apiUrl, $key);
     }
 
     /**
@@ -73,6 +131,22 @@ class ArticuloPrestashopSnapController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+    /**
+     * Finds the ArticuloPrestashopSnap model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return ArticuloPrestashopSnap the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = ArticuloPrestashopSnap::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
     /**
@@ -139,19 +213,4 @@ class ArticuloPrestashopSnapController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the ArticuloPrestashopSnap model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return ArticuloPrestashopSnap the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = ArticuloPrestashopSnap::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
 }

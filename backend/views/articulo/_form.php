@@ -8,15 +8,19 @@ use yii\bootstrap\ActiveForm;
 /* @var $form yii\bootstrap\ActiveForm */
 ?>
 
-<div class="articulo-form">
+<div class="row">
+	 <?php $form = ActiveForm::begin(); ?>
+    <div class="col-md-12">
+  	  <?php echo $form->errorSummary($model); ?>
+	</div>
 
-    <?php $form = ActiveForm::begin(); ?>
+<div class="col-md-8">
 
-    <?php echo $form->errorSummary($model); ?>
+
 
     <?php echo $form->field($model, 'sku')->textInput(['maxlength' => true]) ?>
 
-    <?php echo $form->field($model, 'descripcion')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'descripcion')->textarea() ?>
 
     <?php echo $form->field($model, 'sku_fabricante')->textInput(['maxlength' => true]) ?>
 
@@ -28,7 +32,15 @@ use yii\bootstrap\ActiveForm;
 
     <?php echo $form->field($model, 'serie')->textInput(['maxlength' => true]) ?>
 
+    <?php echo $form->field($model, 'disponible')->dropDownList([0=>'No', 1=>'Si']) ?>
+
+
+</div>
+    <div class="col-md-4">
+
     <?php echo $form->field($model, 'precio')->textInput(['maxlength' => true]) ?>
+
+
 
     <?php echo $form->field($model, 'peso')->textInput() ?>
 
@@ -44,17 +56,18 @@ use yii\bootstrap\ActiveForm;
 
     <?php echo $form->field($model, 'existencia')->textInput() ?>
 
-    <?php echo $form->field($model, 'disponible')->textInput() ?>
 
-    <?php echo $form->field($model, 'ultima_modificacion')->textInput() ?>
 
-    <?php echo $form->field($model, 'id_usuario_modifico')->textInput() ?>
+    <?php echo $form->field($model, 'ultima_modificacion')->textInput(['readonly'=>'true']) ?>
 
-    <?php echo $form->field($model, 'id_snap')->textInput() ?>
 
-    <div class="form-group">
-        <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+
     </div>
+
+
+    <div class ="col-md-12">
+    <?php echo Html::submitButton($model->isNewRecord ? 'Crear' : 'Actualizar', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+ 	</div>
 
     <?php ActiveForm::end(); ?>
 
