@@ -33,6 +33,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                     <i class="fa fa-money"></i>
                     <label id="label_paridad"></label>
                     <label id="label_paridad_estatus"></label>
+               		<i id="paridad" class="fa fa-spinner fa-spin"></i>
                 </h3>
                 <p>
 
@@ -43,7 +44,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                 <i class="ion ion-bag"></i>
             </div>
             <a class="small-box-footer" href="#anchor_dash" id="request_paridad">
-                Actualizar <i class="fa fa-arrow-circle-right"></i>
+                Revisar <i class="fa fa-arrow-circle-right"></i>
             </a>
         </div>
     </div><!-- ./col -->
@@ -52,8 +53,10 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         <div class="small-box bg-light-blue">
             <div class="inner">
                 <h3>
-                    <i class="glyphicon glyphicon-calendar"></i>
-                    10
+                   <i class="fa fa-cart-arrow-down"></i>
+                                       <label id="label_phc"></label>
+                                       <label id="label_phc_estatus"></label>
+                                       <i id="phc_icon" class="fa fa-spinner fa-spin"></i>
                 </h3>
                 <p>
                     Cambios en articulos PHC
@@ -104,27 +107,23 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         </div>
     </div><!-- ./col -->
 </div><!-- /.row -->
-
-
 <h4 class="page-header" id="anchor_supertienda">
     Articulos de SUPER TIENDA
     <small>almacenados en base de datos.</small>
-
-
 </h4>
 
 <div class="row">
-
-
     <div class="col-md-12 col-sm-12 col-xs-12">
         <!-- Custom Tabs (Pulled to the right) -->
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs pull-right">
-                <?php $i = 1; ?>
 
-
-                <li><a data-toggle="tab" href="#tab_sync">SUPER TIENDA - PHC</a></li>
-                <li class="active"><a data-toggle="tab" href="#tab_super_tienda">SUPER TIENDA</a></li>
+             <li>
+             	<a data-toggle="tab" href="#tab_sync">
+             		<small id="bag_count_phc" class="label label-danger"><i class="fa fa-spinner fa-spin"></i></small> SUPER TIENDA - PHC
+             	</a>
+             </li>
+             <li class="active"><a data-toggle="tab" href="#tab_super_tienda"><i class="fa fa-database"></i> SUPER TIENDA</a></li>
 
 
                 <li class="pull-left header"><i class="fa fa-mixcloud"></i> SUPER TIENDA HUB</li>
@@ -294,7 +293,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                         <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda"
                                 data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
                         </button>
-                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['comision-mixta-cap/dashboard', 'id' => 1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
+                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['articulo/index',], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
                     </p>
                 </div><!-- /.tab-pane -->
 
@@ -313,7 +312,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                                 </div>
                                 <div class="panel-footer">
 
-                                    <a href="#anchor_supertienda" class="btn btn-primary"
+                                    <a href="/articulo-mayorista/index" class="btn btn-primary"
                                        id="syncrequest">Actualizar </a>
                                 </div>
                             </div>
@@ -848,8 +847,8 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
             type: "GET",
             url: filterUrl,
             data: {}, success: function (result) {
-
-                $('#label_paridad').html(result);
+				$('#paridad').attr('class', '');
+                 $('#label_paridad').html("$"+result);
 
             }, error: function (result) {
 
@@ -938,8 +937,12 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
                 $('#phcMayoristaSync').html(result);
 
-                var totalChanges = $('#totalChanges').val();
+                 $('#label_phc').html( $('#totalChanges').val());
 
+             	$('#bag_count_phc').html( $('#totalChanges').val())
+
+
+             $('#phc_icon').attr('class', '');
 
                 $('#comparegrid').DataTable({});
 
@@ -977,8 +980,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
             }, error: function (result) {
 
-                $('#phcMayoristaArt').html('Ha ocurrido un error intente mas tarde ...');
-
+             $('#label_phc_estatus').html('Error');
             }
         });
     }
@@ -996,4 +998,4 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
 
 </script>
-<?php JSRegister::end(); ?>                                
+<?php JSRegister::end(); ?>

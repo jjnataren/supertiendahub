@@ -8,6 +8,8 @@ use backend\models\search\ArticuloSearch;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use backend\models\search\KeyStorageItemSearch;
+use common\models\KeyStorageItem;
 
 /**
  * ArticuloController implements the CRUD actions for Articulo model.
@@ -231,6 +233,52 @@ class ArticuloController extends Controller
 
             return $this->renderPartial('_sync_phc_resume',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
     }
+
+
+    /**
+     * Lists all KeyStorageItem models.
+     * @return mixed
+     */
+    public function actionConfig()
+    {
+        $searchModel = new KeyStorageItemSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->sort = [
+            'defaultOrder' => ['key' => SORT_DESC]
+        ];
+        $dataProvider->query->andWhere('`key` like "config.st.tienda%"');
+
+        return $this->render('config', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+
+    /**
+     * Updates an existing KeyStorageItem model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdateConfig($id)
+    {
+
+
+        if (($model = KeyStorageItem::findOne($id)) === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['config']);
+        } else {
+            return $this->render('update_config', [
+                'model' => $model,
+            ]);
+        }
+    }
+
 
 
     /**

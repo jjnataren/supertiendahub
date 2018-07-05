@@ -2,12 +2,17 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use backend\assets\SwalAsset;
+SwalAsset::register($this);
+
+
+
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\search\KeyStorageItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Configuracion temporizador PHC Mayoristas';
+$this->title = 'Configuración SUPER TIENDA HUB';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="row">

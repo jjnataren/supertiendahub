@@ -163,7 +163,7 @@ $currentUrl =  Yii::$app->request->url ;
                         'icon' => '<i class="fa fa-sitemap"></i>',
 
                         'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['articulo/index']),
+                        'active' => strpos(   $currentUrl   , 'articulo/'),
                         'items' => [
                             ['label' => 'Inicio',
                                 'url' => ['/articulo/index'],
