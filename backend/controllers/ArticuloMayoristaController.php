@@ -12,6 +12,7 @@ use backend\models\ArticuloMayoristaSnap;
 use backend\models\search\ArticuloMayoristaSnapSearch;
 use backend\models\search\KeyStorageItemSearch;
 use common\models\KeyStorageItem;
+use backend\models\Articulo;
 
 /**
  * ArticuloMayoristaController implements the CRUD actions for ArticuloMayorista model.
@@ -172,10 +173,36 @@ class ArticuloMayoristaController extends Controller
     }
 
 
+    /**
+     * Saves a particular articulo.
+     * @return mixed
+     */
+    public function actionSaveAjaxModel(){
 
 
+    if (Yii::$app->request->post()) {
+
+        $model = new ArticuloMayorista();
+
+        $model->load( Yii::$app->request->post() );
+
+        $modelArticulo =  Articulo::findOne($model->sku);
+
+        if (!$modelArticulo)
+            $modelArticulo = new Articulo();
+
+            $modelArticulo->load( $model->attributes);
+
+            if (!$modelArticulo->save() ) {
+
+                throw new NotFoundHttpException('Error al guardar');
+            }
 
 
+    }
+
+    return true;
+    }
 
 
     /**

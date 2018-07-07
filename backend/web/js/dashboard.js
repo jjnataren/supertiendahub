@@ -112,6 +112,10 @@
         console.log(type);
         console.log(data);
 
+        if (type === 'display' && (data === undefined || data === null)) {
+            return 'No definido';
+        }
+
         return type === 'display' ? '$' + data + ' MXN' : data;
     };
 

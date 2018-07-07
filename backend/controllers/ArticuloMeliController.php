@@ -78,6 +78,11 @@ class ArticuloMeliController extends Controller
 
         $articles = Articulo::find()->all();
 
+        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
+        $soapClient = new \SoapClient($wsdl);
+        $paridad = $soapClient->ObtenerParidad('50527', '487478');
+        $dollarPrice = $paridad->datos;
+
         $meli = array();
 
         foreach ($articles as $article) {
@@ -91,12 +96,31 @@ class ArticuloMeliController extends Controller
                     $articleMeli = ArticuloMeliSearch::find()->where(['sku' => $article->sku])->one();
 
                     if ($articleMeli !== null) {
+
+                        if ($article->moneda === 'MN') {
+                            $precio = $article->precio;
+                        } else {
+                            $precio = $article->precio * (double)$dollarPrice;
+                        }
+
+                        if ($article->tipo_utilidad_ps === 1) {
+                            $utilidad = $article->utilidad_ps + 1;
+                            $precio *= $utilidad;
+                        } else {
+                            $utilidad = $article->utilidad_ps;
+                            $precio += $utilidad;
+                        }
+
                         if (number_format($article->precio, 3) !== number_format($articleMeli->precio_original, 3)) {
                             $articleMeli->cambio = 1;
                             $meli[] = $articleMeli;
                             $articleMeli->save();
                         } else if ($articleMeli->cambio === 1) {
                             $meli[] = $articleMeli;
+                        } else if (number_format($precio, 3) !== number_format($articleMeli->precio, 3)) {
+                            $articleMeli->cambio = 1;
+                            $meli[] = $articleMeli;
+                            $articleMeli->save();
                         }
                     } else {
                         $articleMeli = new ArticuloMeli();

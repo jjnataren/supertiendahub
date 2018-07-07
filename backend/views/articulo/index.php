@@ -1,6 +1,7 @@
 <?php
 
 use kartik\grid\GridView;
+use richardfan\widget\JSRegister;
 use yii\helpers\Html;
 use backend\models\Articulo;
 
@@ -103,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                                     [
                                                         'attribute'=>'sku',
-                                                        'mergeHeader' => true,
+                                                        'mergeHeader' => false,
                                                         'content'=>function($data){
                                                         return  Html::a( $data->sku, ['articulo/update','id'=>$data->sku]);
                                                         }
@@ -293,7 +294,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
-                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>'Reiniciar grid'])
+                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>'Reiniciar grid','id'=>'reset_grid'])
                                                     ],
                                                     '{export}',
                                                     '{toggleData}'
@@ -327,4 +328,151 @@ $this->params['breadcrumbs'][] = $this->title;
                                             ]); ?>
 
 </div>
+
+
+
+
+	<div class="col-md-12" id="resume">
+               <div class="box box-info with-border">
+            <div class="box-header with-border" >
+            	<i class="fa fa-line-chart"></i>
+              <h3 class="box-title">Supertienda cambios</h3>
+
+              <div class="box-tools pull-right">
+              <?php echo Html::a('<i class="fa fa-refresh"></i>', ['#'], ['class' => 'btn']) ?>
+
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="phcMayoristaSync">
+
+				<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
+
+   			 </div>
+
+     <div class="box-footer">
+
+
+
+       			 <?php echo Html::a('<i class="fa fa-refresh"></i> Actualizar', null, ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
+
+
+     </div>
+
+    </div>
+    </div>
+
+
 </div>
+
+
+
+
+ <?php JSRegister::begin(); ?>
+<script>
+
+
+
+
+
+ $('#syncrequest').click(function() {
+
+      doAjax("/articulo/sync-phc-resume");
+
+
+
+  });
+
+
+      function doAjax(filterUrl) {
+
+    	    $('#phcMayoristaSync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>");
+
+    	   $.ajax({
+    	        type: "GET",
+    	        url: filterUrl,
+    	        data: {
+
+    	        }, success: function(result) {
+
+
+    	                     $('#phcMayoristaSync').html(result);
+
+    	                     var totalChanges = $('#totalChanges').val();
+
+    	                     $('#globalStatus').html((totalChanges>0)?'No sincronizado':'Sincronizado');
+
+    	                     $('#comparegrid').DataTable({
+    	                        'scrollX': true,
+    	                            });
+
+
+    	                       $('#sync_success').click(function() {
+
+
+    	                            doAjax("/articulo/sync-phc-resume?filter=success");
+
+    	                        });
+
+    	                        $('#sync_info').click(function() {
+
+
+    	                            doAjax("/articulo/sync-phc-resume?filter=danger");
+
+    	                        });
+
+
+    	                        $('#sync_warning').click(function() {
+
+    	                            doAjax("/articulo/sync-phc-resume?filter=warning");
+
+
+    	                        });
+
+
+    	                        $('#sync_all').click(function() {
+
+    	                                                    doAjax("/articulo/sync-phc-resume");
+
+
+    	                         });
+
+
+    	                $('[id^=phcform]').on('submit', function(e){
+    	                        var form = $(this);
+    	                        var formData = form.serialize();
+
+    	                        $.ajax({
+    	                            url: form.attr("action"),
+    	                            type: form.attr("method"),
+    	                            data: formData,
+    	                            success: function (data) {
+    	                                $('#syncrequest').trigger('click');
+    	                                $('#reset_grid').trigger('click');
+
+    	                            },
+    	                            error: function () {
+    	                                alert("Error al actualizar.");
+    	                            }
+    	                        });
+    	                        e.preventDefault();
+    	                    });
+
+
+    	        }, error: function(result) {
+
+    	             $('#phcMayoristaArt').html('Ha ocurrido un error intente mas tarde ...');
+
+    	        }
+    	    });
+    	}
+
+
+      $('#syncrequest').trigger('click');
+
+
+</script>
+<?php JSRegister::end(); ?>

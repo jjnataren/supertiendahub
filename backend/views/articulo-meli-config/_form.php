@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
 
     <?php echo $form->errorSummary($model); ?>
 
-    <?php echo $form->field($model, 'comment')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'comment')->textInput(['readonly'=>'readonly']) ?>
 
     <?php echo $form->field($model, 'value')->textInput(['maxlength' => true]) ?>
 

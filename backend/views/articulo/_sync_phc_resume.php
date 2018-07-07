@@ -25,8 +25,6 @@ $changes=[];
 								<th />
 								<th>Precio SUPER TIENDA</th>
 								<th>Precio PHC Mayorista</th>
-								<th>Moneda</th>
-								<th />
 								<th />
 						</tr>
 					</thead>
@@ -35,48 +33,37 @@ $changes=[];
 						<?php if($articles): ?>
 						<?php    foreach($articles as $key=>$item): ?>
 
-						<?php if (  !strcmp(  ($art_status =  !isset($item['model']) ? 'info' : ( ($item['dbmodel']->precio < $item['model']->precio) ?'success':'warning' ) ), $filter ) || !$filter  ) :?>
+						<?php if (  !strcmp(  ($art_status =  !isset($item['model']) ? 'danger' : ( ($item['dbmodel']->precio < $item['model']->precio) ?'success':'warning' ) ), $filter ) || !$filter  ) :?>
 
 
     						<tr class="<?=$art_status  ?>" >
 
     						     <td><?= $key ?> </td>
-    						     <td><?= isset($item['model']->descripcion)?$item['model']->descripcion:'' ?></td>
-    						     <td><i class="fa <?=( ($art_status == 'info')?'fa-opencart': ( ($art_status=='warning')?'fa-level-down':'fa-level-up' )  )?>"></i> </td>
-    						     <td><?= Yii::$app->formatter->asCurrency(isset($item['dbmodel']->precio)?$item['dbmodel']->precio:''  )?></td>
-    						     <td><?= Yii::$app->formatter->asCurrency( !strcmp($item['model']->moneda, 'USD') ?  ( isset($item['model']->precio)?$item['model']->precio:0)  * $paridad  : $item['model']->precio)?></td>
+    						     <td><?= isset($item['dbmodel']->descripcion)?$item['dbmodel']->descripcion:'' ?></td>
+    						     <td><i class="fa <?=( ($art_status == 'danger')?'fa-question-circle': ( ($art_status=='warning')?'fa-level-down':'fa-level-up' )  )?>"></i> </td>
+    						     <td><?= Yii::$app->formatter->asCurrency(isset($item['dbmodel']->precio)?$item['dbmodel']->precio  :''  ) . ' ' .  $item['dbmodel']->moneda?></td>
+    						     <td><?= ($item['model'])?  ( Yii::$app->formatter->asCurrency(( isset($item['model']->precio) &&  isset($item['model']->moneda)  )  ?  ( isset($item['model']->precio)?$item['model']->precio:0)   : $item['model']->precio)).  ' ' .  $item['model']->moneda : '-' ?></td>
     						     <!-- TODO: Asignar el valod de moneda en variable global -->
-    						     <td><?= isset($item['model']->moneda)?$item['model']->moneda:'' ?> &nbsp;
-    						     <?=  (isset($item['model']->moneda) && !strcmp($item['model']->moneda, 'USD') )? Yii::$app->formatter->asCurrency( $item['model']->precio ):''?>  </td>
+    						   	 <td>
 
-    						     <td> <?=( ($art_status == 'info')?'Nuevo': ( ($art_status=='warning')?'Bajo':'Subio' )  )?>
+							<?php if($art_status !=='danger'):?>
 
-
-
-    						       </td>
-    						     <td>
-
-    							<?php $form = ActiveForm::begin(['action' => ['sync-phc-resume'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
+    							<?php $form = ActiveForm::begin(['action' => ['sync-phc-resume-save'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
 
 
     						     	 <?php echo $form->field($item['model'], 'sku')->hiddenInput(['maxlength' => true])->label(false); ?>
     						     	 <?php echo $form->field($item['model'], 'precio')->hiddenInput()->label(false); ?>
-
-    						     		<?php if ($art_status == 'info'):  ?>
-                                            <?php echo $form->field($item['model'], 'descripcion')->hiddenInput(['maxlength' => true])->label(false) ?>
-                                            <?php echo $form->field($item['model'], 'sku_fabricante')->hiddenInput(['maxlength' => true])->label(false) ?>
-                                            <?php echo $form->field($item['model'], 'linea')->hiddenInput(['maxlength' => true])->label(false) ?>
-                                            <?php echo $form->field($item['model'], 'marca')->hiddenInput(['maxlength' => true])->label(false) ?>
-                                            <?php echo $form->field($item['model'], 'serie')->hiddenInput(['maxlength' => true])->label(false)?>
-                                		<?php endif;?>
+									 <?php echo $form->field($item['model'], 'moneda')->hiddenInput()->label(false); ?>
 
 
-    						      <?=  Html::submitButton(($art_status == 'info')?'<i class="fa fa-cloud-download"></i> Importar ' :
+
+
+    						      <?=  Html::submitButton(($art_status == 'danger')?'<i class="fa fa-cloud-download"></i> Importar ' :
     						             ( ($art_status == 'warning')? '<i class="fa fa-warning"></i> Actualizar' : '<i class="fa fa-thumbs-o-up"></i> Actualizar'  ),  ['class' =>'btn btn-' .$art_status ])  ?>
 
     						    <?php ActiveForm::end(); ?>
 
-
+							<?php endif;?>
 
     						       </td>
 
@@ -122,14 +109,14 @@ $changes=[];
                        		<i class="fa fa-sync"></i><a  href="#resume" id="sync_all">Productos cambiaron   </a>
                       </p>
                       <p>
-                      	<?php if(!strcmp($filter, 'info')):?>
+                      	<?php if(!strcmp($filter, 'danger')):?>
                       		<i class="fa fa-angle-left pull-right"></i>
                       		<?php endif;?>
 
-                       		  <span class="label label-info">
-                               <?=isset($vals['info'])?$vals['info']:'0'?>
+                       		  <span class="label label-danger">
+                               <?=isset($vals['danger'])?$vals['danger']:'0'?>
                              </span> &nbsp; &nbsp;
-                       		<i class="fa fa-opencart"></i><a href="#resume" id="sync_info" > Nuevos </a>
+                       		<i class="fa fa-question-circle"></i><a href="#resume" id="sync_info" > No existe info </a>
 
 
 

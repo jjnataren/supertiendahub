@@ -10,6 +10,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use backend\models\search\KeyStorageItemSearch;
 use common\models\KeyStorageItem;
+use common\commands\AddToTimelineCommand;
 
 /**
  * ArticuloController implements the CRUD actions for Articulo model.
@@ -232,6 +233,53 @@ class ArticuloController extends Controller
             return $this->renderPartial('_sync_phc',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
 
             return $this->renderPartial('_sync_phc_resume',['articles'=> $articles,'filter'=>$filter,'paridad'=>$paridad]);
+    }
+
+
+      /**
+       * Saves a particular model
+       * @throws NotFoundHttpException
+       */
+    public function actionSyncPhcResumeSave(){
+
+        //TODO: Validate ajax request
+        if (Yii::$app->request->post()) {
+
+            $model = new Articulo();
+
+            $model->load( Yii::$app->request->post() );
+
+
+
+            $model =  Articulo::findOne($model->sku);
+
+            $old_model =  Articulo::findOne($model->sku);
+
+            if (!$model)
+                $model = new Articulo();
+
+                $model->load( Yii::$app->request->post());
+
+                if (!$model->save() ) {
+
+                    throw new NotFoundHttpException('Error al guardar');
+                }
+
+
+                $addToTimelineCommand = new AddToTimelineCommand([
+                    'category' => 'phc',
+                    'event' => 'update',
+                    'data' => ['model' => $model->attributes, 'old_model'=>$old_model->attributes]
+                ]);
+
+
+                Yii::$app->commandBus->handle($addToTimelineCommand);
+
+           return true;
+
+
+        }
+
     }
 
 

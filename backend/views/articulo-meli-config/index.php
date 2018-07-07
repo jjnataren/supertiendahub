@@ -1,6 +1,7 @@
 <?php
 
 
+use backend\assets\SwalAsset;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\grid\SerialColumn;
@@ -10,6 +11,9 @@ $this->title = 'Articulo Mercado Libre Configuraci&oacute;n';
 $this->params['breadcrumbs'][] = $this->title;
 
 Yii::$app->formatter->locale = 'es-MX';
+
+SwalAsset::register($this);
+$this->registerJsFile('@web/js/swalalert.js', ['depends' => [\yii\web\YiiAsset::class]]);
 
 /* @var $searchModel backend\models\search\KeyStorageItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */

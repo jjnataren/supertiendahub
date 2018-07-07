@@ -48,6 +48,11 @@ class ArticuloPrestashopController extends Controller
         $articles = Articulo::find()->all();
         $prestashop = array();
 
+        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
+        $soapClient = new \SoapClient($wsdl);
+        $paridad = $soapClient->ObtenerParidad('50527', '487478');
+        $dollarPrice = $paridad->datos;
+
         foreach ($articles as $article) {
             try {
                 $opt = array('resource' => 'products');
@@ -64,12 +69,31 @@ class ArticuloPrestashopController extends Controller
 
                     $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $article->sku])->one();
                     if ($articlePrestashop !== null) {
+
+                        if ($article->moneda === 'MN') {
+                            $precio = $article->precio;
+                        } else {
+                            $precio = $article->precio * (double)$dollarPrice;
+                        }
+
+                        if ($article->tipo_utilidad_ps === 1) {
+                            $utilidad = $article->utilidad_ps + 1;
+                            $precio *= $utilidad;
+                        } else {
+                            $utilidad = $article->utilidad_ps;
+                            $precio += $utilidad;
+                        }
+
                         if (number_format($article->precio, 3) !== number_format($articlePrestashop->precio_original, 3)) {
                             $articlePrestashop->cambio = 1;
                             $prestashop[] = $articlePrestashop;
                             $articlePrestashop->save();
                         } else if ($articlePrestashop->cambio === 1) {
                             $prestashop[] = $articlePrestashop;
+                        } else if (number_format($precio, 3) !== number_format($articlePrestashop->precio, 3)) {
+                            $articlePrestashop->cambio = 1;
+                            $prestashop[] = $articlePrestashop;
+                            $articlePrestashop->save();
                         }
                     } else {
                         $articlePrestashop = new ArticuloPrestashop();

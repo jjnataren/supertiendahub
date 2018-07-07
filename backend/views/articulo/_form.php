@@ -67,6 +67,15 @@ use yii\bootstrap\ActiveForm;
 
     <div class ="col-md-12">
     <?php echo Html::submitButton($model->isNewRecord ? 'Crear' : 'Actualizar', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+
+ 	 <?php echo Html::a('Borrar', ['delete', 'id' => $model->sku], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => '¿Seguro que desea borrar este articulo?, ¡No podra recuperarlo! ',
+                'method' => 'post',
+            ],
+        ]) ?>
+
  	</div>
 
     <?php ActiveForm::end(); ?>
