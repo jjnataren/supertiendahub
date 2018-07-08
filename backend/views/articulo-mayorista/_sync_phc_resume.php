@@ -13,7 +13,7 @@ $changes=[];
 
 
 
-				 <div class="col-md-9">
+				 <div class="col-md-10">
 
 
 				<table class="table table-hover table-bordered" id="comparegrid"   style="width:100%">
@@ -23,10 +23,11 @@ $changes=[];
 								<th>sku</th>
 								<th>Descripción</th>
 								<th />
-								<th>Precio SUPER TIENDA</th>
-								<th>Precio PHC Mayorista</th>
+								<th>$ Mi tienda</th>
+								<th>$ PCH</th>
 								<th>Moneda</th>
-								<th />
+								<th># Mi tienda</th>
+								<th># Mi PCH</th>
 								<th />
 						</tr>
 					</thead>
@@ -42,28 +43,37 @@ $changes=[];
 
     						     <td><?= $key ?> </td>
     						     <td><?= isset($item['model']->descripcion)?$item['model']->descripcion:'' ?></td>
-    						     <td><i class="fa <?=( ($art_status == 'info')?'fa-opencart': ( ($art_status=='warning')?'fa-level-down':'fa-level-up' )  )?>"></i> </td>
+    						     <td>
+	    						     <?=( ($art_status == 'info')?'Nuevo': ( ($art_status=='warning')?'Bajo':'Subio' )  )?>
+    							     <i class="fa <?=( ($art_status == 'info')?'fa-opencart': ( ($art_status=='warning')?'fa-level-down':'fa-level-up' )  )?>"></i>
+    						     </td>
     						     <td><?= Yii::$app->formatter->asCurrency(isset($item['dbmodel']->precio)?$item['dbmodel']->precio:''  )?></td>
     						     <td><?= Yii::$app->formatter->asCurrency( !strcmp($item['model']->moneda, 'USD') ?  ( isset($item['model']->precio)?$item['model']->precio:0)  * $paridad  : $item['model']->precio)?></td>
     						     <!-- TODO: Asignar el valod de moneda en variable global -->
     						     <td><?= isset($item['model']->moneda)?$item['model']->moneda:'' ?> &nbsp;
-    						     <?=  (isset($item['model']->moneda) && !strcmp($item['model']->moneda, 'USD') )? Yii::$app->formatter->asCurrency( $item['model']->precio ):''?>  </td>
+    						    	 <?=  (isset($item['model']->moneda) && !strcmp($item['model']->moneda, 'USD') )? Yii::$app->formatter->asCurrency( $item['model']->precio ):''?>
+    						      </td>
 
-    						     <td> <?=( ($art_status == 'info')?'Nuevo': ( ($art_status=='warning')?'Bajo':'Subio' )  )?>
-
-
-
-    						       </td>
+    						     <td> <?=isset($item['dbmodel']->existencia)?$item['dbmodel']->existencia:'0'   ?></td>
+    						     <td> <?=isset($item['model']->existencia)?$item['model']->existencia:'--'   ?></td>
     						     <td>
 
-    							<?php $form = ActiveForm::begin(['action' => ['/articulo-mayorista/save-ajax-model'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
+    							<?php $form = ActiveForm::begin(['action' => ['sync-phc-resume-save'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
 
 
-    						     	 <?php echo $form->field($item['model'], 'sku')->hiddenInput(['maxlength' => true])->label(false); ?>
+    						     	 <?php echo $form->field($item['model'], 'sku')->hiddenInput()->label(false); ?>
     						     	 <?php echo $form->field($item['model'], 'precio')->hiddenInput()->label(false); ?>
-
-
-
+									 <?php echo $form->field($item['model'], 'existencia')->hiddenInput()->label(false); ?>
+									 <?php echo $form->field($item['model'], 'descripcion')->hiddenInput()->label(false); ?>
+    						     	 <?php echo $form->field($item['model'], 'serie')->hiddenInput()->label(false); ?>
+									 <?php echo $form->field($item['model'], 'peso')->hiddenInput()->label(false); ?>
+									  <?php echo $form->field($item['model'], 'moneda')->hiddenInput()->label(false); ?>
+									  <?php echo $form->field($item['model'], 'seccion')->hiddenInput()->label(false); ?>
+									  <?php echo $form->field($item['model'], 'alto')->hiddenInput()->label(false); ?>
+									  <?php echo $form->field($item['model'], 'largo')->hiddenInput()->label(false); ?>
+									  <?php echo $form->field($item['model'], 'ancho')->hiddenInput()->label(false); ?>
+										<?php echo $form->field($item['model'], 'marca')->hiddenInput()->label(false); ?>
+									 <?php echo $form->field($item['model'], 'linea')->hiddenInput()->label(false); ?>
 
     						      <?=  Html::submitButton(($art_status == 'info')?'<i class="fa fa-cloud-download"></i> Importar ' :
     						             ( ($art_status == 'warning')? '<i class="fa fa-warning"></i> Actualizar' : '<i class="fa fa-thumbs-o-up"></i> Actualizar'  ),  ['class' =>'btn btn-' .$art_status ])  ?>
@@ -98,7 +108,7 @@ $changes=[];
 
 				</div>
 
-				      <div class="col-md-3">
+				      <div class="col-md-2">
 
 
 				    <div class="col-md-12">

@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use Yii;
+use backend\models\Articulo;
 use backend\models\ArticuloMayorista;
 use backend\models\search\ArticuloMayoristaSearch;
 use yii\web\Controller;
@@ -12,7 +13,7 @@ use backend\models\ArticuloMayoristaSnap;
 use backend\models\search\ArticuloMayoristaSnapSearch;
 use backend\models\search\KeyStorageItemSearch;
 use common\models\KeyStorageItem;
-use backend\models\Articulo;
+use common\commands\AddToTimelineCommand;
 
 /**
  * ArticuloMayoristaController implements the CRUD actions for ArticuloMayorista model.
@@ -115,38 +116,19 @@ class ArticuloMayoristaController extends Controller
         //TODO: Build a common SOAP Client for PHC .
         //TODO: Get soap body params by environment vars .
         $wsdl =
-        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
+        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint_xxx', 'http://localhost:8088/servidor.php?wsdl');
 
 
         $params = "<cliente>50527</cliente><llave>487478</llave>";
 
         $client = new \SoapClient($wsdl);
-        $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
+        // $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
+        $soap_response = $client->ObtenerListaArticulos( ['cliente'=>'50527','llave'=>'487478'])->datos;
         //TODO: Optimize search proccess
 
-        $paridad = $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
+        //$paridad = $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
 
-
-        if (Yii::$app->request->post()) {
-
-            $model = new ArticuloMayorista();
-
-            $model->load( Yii::$app->request->post() );
-
-            $model =  ArticuloMayorista::findOne($model->sku);
-
-            if (!$model)
-                $model = new ArticuloMayorista();
-
-            $model->load( Yii::$app->request->post());
-
-            if (!$model->save() ) {
-
-                throw new NotFoundHttpException('Error al guardar');
-            }
-
-
-        }
+        $paridad = $client->ObtenerParidad( ['cliente'=>'50527','llave'=>'487478'])->datos;
 
         $articles = [];
 
@@ -155,10 +137,12 @@ class ArticuloMayoristaController extends Controller
 
         foreach ($soap_response as $articulo){
 
-            $model =  new ArticuloMayorista();
+            $model =  new Articulo();
             $model->attributes = get_object_vars($articulo);
+            $model->existencia = $articulo->inventario[0]->existencia;
 
-            $dbModel = ArticuloMayorista::findOne($model->sku);
+
+            $dbModel = Articulo::findOne($model->sku);
 
 
                     if(  !$dbModel || $dbModel->precio*1 !==  $model->precio*1)
@@ -173,35 +157,60 @@ class ArticuloMayoristaController extends Controller
     }
 
 
+
+
+
     /**
-     * Saves a particular articulo.
-     * @return mixed
+     * Saves a particular model
+     * @throws NotFoundHttpException
      */
-    public function actionSaveAjaxModel(){
+    public function actionSyncPhcResumeSave(){
 
+        //TODO: Validate ajax request
+        if (Yii::$app->request->post()) {
 
-    if (Yii::$app->request->post()) {
+            $model = new Articulo();
+            $model->load( Yii::$app->request->post() );
+            $old_model =  Articulo::findOne($model->sku);
 
-        $model = new ArticuloMayorista();
-
-        $model->load( Yii::$app->request->post() );
-
-        $modelArticulo =  Articulo::findOne($model->sku);
-
-        if (!$modelArticulo)
-            $modelArticulo = new Articulo();
-
-            $modelArticulo->load( $model->attributes);
-
-            if (!$modelArticulo->save() ) {
-
-                throw new NotFoundHttpException('Error al guardar');
+            if ($old_model){
+                $model =  Articulo::findOne($model->sku);
+                $model->load( Yii::$app->request->post() );
             }
 
 
-    }
+                $model->ultima_modificacion = date('Y-m-d H:i:s');
 
-    return true;
+                if (!$model->save() ) {
+
+                    throw new NotFoundHttpException('Error al guardar');
+                }
+
+
+
+                if($old_model){
+                    $addToTimelineCommand = new AddToTimelineCommand([
+                        'category' => 'phc',
+                        'event' => 'update',
+                        'data' => ['model' => $model->attributes, 'old_model'=>$old_model->attributes]
+                    ]);
+                }else{
+                    $addToTimelineCommand = new AddToTimelineCommand([
+                        'category' => 'phc',
+                        'event' => 'import',
+                        'data' => ['model' => $model->attributes]
+                    ]);
+
+                }
+
+
+                Yii::$app->commandBus->handle($addToTimelineCommand);
+
+                return true;
+
+
+        }
+
     }
 
 

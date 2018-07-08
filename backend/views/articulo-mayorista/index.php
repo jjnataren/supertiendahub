@@ -245,9 +245,6 @@ $this->registerJs(
             'numero_registros',
 
 
-
-
-
             ['class' => 'yii\grid\ActionColumn',
                 'template' => '{view}',
                 'buttons' => [
@@ -272,7 +269,7 @@ $this->registerJs(
         ],
         'toolbar' =>  [
             ['content'=>
-                Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
+                Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>'Reiniciar'])
             ],
             '{export}',
             '{toggleData}'
@@ -409,8 +406,8 @@ $.ajax({
                   var formData = form.serialize();
 
                   $.ajax({
-                      url: form.attr("action"),
-                      type: form.attr("method"),
+                      url: 'sync-phc-resume-save', //form.attr("sync-phc-resume-save"),
+                      type: 'POST',//form.attr("post"),
                       data: formData,
                       success: function (data) {
                           $('#syncrequest').trigger('click');
