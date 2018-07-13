@@ -5,29 +5,31 @@
     let dataTableUpdated = null;
 
     let language = {
-        "sProcessing":     "Procesando...",
-        "sLengthMenu":     "Mostrar _MENU_ registros",
-        "sZeroRecords":    "No se encontraron resultados",
-        "sEmptyTable":     "Ning&uacute;n dato disponible en esta tabla",
-        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-        "sInfoPostFix":    "",
-        "sSearch":         "Buscar:",
-        "sUrl":            "",
-        "sInfoThousands":  ",",
+        "sProcessing": "Procesando...",
+        "sLengthMenu": "Mostrar _MENU_ registros",
+        "sZeroRecords": "No se encontraron resultados",
+        "sEmptyTable": "Ning&uacute;n dato disponible en esta tabla",
+        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+        "sInfoPostFix": "",
+        "sSearch": "Buscar:",
+        "sUrl": "",
+        "sInfoThousands": ",",
         "sLoadingRecords": "Cargando...",
         "oPaginate": {
-            "sFirst":    "Primero",
-            "sLast":     "&Uacute;ltimo",
-            "sNext":     "Siguiente",
+            "sFirst": "Primero",
+            "sLast": "&Uacute;ltimo",
+            "sNext": "Siguiente",
             "sPrevious": "Anterior"
         },
         "oAria": {
-            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+            "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
             "sSortDescending": ": Activar para ordenar la columna de manera descendente"
         }
     };
+
+    let contenidoDefault = 'No definido';
 
     let settings = {
         onStepChanging: function (event, currentIndex, newIndex) {
@@ -35,7 +37,8 @@
                 if (isTableEmpty(dataTable)) {
                     return false;
                 }
-            } if (currentIndex === 1 && newIndex === 2) {
+            }
+            if (currentIndex === 1 && newIndex === 2) {
 
             }
             return true;
@@ -49,7 +52,7 @@
         enableKeyNavigation: false,
         enablePagination: false,
         forceMoveForward: true,
-        labels : {
+        labels: {
             cancel: 'Cancelar',
             current: 'Actual',
             finish: 'Terminar',
@@ -70,9 +73,9 @@
             dataTableSelection = $('#prestashop_table_selection').DataTable({
                 data: getCurrentSelection(),
                 columns: [
-                    {"data": "sku"},
-                    {"data": "precio"},
-                    {"data": "precio_original"},
+                    {"data": "sku", defaultContent: contenidoDefault},
+                    {"data": "precio", defaultContent: contenidoDefault},
+                    {"data": "precio_original", defaultContent: contenidoDefault},
                 ],
                 language: language
             });
@@ -89,12 +92,13 @@
                 data: data,
                 columns: [
                     {"data": "sku"},
-                    {"data": "id_prestashop"},
-                    {"data": "marca"},
-                    {"data": "serie"},
-                    {"data": "precio"},
-                    {"data": "precio_original"},
-                    {"data": "cambio"}
+                    {"data": "id_prestashop", defaultContent: contenidoDefault},
+                    {"data": "marca", defaultContent: contenidoDefault},
+                    {"data": "serie", defaultContent: contenidoDefault},
+                    {"data": "precio", defaultContent: contenidoDefault},
+                    {"data": "precio_original", defaultContent: contenidoDefault},
+                    {"data": "cambio", defaultContent: contenidoDefault},
+                    {"data": "tipo_cambio", render: formatTipoCambio, defaultContent: contenidoDefault}
                 ],
                 language: language
             });
@@ -111,6 +115,33 @@
             dataTable.rows.add(data);
             dataTable.draw();
         }
+        scrollable();
+    };
+
+    let formatTipoCambio = function (data, type, row) {
+        if (type === 'display' && (data === undefined || data === null)) {
+            return 'No definido';
+        }
+
+        if (type === 'display') {
+            if (data === 0) {
+                return 'Cambio de precio'
+            } else if (data === 1) {
+                return 'Alta en tienda';
+            } else if (data === 2) {
+                return 'Habilitar en tienda';
+            } else if (data === 3) {
+                return 'Inhabilitar en tienda';
+            } else if (data === 4) {
+                return 'Sin cambios';
+            } else if (data === 5) {
+                return 'Alta en sistema';
+            }
+
+            return data;
+        }
+
+        return data;
     };
 
     let generarTablaActualizacion = function (data) {
@@ -118,13 +149,13 @@
             dataTableUpdated = $('#prestashop_table_updated').DataTable({
                 data: data,
                 columns: [
-                    {"data": "sku"},
-                    {"data": "id_prestashop"},
-                    {"data": "marca"},
-                    {"data": "serie"},
-                    {"data": "precio"},
-                    {"data": "precio_original"},
-                    {"data": "cambio"}
+                    {"data": "sku", defaultContent: contenidoDefault},
+                    {"data": "id_prestashop", defaultContent: contenidoDefault},
+                    {"data": "marca", defaultContent: contenidoDefault},
+                    {"data": "serie", defaultContent: contenidoDefault},
+                    {"data": "precio", defaultContent: contenidoDefault},
+                    {"data": "precio_original", defaultContent: contenidoDefault},
+                    {"data": "cambio", defaultContent: contenidoDefault}
                 ],
                 language: language
             });
@@ -173,7 +204,7 @@
 
     let getCurrentSelection = function () {
         if (dataTable !== null) {
-          return dataTable.rows('.selected').data().toArray();
+            return dataTable.rows('.selected').data().toArray();
         }
 
         return [];
@@ -186,7 +217,7 @@
             dataType: 'json',
             contentType: 'json',
             data: JSON.stringify(dataTable.rows('.selected').data().toArray()),
-            beforeSend: function() {
+            beforeSend: function () {
                 $('#update_button')
                     .html('<i class="fa fa-spinner fa-spin"></i>')
                     .prop('disabled', true);
@@ -236,6 +267,11 @@
         $('#wizard').steps("next");
     };
 
+    let scrollable = function () {
+        console.log('Entre al scroll');
+        $('.content').css({"overflow": "scroll"})
+    };
+
     $('#wizard').steps(settings);
     $('#synchronize_button').on('click', synchronizeAction);
     $('#update_button').on('click', clickUpdate);
@@ -243,5 +279,6 @@
     $('#synchronize_button_next').on('click', wizardNext);
     $('#validation_button_next').on('click', wizardNext);
     $('#snapshot_button_next').on('click', wizardNext);
+
 
 })(jQuery);

@@ -1,8 +1,8 @@
 <?php
 
+use backend\assets\StepsAsset;
 use backend\assets\SwalAsset;
 use yii\grid\SerialColumn;
-use backend\assets\StepsAsset;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
@@ -141,6 +141,7 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                                         <th>Precio</th>
                                         <th>Precio Original</th>
                                         <th>Cambio</th>
+                                        <th>Tipo de cambio</th>
                                     </tr>
                                     </thead>
                                 </table>

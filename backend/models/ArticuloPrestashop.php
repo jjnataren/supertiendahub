@@ -2,8 +2,6 @@
 
 namespace backend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "tbl_articulo_prestashop".
  *
@@ -14,6 +12,7 @@ use Yii;
  * @property double $precio
  * @property int $cambio
  * @property double $precio_original
+ * @property int $tipo_cambio
  */
 class ArticuloPrestashop extends \yii\db\ActiveRecord
 {
@@ -32,7 +31,7 @@ class ArticuloPrestashop extends \yii\db\ActiveRecord
     {
         return [
             [['sku', 'id_prestashop', 'precio', 'cambio', 'precio_original'], 'required'],
-            [['precio', 'cambio'], 'number'],
+            [['precio', 'cambio', 'tipo_cambio'], 'number'],
             [['sku', 'id_prestashop', 'marca', 'serie'], 'string', 'max' => 200],
             [['id_prestashop'], 'unique'],
         ];
@@ -51,6 +50,7 @@ class ArticuloPrestashop extends \yii\db\ActiveRecord
             'precio' => 'Precio',
             'cambio' => 'Cambio',
             'precio_original' => 'Precio Original',
+            'tipo_cambio' => 'Tipo de Cambio',
         ];
     }
 }
