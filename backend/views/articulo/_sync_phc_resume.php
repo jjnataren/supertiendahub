@@ -24,7 +24,7 @@ $changes=[];
 								<th>Descripción</th>
 								<th />
 								<th>Precio SUPER TIENDA</th>
-								<th>Precio PHC Mayorista</th>
+								<th>Precio PCH Mayorista</th>
 								<th />
 						</tr>
 					</thead>
@@ -62,6 +62,29 @@ $changes=[];
     						             ( ($art_status == 'warning')? '<i class="fa fa-warning"></i> Actualizar' : '<i class="fa fa-thumbs-o-up"></i> Actualizar'  ),  ['class' =>'btn btn-' .$art_status ])  ?>
 
     						    <?php ActiveForm::end(); ?>
+
+
+    						    <?php else:?>
+
+    						    <?php $form = ActiveForm::begin(['action' => ['sync-phc-resume-save'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
+
+
+    						     	 <?php echo $form->field($item['dbmodel'], 'sku')->hiddenInput()->label(false); ?>
+
+									 <?php echo $form->field($item['dbmodel'], 'existencia')->hiddenInput(['value' => 0])->label(false); ?>
+
+									 <?php echo $form->field($item['dbmodel'], 'existencia_ml')->hiddenInput(['value' => 0])->label(false); ?>
+
+									 <?php echo $form->field($item['dbmodel'], 'existencia_ps')->hiddenInput(['value' => 0])->label(false); ?>
+
+
+
+    						      <?=  Html::submitButton(($art_status == 'danger')?'<i class="fa fa-thumbs-down"></i> Actualizar ' :
+    						             ( ($art_status == 'warning')? '<i class="fa fa-warning"></i> Actualizar' : '<i class="fa fa-thumbs-o-up"></i> Actualizar'  ),  ['class' =>'btn btn-' .$art_status ])  ?>
+
+    						    <?php ActiveForm::end(); ?>
+
+
 
 							<?php endif;?>
 

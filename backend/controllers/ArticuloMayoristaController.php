@@ -116,19 +116,19 @@ class ArticuloMayoristaController extends Controller
         //TODO: Build a common SOAP Client for PHC .
         //TODO: Get soap body params by environment vars .
         $wsdl =
-        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint_xxx', 'http://localhost:8088/servidor.php?wsdl');
+        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
 
 
         $params = "<cliente>50527</cliente><llave>487478</llave>";
 
         $client = new \SoapClient($wsdl);
-        // $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
-        $soap_response = $client->ObtenerListaArticulos( ['cliente'=>'50527','llave'=>'487478'])->datos;
+        $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
+        //$soap_response = $client->ObtenerListaArticulos( ['cliente'=>'50527','llave'=>'487478'])->datos;
         //TODO: Optimize search proccess
 
-        //$paridad = $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
+        $paridad = $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
 
-        $paridad = $client->ObtenerParidad( ['cliente'=>'50527','llave'=>'487478'])->datos;
+        //$paridad = $client->ObtenerParidad( ['cliente'=>'50527','llave'=>'487478'])->datos;
 
         $articles = [];
 

@@ -24,8 +24,8 @@ use yii\widgets\DetailView;
 
 
 
-	<div class="col-md-6">
-	<h3>Producto actualizado</h3>
+
+	<h3>Producto Importado</h3>
 		<?php echo DetailView::widget([
 		    'model' =>$model->data['model'] ,
         'attributes' => [
@@ -33,9 +33,10 @@ use yii\widgets\DetailView;
             'marca',
             'serie',
             'precio',
+            'existencia'
         ],
     ]) ?>
-	</div>
+
 
        <?php endif;?>
 

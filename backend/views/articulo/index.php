@@ -138,7 +138,41 @@ $this->params['breadcrumbs'][] = $this->title;
                                                          'refreshGrid' => true,
                                                          'content'=>function($data){
 
-                                                         return   ($data->tipo_utilidad_ml == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ml == 2)?'monto': null) ;
+
+
+                                                         switch ($data->tipo_utilidad_ml*1){
+
+                                                             case 1:
+
+                                                             return 'Porcentaje';
+
+                                                             break;
+
+                                                             case 2:
+
+                                                                 return 'Monto';
+
+                                                             break;
+
+                                                             case 3:
+
+                                                                 return 'M Basica';
+
+                                                              break;
+
+                                                             case 4:
+
+                                                                 return 'M Premium';
+
+                                                                 break;
+
+                                                              default:
+                                                                  return null;
+
+                                                         }
+
+
+                                                         return   null;
 
                                                          },
                                                          'editableOptions'=> [
@@ -147,7 +181,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                              'asPopover' => true,
 
                                                              'options' => [
-                                                                 'data' =>  [ '1' => 'Porcentaje', '2' => 'Monto'],
+                                                                 'data' =>  [ '1' => 'Porcentaje', '2' => 'Monto','3' => 'M Basica', '4' => 'M Premium'],
                                                              ]
                                                          ],
                                                          'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
@@ -165,11 +199,62 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             'mergeHeader' => true,
                                                         'content'=>function($data){
 
-                                                        return  ($data->tipo_utilidad_ml == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ml):  ( ($data->tipo_utilidad_ml == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ml): null) ;
+
+                                                        switch ($data->tipo_utilidad_ml*1){
+
+                                                            case 1:
+
+                                                                return Yii::$app->formatter->asPercent($data->utilidad_ml);
+
+                                                                break;
+
+                                                            case 2:
+
+                                                                return Yii::$app->formatter->asCurrency($data->utilidad_ml);
+
+                                                                break;
+
+                                                            case 3:
+
+                                                                if ($data->precio*1 < 1001){
+
+                                                                    return Yii::$app->formatter->asCurrency($data->precio * 0.13);
+                                                                }elseif ($data->precio*1 < 5001){
+
+                                                                    return Yii::$app->formatter->asCurrency( (130 +  (($data->precio-1000)  * 0.1)) );
+                                                                }else{
+
+                                                                    return Yii::$app->formatter->asCurrency( (530 +  (($data->precio-5000) * 0.07) ));
+                                                                }
+
+                                                                break;
+
+                                                            case 4:
+
+                                                                if ($data->precio*1 < 1001){
+
+                                                                    return Yii::$app->formatter->asCurrency($data->precio * 0.175);
+                                                                }elseif ($data->precio*1 < 5001){
+
+                                                                    return Yii::$app->formatter->asCurrency( (175 +  (($data->precio-1000) * 0.145)) );
+                                                                }else{
+
+                                                                    return Yii::$app->formatter->asCurrency( (755 +  (($data->precio-5000) * 0.115) ));
+                                                                }
+
+                                                                break;
+
+                                                            default:
+                                                                return null;
+
+                                                        }
+
+                                                        return  null;
 
                                                         },
                                                         'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
                                                         'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
+
 
                                                         ],
 
@@ -181,7 +266,63 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                                             'mergeHeader' => true,
                                                             'content'=>function($data){
-                                                                return Yii::$app->formatter->asCurrency (($data->precio*1) +  (($data->tipo_utilidad_ml == 1) ? ($data->precio * $data->utilidad_ml) : (($data->tipo_utilidad_ml == 2) ? $data->utilidad_ml : 0)));
+
+                                                            $utility = 0;
+
+                                                            switch ($data->tipo_utilidad_ml*1){
+
+                                                                case 1:
+
+                                                                    $utility  =  $data->precio * $data->utilidad_ml;
+
+                                                                    break;
+
+                                                                case 2:
+
+                                                                    $utility =  $data->utilidad_ml;
+
+                                                                    break;
+
+                                                                case 3:
+
+                                                                    if ($data->precio*1 < 1001){
+
+                                                                        $utility =  $data->precio * 0.13;
+                                                                    }elseif ($data->precio*1 < 5001){
+
+                                                                        $utility = (130 +  (($data->precio-1000) * 0.1)) ;
+                                                                    }else{
+
+                                                                        $utility = (530 +  (($data->precio-5000) * 0.07) );
+                                                                    }
+
+                                                                    break;
+
+                                                                case 4:
+
+                                                                    if ($data->precio*1 < 1001){
+
+                                                                        $utility = ( $data->precio * 0.175);
+                                                                    }elseif ($data->precio*1 < 5001){
+
+                                                                        $utility = ( (175 +  (($data->precio-1000) * 0.145))  );
+                                                                    }else{
+
+                                                                        $utility = ( (755 +  (($data->precio-5000) * 0.115) ) );
+                                                                    }
+
+                                                                    break;
+
+                                                                default:
+                                                                    return null;
+
+                                                            }
+
+
+                                                            return Yii::$app->formatter->asCurrency (($data->precio*1) +  $utility);
+
+
+
                                                             },
                                                             'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
                                                             'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
@@ -248,7 +389,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                                                     [
                                                                     'attribute'=>'existencia',
-                                                                    'header'=>'PHC',
+                                                                    'header'=>'PCH',
                                                                     'mergeHeader' => true,
                                                                     'content'=>function($data){
                                                                     return        $data->existencia;
@@ -349,7 +490,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <!-- /.box-header -->
             <div class="box-body" id="phcMayoristaSync">
 
-				<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
+				<img src="/img/loading.gif" /> <p class="text text-info">Consultando servicio PCH Mayorista ....</p>
 
    			 </div>
 
@@ -389,7 +530,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
       function doAjax(filterUrl) {
 
-    	    $('#phcMayoristaSync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PHC Mayorista ....</p>");
+    	    $('#phcMayoristaSync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio PCH Mayorista ....</p>");
 
     	   $.ajax({
     	        type: "GET",

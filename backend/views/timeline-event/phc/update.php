@@ -34,6 +34,7 @@ use backend\models\Articulo;
             'marca',
             'serie',
             'precio',
+            'existencia'
         ],
     ]) ?>
 	</div>
@@ -46,6 +47,7 @@ use backend\models\Articulo;
             'marca',
             'serie',
             'precio',
+                'existencia'
         ],
     ]) ?>
 
