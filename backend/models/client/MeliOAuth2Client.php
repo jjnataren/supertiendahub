@@ -71,4 +71,19 @@ class MeliOAuth2Client extends OAuth2
 
     }
 
+    public function add($uri, $body)
+    {
+        if (!$this->accessToken->getIsValid()) {
+            $this->refreshAccessToken($this->accessToken);
+        }
+
+        return $this->createApiRequest()
+            ->setUrl($uri . '?access_token=' . $this->accessToken->getToken())
+            ->setFormat(Client::FORMAT_JSON)
+            ->setMethod('POST')
+            ->setContent($body)
+            ->addHeaders(['content-type' => 'application/json'])
+            ->send();
+    }
+
 }

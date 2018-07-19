@@ -29,6 +29,8 @@
         }
     };
 
+    let contenidoDefault = 'No definido';
+
     let settings = {
         onStepChanging: function (event, currentIndex, newIndex) {
             if (currentIndex === 0 && newIndex === 1) {
@@ -88,13 +90,14 @@
             dataTable = $('#meli_table').DataTable({
                 data: data,
                 columns: [
-                    {"data": "sku"},
-                    {"data": "id"},
-                    {"data": "marca"},
-                    {"data": "serie"},
-                    {"data": "precio"},
-                    {"data": "precio_original"},
-                    {"data": "cambio"}
+                    {"data": "sku", defaultContent: contenidoDefault},
+                    {"data": "id", defaultContent: contenidoDefault},
+                    {"data": "marca", defaultContent: contenidoDefault},
+                    {"data": "serie", defaultContent: contenidoDefault},
+                    {"data": "precio", defaultContent: contenidoDefault},
+                    {"data": "precio_original", defaultContent: contenidoDefault},
+                    {"data": "cambio", defaultContent: contenidoDefault},
+                    {"data": "tipo_cambio", render: formatTipoCambio, defaultContent: contenidoDefault}
                 ],
                 language: language
             });
@@ -111,6 +114,35 @@
             dataTable.rows.add(data);
             dataTable.draw();
         }
+        scrollable();
+    };
+
+    let formatTipoCambio = function (data, type, row) {
+        if (type === 'display' && (data === undefined || data === null)) {
+            return 'No definido';
+        }
+
+        if (type === 'display') {
+            if (data === 0) {
+                return 'Cambio de precio'
+            } else if (data === 1) {
+                return 'Alta en tienda';
+            } else if (data === 2) {
+                return 'Habilitar en tienda';
+            } else if (data === 3) {
+                return 'Inhabilitar en tienda';
+            } else if (data === 4) {
+                return 'Sin cambios';
+            } else if (data === 5) {
+                return 'Alta en sistema';
+            } else if (data === 6) {
+                return 'Cambio de cantidad';
+            }
+
+            return data;
+        }
+
+        return data;
     };
 
     let generarTablaActualizacion = function (data) {
@@ -118,13 +150,13 @@
             dataTableUpdated = $('#meli_table_updated').DataTable({
                 data: data,
                 columns: [
-                    {"data": "sku"},
-                    {"data": "id"},
-                    {"data": "marca"},
-                    {"data": "serie"},
-                    {"data": "precio"},
-                    {"data": "precio_original"},
-                    {"data": "cambio"}
+                    {"data": "sku", defaultContent: contenidoDefault},
+                    {"data": "id", defaultContent: contenidoDefault},
+                    {"data": "marca", defaultContent: contenidoDefault},
+                    {"data": "serie", defaultContent: contenidoDefault},
+                    {"data": "precio", defaultContent: contenidoDefault},
+                    {"data": "precio_original", defaultContent: contenidoDefault},
+                    {"data": "cambio", defaultContent: contenidoDefault}
                 ],
                 language: language
             });
@@ -234,6 +266,11 @@
 
     let wizardNext = function () {
         $('#wizard').steps("next");
+    };
+
+    let scrollable = function () {
+        console.log('Entre al scroll');
+        $('.content').css({"overflow": "scroll"})
     };
 
     $('#wizard').steps(settings);

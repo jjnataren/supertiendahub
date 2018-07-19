@@ -24,6 +24,7 @@ use yii\web\NotFoundHttpException;
  */
 class ArticuloPrestashopController extends Controller
 {
+
     public function behaviors()
     {
         return [
@@ -42,18 +43,324 @@ class ArticuloPrestashopController extends Controller
         return ArticuloPrestashop::find()->all();
     }
 
+    public function actionSynchronize()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $client = $this->getClient();
+        $articles = Articulo::find()->all();
+        $prestashop = array();
+
+        $dollarPrice = $this->getParidad();
+
+        foreach ($articles as $article) {
+            try {
+                $opt = array('resource' => 'products');
+                $opt['filter[reference]'] = $article->sku;
+                $xml = $client->get($opt)->children();
+
+                if ($xml->children()[0] !== null) {
+                    $xml = $xml->children();
+                    $id = $this->xml_attribute($xml->attributes(), 'id');
+                    $articlePrestashop = null;
+
+                    $optArticle = array('resource' => 'products', 'id' => $id);
+                    $articleXml = $client->get($optArticle)->product;
+
+                    $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $article->sku])->one();
+
+                    if ($articlePrestashop !== null) {
+
+                        if ($article->moneda === 'MN') {
+                            $precio = $article->precio;
+                        } else {
+                            $precio = $article->precio * (double)$dollarPrice;
+                        }
+
+                        if ($article->tipo_utilidad_ps === 1) {
+                            $utilidad = $article->utilidad_ps + 1;
+                            $precio *= $utilidad;
+                        } else {
+                            $utilidad = $article->utilidad_ps;
+                            $precio += $utilidad;
+                        }
+
+                        $precio = round($precio, 2, PHP_ROUND_HALF_UP);
+                        $precio_prestashop = round((float)$articleXml->price, 2, PHP_ROUND_HALF_UP);
+
+                        if (number_format($precio_prestashop, 3) !== number_format($articlePrestashop->precio, 3)) {
+                            $articlePrestashop->cambio = 1;
+                            $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $prestashop[] = $articlePrestashop;
+                            $articlePrestashop->save();
+                        } else if (number_format($article->precio, 3) !== number_format($articlePrestashop->precio_original, 3)) {
+                            $articlePrestashop->cambio = 1;
+                            $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $prestashop[] = $articlePrestashop;
+                            $articlePrestashop->save();
+                        } else if (number_format($precio, 3) !== number_format($articlePrestashop->precio, 3)) {
+                            $articlePrestashop->cambio = 1;
+                            $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $prestashop[] = $articlePrestashop;
+                            $articlePrestashop->save();
+                        } else if ($articlePrestashop->cambio === 1) {
+                            $prestashop[] = $articlePrestashop;
+                        } else if (!$this->compareStock($articleXml, (int)$article->existencia_ps)) {
+                            $articlePrestashop->cambio = 1;
+                            $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_CANTIDAD;
+                            $prestashop[] = $articlePrestashop;
+                            $articlePrestashop->save();
+                        }
+                    } else {
+                        $articlePrestashop = new ArticuloPrestashop();
+                        $articlePrestashop->sku = $article->sku;
+                        $articlePrestashop->id_prestashop = $id;
+                        $articlePrestashop->marca = $article->marca;
+                        $articlePrestashop->serie = $article->serie;
+                        $articlePrestashop->cambio = 1;
+                        $articlePrestashop->precio = round((double)$articleXml->price, 2, PHP_ROUND_HALF_UP);
+                        $articlePrestashop->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
+                        $articlePrestashop->tipo_cambio = TipoCambio::ALTA_SISTEMA;
+
+                        $articlePrestashop->save();
+                        $prestashop[] = $articlePrestashop;
+                    }
+                } else {
+
+                    $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $article->sku])->one();
+
+                    if ($articlePrestashop === null) {
+                        $articlePrestashop = new ArticuloPrestashop();
+                        $articlePrestashop->sku = $article->sku;
+                        $articlePrestashop->id_prestashop = '-1';
+                        $articlePrestashop->precio = round($article->precio, 2, PHP_ROUND_HALF_UP);
+                        $articlePrestashop->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
+                        $articlePrestashop->save();
+                    }
+
+                    $articlePrestashop->cambio = 1;
+                    $articlePrestashop->tipo_cambio = TipoCambio::NUEVO;
+
+                    $prestashop[] = $articlePrestashop;
+                }
+            } catch (PrestaShopWebserviceException $e) {
+            }
+        }
+        return $prestashop;
+    }
+
+    private function getClient()
+    {
+        $security = Yii::$app->getSecurity();
+        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
+        $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
+        return new PrestashopClient($apiUrl, $key);
+    }
+
+    private function getParidad()
+    {
+        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
+        $soapClient = new \SoapClient($wsdl);
+        return $soapClient->ObtenerParidad('50527', '487478')->datos;
+    }
+
+    function xml_attribute($object, $attribute)
+    {
+        if (isset($object[$attribute])) {
+            return (string)$object[$attribute];
+        }
+        return '';
+    }
+
+    /**
+     * @param $xml
+     * @param $quantity
+     * @return bool
+     * @throws PrestaShopWebserviceException
+     */
+    private function compareStock($xml, $quantity)
+    {
+        $stockId = $xml->associations->stock_availables->stock_available->id;
+        $xmlStock = $this->obtenerSchemaUpdateStock($stockId);
+        return (int)$xmlStock->stock_available->quantity === $quantity;
+    }
+
+    /**
+     * @param $id
+     * @return \SimpleXMLElement
+     * @throws PrestaShopWebserviceException
+     */
+    private function obtenerSchemaUpdateStock($id)
+    {
+        $client = $this->getClient();
+        $opt = array('resource' => 'stock_availables');
+        $opt['id'] = $id;
+        return $client->get($opt);
+    }
+
+    /**
+     * @return array|PrestaShopWebserviceException|\Exception
+     * @throws PrestaShopWebserviceException
+     */
+    public function actionUpdatePrices()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $request = \Yii::$app->request;
+
+        $dollarPrice = $this->getParidad();
+
+        $prestashop = array();
+
+        if ($request->isAjax && $request->isPost) {
+            foreach ($request->bodyParams as $product) {
+                $client = $this->getClient();
+
+                $tipoOperacion = $product['tipo_cambio'];
+
+                if ($tipoOperacion === TipoCambio::NUEVO) {
+                    $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
+                    $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $product['sku']])->one();
+
+                    if ($article->moneda === 'MN') {
+                        $precio = $article->precio;
+                    } else {
+                        $precio = $article->precio * (double)$dollarPrice;
+                    }
+
+                    if ($article->tipo_utilidad_ps === 1) {
+                        $utilidad = $article->utilidad_ps + 1;
+                        $precio *= $utilidad;
+                    } else {
+                        $utilidad = $article->utilidad_ps;
+                        $precio += $utilidad;
+                    }
+
+                    $precio = round($precio, 2, PHP_ROUND_HALF_UP);
+
+                    $xml = $this->obtenerXmlNuevoProducto();
+
+                    $xml->product->id_manufacturer = 0;
+                    $xml->product->id_supplier = 0;
+                    $xml->product->id_category_default = 2;
+                    $xml->product->cache_default_attribute = 0;
+                    $xml->product->id_tax_rules_group = 0;
+                    $xml->product->type = 'simple';
+                    $xml->product->id_shop_default = 1;
+                    $xml->product->reference = $product['sku'];
+                    $xml->product->price = $precio;
+                    $xml->product->active = 0;
+
+                    $xml->product->link_rewrite->language[0] = $article->descripcion;
+                    $xml->product->link_rewrite->language[1] = $article->descripcion;
+
+                    $xml->product->name->language[0] = $article->descripcion;
+                    $xml->product->name->language[1] = $article->descripcion;
+
+                    $opt = array('resource' => 'products');
+                    $opt['postXml'] = $xml->asXML();
+
+                    $response = $client->add($opt);
+
+                    $articlePrestashop->precio = $precio;
+                    $articlePrestashop->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
+                    $articlePrestashop->marca = $article->marca;
+                    $articlePrestashop->serie = $article->serie;
+                    $articlePrestashop->id_prestashop = (string)$response->product->id;
+                    $articlePrestashop->tipo_cambio = TipoCambio::SIN_CAMBIOS;
+                    $articlePrestashop->cambio = 0;
+
+                    $articlePrestashop->save();
+
+                    $prestashop[] = $articlePrestashop;
+                } else {
+                    try {
+                        $opt = array('resource' => 'products');
+                        $opt['id'] = $product['id_prestashop'];
+
+                        $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
+                        $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $product['sku']])->one();
+
+
+                        $xml = $client->get($opt);
+                        $children = $xml->children()->children();
+                        unset($children->manufacturer_name, $children->quantity);
+
+                        $editar = true;
+
+                        if ($tipoOperacion === TipoCambio::HABILITAR) {
+                            $children->active = 1;
+                        } else if ($tipoOperacion === TipoCambio::INHABILITAR) {
+                            $children->active = 0;
+                        } else if ($tipoOperacion === TipoCambio::ALTA_SISTEMA || $tipoOperacion === TipoCambio::CAMBIO_PRECIO) {
+                            if ($article->moneda === 'MN') {
+                                $precio = $article->precio;
+                            } else {
+                                $precio = $article->precio * (double)$dollarPrice;
+                            }
+
+                            if ($article->tipo_utilidad_ps === 1) {
+                                $utilidad = $article->utilidad_ps + 1;
+                                $precio *= $utilidad;
+                            } else {
+                                $utilidad = $article->utilidad_ps;
+                                $precio += $utilidad;
+                            }
+
+                            $precio = round($precio, 2, PHP_ROUND_HALF_UP);
+
+                            $children->price = $precio;
+                            $articlePrestashop->precio = $precio;
+                            $articlePrestashop->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
+                        } else if ($tipoOperacion === TipoCambio::CAMBIO_CANTIDAD) {
+                            $this->editStock($xml, $article->existencia_ps);
+                            $editar = false;
+                        }
+
+                        $articlePrestashop->cambio = 0;
+                        $articlePrestashop->tipo_cambio = TipoCambio::SIN_CAMBIOS;
+
+                        if ($editar) {
+                            $opt = array('resource' => 'products');
+                            $opt['putXml'] = $xml->asXML();
+                            $opt['id'] = $product['id_prestashop'];
+
+                            try {
+                                $client->edit($opt);
+                            } catch (PrestaShopWebserviceException $e) {
+                            }
+                        }
+
+                        $articlePrestashop->save();
+
+                        $prestashop[] = $articlePrestashop;
+                    } catch (PrestaShopWebserviceException $e) {
+                        return $e;
+                    }
+                }
+            }
+        }
+
+        try {
+            $addToTimelineCommand = new AddToTimelineCommand([
+                'category' => 'prestashop',
+                'event' => 'change',
+                'data' => ['articles' => $prestashop]
+            ]);
+
+            Yii::$app->commandBus->handle($addToTimelineCommand);
+        } catch (MissingHandlerException $igored) {
+        } catch (InvalidConfigException $igored) {
+        }
+
+        return $prestashop;
+    }
+
     /**
      * @return \SimpleXMLElement
      * @throws PrestaShopWebserviceException
      */
-    public function actionProof()
+    private function obtenerXmlNuevoProducto()
     {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $client = $this->getClient();
-        $opt = array('resource' => 'products');
-        $opt['schema'] = 'blank';
-
-        $xml = $client->get($opt);
+        $xml = $this->obtenerNuevoSchemaCreateProduct();
 
         unset(
             $xml->product->id,
@@ -106,360 +413,39 @@ class ArticuloPrestashopController extends Controller
             $xml->product->associations
         );
 
-        $xml->product->id_manufacturer = 0;
-        $xml->product->id_supplier = 0;
-        $xml->product->id_category_default = 2;
-        $xml->product->cache_default_attribute = 0;
-        $xml->product->id_tax_rules_group = 0;
-        $xml->product->type = 'simple';
-        $xml->product->id_shop_default = 1;
-        $xml->product->reference = 'SKU-890';
-        $xml->product->price = 456.56;
-        $xml->product->active = 0;
-
-        $xml->product->link_rewrite->language[0] = 'link_rewrite';
-        $xml->product->link_rewrite->language[1] = 'link_rewrite';
-
-        $xml->product->name->language[0] = 'name';
-        $xml->product->name->language[1] = 'name';
-
-        $opt = array('resource' => 'products');
-        $opt['postXml'] = $xml->asXML();
-
-        $response = $client->add($opt);
-        return $response->product->id;
-    }
-
-    private function getClient()
-    {
-        $security = Yii::$app->getSecurity();
-        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
-        $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
-        return new PrestashopClient($apiUrl, $key);
-    }
-
-    public function actionSynchronize()
-    {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $client = $this->getClient();
-        $articles = Articulo::find()->all();
-        $prestashop = array();
-
-        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
-        $soapClient = new \SoapClient($wsdl);
-        $paridad = $soapClient->ObtenerParidad('50527', '487478');
-        $dollarPrice = $paridad->datos;
-
-        foreach ($articles as $article) {
-            try {
-                $opt = array('resource' => 'products');
-                $opt['filter[reference]'] = $article->sku;
-                $xml = $client->get($opt)->children();
-
-                if ($xml->children()[0] !== null) {
-                    $xml = $xml->children();
-                    $id = $this->xml_attribute($xml->attributes(), 'id');
-                    $articlePrestashop = null;
-
-                    $optArticle = array('resource' => 'products', 'id' => $id);
-                    $articleXml = $client->get($optArticle)->product;
-
-                    $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $article->sku])->one();
-
-                    if ($articlePrestashop !== null) {
-
-                        if ($article->moneda === 'MN') {
-                            $precio = $article->precio;
-                        } else {
-                            $precio = $article->precio * (double)$dollarPrice;
-                        }
-
-                        if ($article->tipo_utilidad_ps === 1) {
-                            $utilidad = $article->utilidad_ps + 1;
-                            $precio *= $utilidad;
-                        } else {
-                            $utilidad = $article->utilidad_ps;
-                            $precio += $utilidad;
-                        }
-
-                        $precio = round($precio, 2, PHP_ROUND_HALF_UP);
-
-                        if (number_format($article->precio, 3) !== number_format($articlePrestashop->precio_original, 3)) {
-                            $articlePrestashop->cambio = 1;
-                            $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
-                            $prestashop[] = $articlePrestashop;
-                            $articlePrestashop->save();
-                        } else if ($articlePrestashop->cambio === 1) {
-                            $prestashop[] = $articlePrestashop;
-                        } else if (number_format($precio, 3) !== number_format($articlePrestashop->precio, 3)) {
-                            $articlePrestashop->cambio = 1;
-                            $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
-                            $prestashop[] = $articlePrestashop;
-                            $articlePrestashop->save();
-                        } else if ((int)$articleXml->active === 1 && ($article->existencia <= $article->existencia_ps
-                                || $article->existencia_ps === 0)) {
-                            $articlePrestashop->cambio = 1;
-                            $articlePrestashop->tipo_cambio = TipoCambio::INHABILITAR;
-                            $prestashop[] = $articlePrestashop;
-                            $articlePrestashop->save();
-                        } else if ((int)$articleXml->active === 0 && $article->existencia > $article->existencia_ps) {
-                            $articlePrestashop->cambio = 1;
-                            $articlePrestashop->tipo_cambio = TipoCambio::HABILITAR;
-                            $prestashop[] = $articlePrestashop;
-                            $articlePrestashop->save();
-                        }
-                    } else {
-                        $articlePrestashop = new ArticuloPrestashop();
-                        $articlePrestashop->sku = $article->sku;
-                        $articlePrestashop->id_prestashop = $id;
-                        $articlePrestashop->marca = $article->marca;
-                        $articlePrestashop->serie = $article->serie;
-                        $articlePrestashop->cambio = 1;
-                        $articlePrestashop->precio = (double)$articleXml->price;
-                        $articlePrestashop->precio_original = $article->precio;
-                        $articlePrestashop->tipo_cambio = TipoCambio::ALTA_SISTEMA;
-                        $prestashop[] = $articlePrestashop;
-                        $articlePrestashop->save();
-                    }
-                } else {
-                    $articlePrestashop = new ArticuloPrestashop();
-                    $articlePrestashop->sku = $article->sku;
-                    $articlePrestashop->id_prestashop = '-1';
-                    $articlePrestashop->cambio = 1;
-                    $articlePrestashop->precio = $article->precio;
-                    $articlePrestashop->precio_original = $article->precio;
-                    $articlePrestashop->tipo_cambio = TipoCambio::NUEVO;
-                    $articlePrestashop->save();
-
-                    $prestashop[] = $articlePrestashop;
-                }
-            } catch (PrestaShopWebserviceException $e) {
-            }
-        }
-        return $prestashop;
-    }
-
-    function xml_attribute($object, $attribute)
-    {
-        if (isset($object[$attribute])) {
-            return (string)$object[$attribute];
-        }
-        return '';
-    }
-
-    /**
-     * @return array
-     * @throws PrestaShopWebserviceException
-     */
-    public function actionUpdatePrices()
-    {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $request = \Yii::$app->request;
-
-        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
-        $soapClient = new \SoapClient($wsdl);
-        $paridad = $soapClient->ObtenerParidad('50527', '487478');
-        $dollarPrice = $paridad->datos;
-
-        $prestashop = array();
-
-        if ($request->isAjax && $request->isPost) {
-            foreach ($request->bodyParams as $product) {
-                $client = $this->getClient();
-
-                $tipoOperacion = $product['tipo_cambio'];
-
-                if ($tipoOperacion === TipoCambio::NUEVO) {
-                    $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
-                    $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $product['sku']])->one();
-
-                    $xml = $this->obtenerNuevoSchema();
-
-                    if ($article->moneda === 'MN') {
-                        $precio = $article->precio;
-                    } else {
-                        $precio = $article->precio * (double)$dollarPrice;
-                    }
-
-                    if ($article->tipo_utilidad_ps === 1) {
-                        $utilidad = $article->utilidad_ps + 1;
-                        $precio *= $utilidad;
-                    } else {
-                        $utilidad = $article->utilidad_ps;
-                        $precio += $utilidad;
-                    }
-
-                    $precio = round($precio, 2, PHP_ROUND_HALF_UP);
-
-                    unset(
-                        $xml->product->id,
-                        $xml->product->new,
-                        $xml->product->id_default_image,
-                        $xml->product->id_default_combination,
-                        $xml->product->position_in_category,
-                        $xml->product->supplier_reference,
-                        $xml->product->location,
-                        $xml->product->width,
-                        $xml->product->height,
-                        $xml->product->depth,
-                        $xml->product->weight,
-                        $xml->product->quantity_discount,
-                        $xml->product->ean13,
-                        $xml->product->upc,
-                        $xml->product->cache_is_pack,
-                        $xml->product->cache_has_attachments,
-                        $xml->product->is_virtual,
-                        $xml->product->on_sale,
-                        $xml->product->online_only,
-                        $xml->product->ecotax,
-                        $xml->product->minimal_quantity,
-                        $xml->product->wholesale_price,
-                        $xml->product->unity,
-                        $xml->product->unit_price_ratio,
-                        $xml->product->additional_shipping_cost,
-                        $xml->product->customizable,
-                        $xml->product->text_fields,
-                        $xml->product->uploadable_files,
-                        $xml->product->redirect_type,
-                        $xml->product->id_product_redirected,
-                        $xml->product->available_for_order,
-                        $xml->product->available_date,
-                        $xml->product->condition,
-                        $xml->product->show_price,
-                        $xml->product->indexed,
-                        $xml->product->visibility,
-                        $xml->product->advanced_stock_management,
-                        $xml->product->date_add,
-                        $xml->product->date_upd,
-                        $xml->product->meta_description,
-                        $xml->product->pack_stock_type,
-                        $xml->product->meta_keywords,
-                        $xml->product->meta_title,
-                        $xml->product->description,
-                        $xml->product->description_short,
-                        $xml->product->available_now,
-                        $xml->product->available_later,
-                        $xml->product->associations
-                    );
-
-                    $xml->product->id_manufacturer = 0;
-                    $xml->product->id_supplier = 0;
-                    $xml->product->id_category_default = 2;
-                    $xml->product->cache_default_attribute = 0;
-                    $xml->product->id_tax_rules_group = 0;
-                    $xml->product->type = 'simple';
-                    $xml->product->id_shop_default = 1;
-                    $xml->product->reference = $product['sku'];
-                    $xml->product->price = $precio;
-                    $xml->product->active = 0;
-
-                    $xml->product->link_rewrite->language[0] = $article->descripcion;
-                    $xml->product->link_rewrite->language[1] = $article->descripcion;
-
-                    $xml->product->name->language[0] = $article->descripcion;
-                    $xml->product->name->language[1] = $article->descripcion;
-
-                    $opt = array('resource' => 'products');
-                    $opt['postXml'] = $xml->asXML();
-
-                    $response = $client->add($opt);
-
-                    $articlePrestashop->precio = $precio;
-                    $articlePrestashop->marca = $article->marca;
-                    $articlePrestashop->serie = $article->serie;
-                    $articlePrestashop->id_prestashop = (string)$response->product->id;
-
-                    $articlePrestashop->save();
-
-                    $prestashop[] = $articlePrestashop;
-                } else {
-                    try {
-                        $opt = array('resource' => 'products');
-                        $opt['id'] = $product['id_prestashop'];
-
-                        $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
-                        $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $product['sku']])->one();
-
-
-                        $xml = $client->get($opt);
-                        $children = $xml->children()->children();
-                        unset($children->manufacturer_name, $children->quantity);
-
-
-                        if ($tipoOperacion === TipoCambio::HABILITAR) {
-                            $children->active = 1;
-                        } else if ($tipoOperacion === TipoCambio::INHABILITAR) {
-                            $children->active = 0;
-                        } else if ($tipoOperacion === TipoCambio::ALTA_SISTEMA || $tipoOperacion === TipoCambio::CAMBIO_PRECIO) {
-                            if ($article->moneda === 'MN') {
-                                $precio = $article->precio;
-                            } else {
-                                $precio = $article->precio * (double)$dollarPrice;
-                            }
-
-                            if ($article->tipo_utilidad_ps === 1) {
-                                $utilidad = $article->utilidad_ps + 1;
-                                $precio *= $utilidad;
-                            } else {
-                                $utilidad = $article->utilidad_ps;
-                                $precio += $utilidad;
-                            }
-
-                            $precio = round($precio, 2, PHP_ROUND_HALF_UP);
-
-                            $children->price = $precio;
-                            $articlePrestashop->precio = $precio;
-                            $articlePrestashop->precio_original = $article->precio;
-                        }
-
-                        $articlePrestashop->cambio = 0;
-                        $articlePrestashop->tipo_cambio = TipoCambio::SIN_CAMBIOS;
-
-                        $opt = array('resource' => 'products');
-                        $opt['putXml'] = $xml->asXML();
-                        $opt['id'] = $product['id_prestashop'];
-
-                        try {
-                            $client->edit($opt);
-                        } catch (PrestaShopWebserviceException $e) {
-                        }
-
-                        $articlePrestashop->save();
-
-                        $prestashop[] = $articlePrestashop;
-                    } catch (PrestaShopWebserviceException $e) {
-                        return $e;
-                    }
-                }
-            }
-        }
-
-        try {
-            $addToTimelineCommand = new AddToTimelineCommand([
-                'category' => 'prestashop',
-                'event' => 'change',
-                'data' => ['articles' => $prestashop]
-            ]);
-
-            Yii::$app->commandBus->handle($addToTimelineCommand);
-        } catch (MissingHandlerException $igored) {
-        } catch (InvalidConfigException $igored) {
-        }
-
-        return $prestashop;
+        return $xml;
     }
 
     /**
      * @return \SimpleXMLElement
      * @throws PrestaShopWebserviceException
      */
-    public function obtenerNuevoSchema()
+    private function obtenerNuevoSchemaCreateProduct()
     {
         $client = $this->getClient();
         $opt = array('resource' => 'products');
         $opt['schema'] = 'blank';
 
         return $client->get($opt);
+    }
+
+    /**
+     * @param $xml
+     * @param $quantity
+     * @return string
+     * @throws PrestaShopWebserviceException
+     */
+    private function editStock($xml, $quantity)
+    {
+        $stockId = $xml->product->associations->stock_availables->stock_available->id;
+
+        $xml = $this->obtenerSchemaUpdateStock($stockId);
+        $xml->stock_available->quantity = $quantity;
+        $opt = array('resource' => 'stock_availables');
+        $opt['id'] = $stockId;
+        $opt['putXml'] = $xml->asXML();
+
+        $this->getClient()->edit($opt);
     }
 
     /**
@@ -497,9 +483,7 @@ class ArticuloPrestashopController extends Controller
     public function actionIndex()
     {
         try {
-            $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
-            $client = new \SoapClient($wsdl);
-            $paridad = $client->ObtenerParidad('50527', '487478');
+            $paridad = $this->getParidad();
         } catch (\Exception $e) {
             $paridad = 0;
         }
@@ -510,7 +494,7 @@ class ArticuloPrestashopController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'paridad' => $paridad->datos,
+            'paridad' => $paridad,
         ]);
     }
 

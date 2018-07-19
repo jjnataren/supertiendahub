@@ -8,6 +8,7 @@ use backend\models\client\MeliOAuth2Client;
 use backend\models\MeliModel;
 use backend\models\search\ArticuloMeliSearch;
 use backend\models\search\ArticuloSearch;
+use backend\models\TipoCambio;
 use common\commands\AddToTimelineCommand;
 use common\models\KeyStorageItem;
 use trntv\bus\exceptions\MissingHandlerException;
@@ -69,19 +70,34 @@ class ArticuloMeliController extends Controller
 
     }
 
+    private function getClient()
+    {
+        $security = Yii::$app->getSecurity();
+        $clientSecret = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.secret')->value), env('SECRET_KEY'));
+        $clientId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.id')->value), env('SECRET_KEY'));
+        $tokenUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.url.token')->value), env('SECRET_KEY'));
+        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.url.api')->value), env('SECRET_KEY'));
+        $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.userid')->value), env('SECRET_KEY'));
+
+        $client = new MeliOAuth2Client();
+        $client->clientSecret = $clientSecret;
+        $client->clientId = $clientId;
+        $client->tokenUrl = $tokenUrl;
+        $client->apiBaseUrl = $apiUrl;
+        $client->userId = $userId;
+
+        $client->authenticateClient();
+
+        return $client;
+    }
 
     public function actionSynchronize()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $client = $this->getClient();
-
         $articles = Articulo::find()->all();
-
-        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
-        $soapClient = new \SoapClient($wsdl);
-        $paridad = $soapClient->ObtenerParidad('50527', '487478');
-        $dollarPrice = $paridad->datos;
+        $dollarPrice = $this->getParidad();
 
         $meli = array();
 
@@ -111,31 +127,70 @@ class ArticuloMeliController extends Controller
                             $precio += $utilidad;
                         }
 
-                        if (number_format($article->precio, 3) !== number_format($articleMeli->precio_original, 3)) {
+                        $precio = round($precio, 2, PHP_ROUND_HALF_UP);
+                        $precio_meli = round((float)$articleMeliJson['price'], 2, PHP_ROUND_HALF_UP);
+
+                        if (number_format($precio_meli, 3) !== number_format($articleMeli->precio, 3)) {
                             $articleMeli->cambio = 1;
+                            $articleMeli->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $meli[] = $articleMeli;
+                            $articleMeli->save();
+                        } else if (number_format($article->precio, 3) !== number_format($articleMeli->precio_original, 3)) {
+                            $articleMeli->cambio = 1;
+                            $articleMeli->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $meli[] = $articleMeli;
+                            $articleMeli->save();
+                        } else if (number_format($precio, 3) !== number_format($articleMeli->precio, 3)) {
+                            $articleMeli->cambio = 1;
+                            $articleMeli->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $meli[] = $articleMeli;
+                            $articleMeli->save();
+                        } else if (!$this->compareStock($articleMeliJson, $article->existencia_ml)) {
+                            $articleMeli->cambio = 1;
+                            $articleMeli->tipo_cambio = TipoCambio::CAMBIO_CANTIDAD;
                             $meli[] = $articleMeli;
                             $articleMeli->save();
                         } else if ($articleMeli->cambio === 1) {
                             $meli[] = $articleMeli;
-                        } else if (number_format($precio, 3) !== number_format($articleMeli->precio, 3)) {
-                            $articleMeli->cambio = 1;
-                            $meli[] = $articleMeli;
-                            $articleMeli->save();
                         }
                     } else {
+
+                        $precioMeli = round($articleMeliJson['price'], 2, PHP_ROUND_HALF_UP);
+                        $precio = round($article->precio);
+
                         $articleMeli = new ArticuloMeli();
-                        $articleMeli->precio = $articleMeliJson['price'];
+                        $articleMeli->precio = $precioMeli;
                         $articleMeli->sku = $article->sku;
                         $articleMeli->id = $articlesMeli[0];
                         $articleMeli->marca = $article->marca;
                         $articleMeli->serie = $article->serie;
-                        $articleMeli->precio_original = $article->precio;
+                        $articleMeli->precio_original = $precio;
+
                         $articleMeli->cambio = 1;
+                        $articleMeli->tipo_cambio = TipoCambio::ALTA_SISTEMA;
 
                         $articleMeli->save();
 
                         $meli[] = $articleMeli;
                     }
+                } else {
+                    $articleMeli = ArticuloMeliSearch::find()->where(['sku' => $article->sku])->one();
+
+                    if ($articleMeli === null) {
+                        $articleMeli = new ArticuloMeli();
+                        $articleMeli->precio = round($article->precio, 2, PHP_ROUND_HALF_UP);
+                        $articleMeli->sku = $article->sku;
+                        $articleMeli->id = $articlesMeli[0];
+                        $articleMeli->marca = $article->marca;
+                        $articleMeli->serie = $article->serie;
+                        $articleMeli->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
+                    }
+
+                    $articleMeli->cambio = 1;
+                    $articleMeli->tipo_cambio = TipoCambio::NUEVO;
+
+                    $meli[] = $articleMeli;
+                    $articleMeli->save();
                 }
 
             } catch (\Exception $e) {
@@ -144,20 +199,30 @@ class ArticuloMeliController extends Controller
         return $meli;
     }
 
+    private function getParidad()
+    {
+        try {
+            $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
+            $client = new \SoapClient($wsdl);
+            $paridad = $client->ObtenerParidad('50527', '487478');
+        } catch (\Exception $e) {
+            $paridad = 0;
+        }
+
+        return $paridad->datos;
+    }
+
+    private function compareStock($articleMeliJson, $existencia_ml)
+    {
+        return (int)$articleMeliJson['available_quantity'] === (int)$existencia_ml;
+    }
+
     public function actionUpdatePrices()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $request = \Yii::$app->request;
 
-        $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
-        $soapClient = new \SoapClient($wsdl);
-
-        try {
-            $paridad = $soapClient->ObtenerParidad('50527', '487478');
-            $dollarPrice = $paridad->datos;
-        } catch (\Exception $e) {
-            $dollarPrice = 0;
-        }
+        $dollarPrice = $this->getParidad();
 
         $meli = array();
 
@@ -165,13 +230,11 @@ class ArticuloMeliController extends Controller
             foreach ($request->bodyParams as $product) {
                 $client = $this->getClient();
 
-                try {
+                $tipoOperacion = $product['tipo_cambio'];
+
+                if ($tipoOperacion === TipoCambio::NUEVO) {
                     $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
                     $articleMeli = ArticuloMeliSearch::find()->where(['sku' => $product['sku']])->one();
-
-                    $url = 'items/' . $articleMeli->id;
-
-                    $meliModel = new MeliModel();
 
                     if ($article->moneda === 'MN') {
                         $precio = $article->precio;
@@ -179,27 +242,91 @@ class ArticuloMeliController extends Controller
                         $precio = $article->precio * (double)$dollarPrice;
                     }
 
-                    if ($article->tipo_utilidad_ml === 1) {
-                        $utilidad = $article->utilidad_ml + 1;
+                    if ($article->tipo_utilidad_pl === 1) {
+                        $utilidad = $article->utilidad_pl + 1;
                         $precio *= $utilidad;
                     } else {
-                        $utilidad = $article->utilidad_ml;
+                        $utilidad = $article->utilidad_pl;
                         $precio += $utilidad;
                     }
 
-                    $meliModel->price = $precio;
+                    $precio = round($precio, 2, PHP_ROUND_HALF_UP);
 
+                    $json = new MeliModel();
+                    $json->site_id = 'MLM';
+                    $json->title = $article->descripcion;
+                    $json->category_id = 'MLM57494';
+                    $json->price = $precio;
+                    $json->currency_id = 'MXN';
+                    $json->available_quantity = 1;
+                    $json->buying_mode = 'buy_it_now';
+                    $json->listing_type_id = 'free';
+                    $json->condition = 'new';
+                    $json->status = 'paused';
+                    $json->seller_custom_field = $article->sku;
+
+                    $url = 'items';
+
+                    $response = $client->add($url, $json);
+
+                    $articleMeli->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
                     $articleMeli->precio = $precio;
-                    $articleMeli->precio_original = $article->precio;
+                    $articleMeli->marca = $article->marca;
+                    $articleMeli->serie = $article->serie;
+                    $articleMeli->id = $response['id'];
+                    $articleMeli->tipo_cambio = TipoCambio::SIN_CAMBIOS;
                     $articleMeli->cambio = 0;
+
+                    $articleMeli->save();
+
+                    $meli[] = $articleMeli;
+                } else {
+                    $meliModel = new MeliModel();
+                    $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
+                    $articleMeli = ArticuloMeliSearch::find()->where(['sku' => $product['sku']])->one();
+                    if ($tipoOperacion === TipoCambio::INHABILITAR) {
+                        $meliModel->status = 'paused';
+                    } else if ($tipoOperacion === TipoCambio::HABILITAR) {
+                        $meliModel->status = 'active';
+                    } else if ($tipoOperacion === TipoCambio::ALTA_SISTEMA || $tipoOperacion === TipoCambio::CAMBIO_PRECIO) {
+                        if ($article->moneda === 'MN') {
+                            $precio = $article->precio;
+                        } else {
+                            $precio = $article->precio * (double)$dollarPrice;
+                        }
+
+                        if ($article->tipo_utilidad_ml === 1) {
+                            $utilidad = $article->utilidad_ml + 1;
+                            $precio *= $utilidad;
+                        } else {
+                            $utilidad = $article->utilidad_ml;
+                            $precio += $utilidad;
+                        }
+
+                        $precio = round($precio, 2, PHP_ROUND_HALF_UP);
+
+                        $meliModel->price = $precio;
+                        $articleMeli->precio = $precio;
+                        $articleMeli->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
+                    } else if ($tipoOperacion === TipoCambio::CAMBIO_CANTIDAD) {
+                        if ($article->existencia_ml === 0) {
+                            $meliModel->status = 'paused';
+                        } else {
+                            $meliModel->available_quantity = $article->existencia_ml;
+                            $meliModel->status = 'active';
+                        }
+                    }
+
+                    $url = 'items/' . $articleMeli->id;
+
+                    $articleMeli->cambio = 0;
+                    $articleMeli->tipo_cambio = TipoCambio::SIN_CAMBIOS;
 
                     $client->edit($url, Json::encode($meliModel));
 
                     $articleMeli->save();
 
                     $meli[] = $articleMeli;
-                } catch (\Exception $e) {
-                    return $e;
                 }
             }
         }
@@ -225,22 +352,13 @@ class ArticuloMeliController extends Controller
      */
     public function actionIndex()
     {
-
-        try {
-            $wsdl = 'http://serviciosmayoristas.pchmayoreo.com/servidor.php?wsdl';
-            $client = new \SoapClient($wsdl);
-            $paridad = $client->ObtenerParidad('50527', '487478');
-        } catch (\Exception $e) {
-            $paridad = 0;
-        }
-
         $searchModel = new ArticuloMeliSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'paridad' => $paridad->datos,
+            'paridad' => $this->getParidad(),
         ]);
     }
 
@@ -255,6 +373,22 @@ class ArticuloMeliController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+    /**
+     * Finds the ArticuloMeli model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return ArticuloMeli the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = ArticuloMeli::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
     /**
@@ -311,43 +445,6 @@ class ArticuloMeliController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the ArticuloMeli model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return ArticuloMeli the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = ArticuloMeli::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    private function getClient()
-    {
-        $security = Yii::$app->getSecurity();
-        $clientSecret = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.secret')->value), env('SECRET_KEY'));
-        $clientId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.id')->value), env('SECRET_KEY'));
-        $tokenUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.url.token')->value), env('SECRET_KEY'));
-        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.url.api')->value), env('SECRET_KEY'));
-        $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.userid')->value), env('SECRET_KEY'));
-
-        $client = new MeliOAuth2Client();
-        $client->clientSecret = $clientSecret;
-        $client->clientId = $clientId;
-        $client->tokenUrl = $tokenUrl;
-        $client->apiBaseUrl = $apiUrl;
-        $client->userId = $userId;
-
-        $client->authenticateClient();
-
-        return $client;
-    }
-
     public function actionHubMeli()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -360,7 +457,6 @@ class ArticuloMeliController extends Controller
     }
 
     /**
-     * @throws PrestaShopWebserviceException
      * @throws InvalidConfigException
      */
     public function actionHubOnlineMeli()

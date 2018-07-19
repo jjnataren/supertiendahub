@@ -24,4 +24,6 @@ abstract class TipoCambio extends BaseEnum
 
     public const ALTA_SISTEMA = 5;
 
+    public const CAMBIO_CANTIDAD = 6;
+
 }

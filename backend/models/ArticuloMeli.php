@@ -2,8 +2,6 @@
 
 namespace backend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "tbl_articulo_meli".
  *
@@ -14,6 +12,7 @@ use Yii;
  * @property double $precio
  * @property double $precio_original
  * @property int $cambio
+ * @property int $tipo_cambio
  * @property string $site_id
  * @property string $title
  * @property string $subtitle
@@ -89,10 +88,10 @@ class ArticuloMeli extends \yii\db\ActiveRecord
         return [
             [['id'], 'required'],
             [['precio', 'precio_original'], 'number'],
-            [['cambio'], 'integer'],
+            [['cambio', 'tipo_cambio'], 'integer'],
             [['sku', 'id', 'marca', 'serie'], 'string', 'max' => 200],
             [['site_id', 'title', 'subtitle', 'seller_id', 'category_id', 'price', 'base_price', 'original_price', 'currency_id', 'initial_quantity', 'available_quantity', 'sold_quantity', 'sale_terms', 'buying_mode', 'listing_type_id', 'start_time', 'historical_start_time', 'stop_time', 'end_time', 'expiration_time', 'condition', 'permalink', 'thumbnail', 'secure_thumbnail', 'pictures', 'video_id', 'descriptions', 'accepts_mercadopago', 'non_mercado_pago_payment_methods', 'shipping', 'international_delivery_mode', 'seller_address', 'seller_contact', 'location', 'geolocation', 'coverage_areas', 'attributes', 'warnings', 'listing_source', 'variations', 'status', 'sub_status', 'tags', 'warranty', 'catalog_product_id', 'domain_id', 'tbl_articulo_melicol', 'seller_custom_field', 'tbl_articulo_melicol1', 'parent_item_id', 'differential_pricing', 'deal_ids', 'automatic_relist', 'date_created', 'last_updated', 'health'], 'string', 'max' => 45],
-            [['id'], 'unique'],
+            [['sku'], 'unique'],
         ];
     }
 
@@ -109,6 +108,7 @@ class ArticuloMeli extends \yii\db\ActiveRecord
             'precio' => 'Precio',
             'precio_original' => 'Precio Original',
             'cambio' => 'Cambio',
+            'tipo_cambio' => 'Tipo cambio',
             'site_id' => 'Site ID',
             'title' => 'Title',
             'subtitle' => 'Subtitle',

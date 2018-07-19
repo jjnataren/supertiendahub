@@ -141,6 +141,7 @@ $this->registerJsFile('@web/js/meli.js', ['depends' => [\yii\web\JqueryAsset::cl
                                         <th>Precio</th>
                                         <th>Precio Original</th>
                                         <th>Cambio</th>
+                                        <th>Tipo de cambio</th>
                                     </tr>
                                     </thead>
                                 </table>

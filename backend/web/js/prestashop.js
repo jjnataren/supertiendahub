@@ -136,6 +136,8 @@
                 return 'Sin cambios';
             } else if (data === 5) {
                 return 'Alta en sistema';
+            } else if (data === 6) {
+                return 'Cambio de cantidad';
             }
 
             return data;
