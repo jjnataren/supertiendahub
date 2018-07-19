@@ -34,6 +34,7 @@ use Yii;
  * @property string $utilidad_monto_ps
  * @property int $tipo_utilidad_ml
  * @property int $tipo_utilidad_ps
+ * @property int $comision_ml
  */
 class Articulo extends \yii\db\ActiveRecord
 {
@@ -53,7 +54,7 @@ class Articulo extends \yii\db\ActiveRecord
         return [
             [['sku'], 'required'],
             [['precio', 'peso', 'alto', 'largo', 'ancho', 'utilidad_ml', 'utilidad_ps', 'utilidad_monto_ml', 'utilidad_monto_ps'], 'number'],
-            [['almacen', 'existencia', 'disponible', 'id_usuario_modifico', 'id_snap', 'existencia_ml', 'existencia_ps', 'tipo_utilidad_ml', 'tipo_utilidad_ps'], 'integer'],
+            [['almacen', 'existencia', 'disponible', 'id_usuario_modifico', 'id_snap', 'existencia_ml', 'existencia_ps', 'tipo_utilidad_ml', 'tipo_utilidad_ps', 'comision_ml'], 'integer'],
             [['ultima_modificacion'], 'safe'],
             [['sku', 'sku_fabricante', 'seccion', 'linea', 'marca', 'serie'], 'string', 'max' => 200],
             [['descripcion'], 'string', 'max' => 300],
@@ -95,6 +96,7 @@ class Articulo extends \yii\db\ActiveRecord
             'utilidad_monto_ps' => 'Utilidad Monto Ps',
             'tipo_utilidad_ml' => 'Tipo Utilidad Ml',
             'tipo_utilidad_ps' => 'Tipo Utilidad Ps',
+            'comision_ml' => 'Comision',
         ];
     }
 }

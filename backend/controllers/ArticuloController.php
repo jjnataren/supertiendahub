@@ -39,6 +39,22 @@ class ArticuloController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 
+        $wsdl =
+        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
+
+        $cliente =
+        \Yii::$app->keyStorage->get('config.phc.webservice.cliente', '50527');
+
+        $llave =
+        \Yii::$app->keyStorage->get('config.phc.webservice.llave', '487478');
+
+        $params = "<cliente>$cliente</cliente><llave>$llave</llave>";
+
+        $client = new \SoapClient($wsdl);
+        //$valores = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+
+        $dollar =  (float)$client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
+
         if (isset($_POST['hasEditable'])) {
             // use Yii's response format to encode output as JSON
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -72,6 +88,8 @@ class ArticuloController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'dollar'=>$dollar
+
         ]);
     }
 
@@ -224,7 +242,7 @@ class ArticuloController extends Controller
               $model = null;
             }
 
-            if(  !$model || $dbModel->precio*1 !==  $model->precio*1)
+            if(  (!$model && (  $dbModel->existencia > 0 || $dbModel->existencia_ml > 0 || $dbModel->existencia_ps > 0 )) || ($model &&  $dbModel->precio*1 !==  $model->precio*1) )
                 $articles[$dbModel->sku] = ['dbmodel'=>$dbModel, 'model'=>$model];
         }
 

@@ -119,18 +119,21 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         'refreshGrid' => true,
                                                         'attribute'=>'precio',
                                                         'mergeHeader' => true,
-                                                        'content'=>function($data){
-                                                        return   Yii::$app->formatter->asCurrency($data->precio);
+                                                        'content'=>function($data) use ($dollar) {
+
+                                                        return  ($data->moneda == 'USD') ? Yii::$app->formatter->asCurrency($data->precio * $dollar) : Yii::$app->formatter->asCurrency($data->precio) ;
+
                                                         }
                                                     ],
+
                                                     [
                                                         'attribute'=>'moneda',
                                                         'mergeHeader' => true,
-                                                        'content'=>function($data){
-                                                        return   $data->moneda;
+                                                        'content'=>function($data) {
+                                                        return  ($data->moneda == 'USD') ? 'USD (' .  Yii::$app->formatter->asCurrency($data->precio) . ')' :$data->moneda ;
+
                                                         }
                                                      ],
-
                                                      [
                                                          'class' => 'kartik\grid\EditableColumn',
                                                          'attribute'=>'tipo_utilidad_ml',
@@ -138,41 +141,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                          'refreshGrid' => true,
                                                          'content'=>function($data){
 
-
-
-                                                         switch ($data->tipo_utilidad_ml*1){
-
-                                                             case 1:
-
-                                                             return 'Porcentaje';
-
-                                                             break;
-
-                                                             case 2:
-
-                                                                 return 'Monto';
-
-                                                             break;
-
-                                                             case 3:
-
-                                                                 return 'M Basica';
-
-                                                              break;
-
-                                                             case 4:
-
-                                                                 return 'M Premium';
-
-                                                                 break;
-
-                                                              default:
-                                                                  return null;
-
-                                                         }
-
-
-                                                         return   null;
+                                                         return   ($data->tipo_utilidad_ml == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ml == 2)?'monto': null) ;
 
                                                          },
                                                          'editableOptions'=> [
@@ -181,7 +150,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                              'asPopover' => true,
 
                                                              'options' => [
-                                                                 'data' =>  [ '1' => 'Porcentaje', '2' => 'Monto','3' => 'M Basica', '4' => 'M Premium'],
+                                                                 'data' =>  [ '1' => 'Porcentaje', '2' => 'Monto'],
                                                              ]
                                                          ],
                                                          'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
@@ -199,57 +168,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             'mergeHeader' => true,
                                                         'content'=>function($data){
 
-
-                                                        switch ($data->tipo_utilidad_ml*1){
-
-                                                            case 1:
-
-                                                                return Yii::$app->formatter->asPercent($data->utilidad_ml);
-
-                                                                break;
-
-                                                            case 2:
-
-                                                                return Yii::$app->formatter->asCurrency($data->utilidad_ml);
-
-                                                                break;
-
-                                                            case 3:
-
-                                                                if ($data->precio*1 < 1001){
-
-                                                                    return Yii::$app->formatter->asCurrency($data->precio * 0.13);
-                                                                }elseif ($data->precio*1 < 5001){
-
-                                                                    return Yii::$app->formatter->asCurrency( (130 +  (($data->precio-1000)  * 0.1)) );
-                                                                }else{
-
-                                                                    return Yii::$app->formatter->asCurrency( (530 +  (($data->precio-5000) * 0.07) ));
-                                                                }
-
-                                                                break;
-
-                                                            case 4:
-
-                                                                if ($data->precio*1 < 1001){
-
-                                                                    return Yii::$app->formatter->asCurrency($data->precio * 0.175);
-                                                                }elseif ($data->precio*1 < 5001){
-
-                                                                    return Yii::$app->formatter->asCurrency( (175 +  (($data->precio-1000) * 0.145)) );
-                                                                }else{
-
-                                                                    return Yii::$app->formatter->asCurrency( (755 +  (($data->precio-5000) * 0.115) ));
-                                                                }
-
-                                                                break;
-
-                                                            default:
-                                                                return null;
-
-                                                        }
-
-                                                        return  null;
+                                                        return  ($data->tipo_utilidad_ml == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ml):  ( ($data->tipo_utilidad_ml == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ml): null) ;
 
                                                         },
                                                         'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
@@ -258,22 +177,126 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                                         ],
 
+                                                        [
+                                                            'class' => 'kartik\grid\EditableColumn',
+                                                            'attribute'=>'comision_ml',
+                                                            'mergeHeader' => true,
+                                                            'refreshGrid' => true,
+                                                            'content'=>function($data){
+
+
+                                                            $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
+
+
+                                                            if ($data->comision_ml*1 == 1){
+
+
+
+                                                                $precio *=1.16;
+
+                                                                if ($precio*1 < 1001){
+
+                                                                    $utility =  $precio * 0.13;
+                                                                }elseif ($precio*1 < 5001){
+
+                                                                    $utility = (130 +  (($precio-1000) * 0.1)) ;
+                                                                }else{
+
+                                                                    $utility = (530 +  (($precio-5000) * 0.07) );
+                                                                }
+
+                                                            }elseif($data->comision_ml*1 == 2){
+
+                                                                if ($precio*1 < 1001){
+
+                                                                    $utility = ( $precio * 0.175);
+                                                                }elseif ($precio*1 < 5001){
+
+                                                                    $utility = ( (175 +  (($precio-1000) * 0.145))  );
+                                                                }else{
+
+                                                                    $utility = ( (755 +  (($precio-5000) * 0.115) ) );
+                                                                }
+
+                                                            }else{
+
+                                                                $utility = 0;
+                                                            }
+
+
+                                                            $utility = Yii::$app->formatter->asCurrency ($utility);
+
+
+                                                            return   ($data->comision_ml == 1) ? "Basica ($utility) " :  ( ($data->comision_ml == 2)?"Premium ($utility)": null) ;
+
+                                                            },
+                                                            'editableOptions'=> [
+                                                                'inputType' => \kartik\editable\Editable::INPUT_SELECT2,
+                                                                'header' => 'Tipo utilidad',
+                                                                'asPopover' => true,
+
+                                                                'options' => [
+                                                                    'data' =>  [ '1' => 'Basica', '2' => 'Premium'],
+                                                                ]
+                                                            ],
+                                                            'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
+                                                            'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
+
+                                                            ],
+
 
                                                         [
 
-                                                            'header'=>'publico',
+                                                            'header'=>'Publico (+IVA)',
                                                             'attribute'=>'utilidad_ml',
 
                                                             'mergeHeader' => true,
-                                                            'content'=>function($data){
+                                                            'content'=>function($data) use($dollar){
+
+
+                                                            $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
+
+                                                            $precio *=1.16;
 
                                                             $utility = 0;
+                                                            $mlUtility = 0;
+
+
+
+                                                            if ($data->comision_ml*1 == 1){
+
+                                                                if ($precio*1 < 1001){
+
+                                                                    $mlUtility =  $precio * 0.13;
+                                                                }elseif ($precio*1 < 5001){
+
+                                                                    $mlUtility = (130 +  (($precio-1000) * 0.1)) ;
+                                                                }else{
+
+                                                                    $mlUtility = (530 +  (($precio-5000) * 0.07) );
+                                                                }
+
+                                                            }elseif($data->comision_ml*1 == 2){
+
+                                                                if ($precio*1 < 1001){
+
+                                                                    $mlUtility = ( $precio * 0.175);
+                                                                }elseif ($precio*1 < 5001){
+
+                                                                    $mlUtility = ( (175 +  (($precio-1000) * 0.145))  );
+                                                                }else{
+
+                                                                    $mlUtility = ( (755 +  (($precio-5000) * 0.115) ) );
+                                                                }
+
+                                                            }
+
 
                                                             switch ($data->tipo_utilidad_ml*1){
 
                                                                 case 1:
 
-                                                                    $utility  =  $data->precio * $data->utilidad_ml;
+                                                                    $utility  =  $precio * $data->utilidad_ml;
 
                                                                     break;
 
@@ -283,35 +306,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                                                     break;
 
-                                                                case 3:
-
-                                                                    if ($data->precio*1 < 1001){
-
-                                                                        $utility =  $data->precio * 0.13;
-                                                                    }elseif ($data->precio*1 < 5001){
-
-                                                                        $utility = (130 +  (($data->precio-1000) * 0.1)) ;
-                                                                    }else{
-
-                                                                        $utility = (530 +  (($data->precio-5000) * 0.07) );
-                                                                    }
-
-                                                                    break;
-
-                                                                case 4:
-
-                                                                    if ($data->precio*1 < 1001){
-
-                                                                        $utility = ( $data->precio * 0.175);
-                                                                    }elseif ($data->precio*1 < 5001){
-
-                                                                        $utility = ( (175 +  (($data->precio-1000) * 0.145))  );
-                                                                    }else{
-
-                                                                        $utility = ( (755 +  (($data->precio-5000) * 0.115) ) );
-                                                                    }
-
-                                                                    break;
 
                                                                 default:
                                                                     return null;
@@ -319,7 +313,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             }
 
 
-                                                            return Yii::$app->formatter->asCurrency (($data->precio*1) +  $utility);
+                                                            return Yii::$app->formatter->asCurrency (($precio*1) +  $utility + $mlUtility);
 
 
 
@@ -421,21 +415,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                                                             'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
                                                                             ],
 
-                                                                [
-                                                                    'header'=>'Tot',
-                                                                    'mergeHeader' => true,
-
-                                                                    'content'=>function($data){
-                                                                    return   $data->existencia + $data->existencia_ml  +$data->existencia_ps;
-                                                                    }
-                                                                    ],
-
-
 
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
-                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], [ 'class' => 'btn btn-default', 'title'=>'Reiniciar grid','id'=>'reset_grid'])
+                                                        '<a  href="'.
+                                                        Yii::$app->request->url
+                                                         .'"  id="reset_grid" class = "btn btn-info" title="Buscar cambios"> <i class="fa fa-refresh"></i></a>'
+                                                    ],
+                                                    ['content' =>
+                                                        Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], ['class' => 'btn btn-default', 'title' => 'Reiniciar grid'])
                                                     ],
                                                     '{export}',
                                                     '{toggleData}'
@@ -446,9 +435,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     [
                                                         'columns'=>[
                                                             ['content'=>'<i class="fa fa-mixcloud"></i> Articulo', 'options'=>['colspan'=>4, 'class'=>'text text-center',]],
-                                                            ['content'=>'<i class="fa fa-truck"></i> Me Libre', 'options'=>['colspan'=>3, 'class'=>'text text-left','style' => 'border: 1px solid #FFF159']],
+                                                            ['content'=>'<i class="fa fa-truck"></i> Me Libre', 'options'=>['colspan'=>4, 'class'=>'text text-left','style' => 'border: 1px solid #FFF159']],
                                                             ['content'=>'<i class="fa fa-sellsy"></i> PrestaShop', 'options'=>['colspan'=>3, 'class'=>'text text-left','style' => 'border: 1px solid #FF95C5']],
-                                                            ['content'=>'<i class="fa fa-database"></i> Existencias', 'options'=>['colspan'=>4, 'class'=>'text text-center' ,'style' => 'border: 2px solid']],
+                                                            ['content'=>'<i class="fa fa-database"></i> Existencias', 'options'=>['colspan'=>3, 'class'=>'text text-center' ,'style' => 'border: 2px solid']],
                                                         ],
                                                         //  'options'=>['class'=>'skip-export'] // remove this row from export
                                                     ]
@@ -551,6 +540,7 @@ $this->params['breadcrumbs'][] = $this->title;
     	                            });
 
 
+
     	                       $('#sync_success').click(function() {
 
 
@@ -586,12 +576,19 @@ $this->params['breadcrumbs'][] = $this->title;
     	                        var form = $(this);
     	                        var formData = form.serialize();
 
+    	                        var table = $('#comparegrid').DataTable();
+           	                          table
+           	                             .row( $(this).parents('tr') )
+           	                             .remove()
+           	                             .draw();
+
+
     	                        $.ajax({
     	                            url: form.attr("action"),
     	                            type: form.attr("method"),
     	                            data: formData,
     	                            success: function (data) {
-    	                                $('#syncrequest').trigger('click');
+
     	                                $('#reset_grid').trigger('click');
 
     	                            },
@@ -613,6 +610,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
       $('#syncrequest').trigger('click');
+
+
+
 
 
 </script>
