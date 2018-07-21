@@ -1,5 +1,6 @@
 <?php
 
+use backend\assets\SwalAsset;
 use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\web\View;
@@ -15,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 Yii::$app->formatter->locale = 'es-MX';
 
 
-
+SwalAsset::register($this);
 
 
 $this->registerJs(
@@ -409,13 +410,53 @@ $.ajax({
                       url: 'sync-phc-resume-save', //form.attr("sync-phc-resume-save"),
                       type: 'POST',//form.attr("post"),
                       data: formData,
+                      beforeSend: function () {
+                      	form.find(':submit')
+                              .html('Aplicando <i class="fa fa-spinner fa-spin"></i>')
+                              .prop('disabled', true);
+                      },
                       success: function (data) {
-                          $('#syncrequest').trigger('click');
+
+                    	  var table = $('#comparegrid').DataTable();
+	                          table
+	                             .row( form.parents('tr') )
+	                             .remove()
+	                             .draw();
+
                       },
                       error: function () {
-                          alert("Error al actualizar.");
+                    	  console.log(msg);
+                          swal({
+                              title: 'Servicio no disponible por el momento.',
+                              text: 'Por favor consulte a su proveedor',
+                              type: 'error'
+                          });
+                      },
+                      complete: function () {
+                      	let timerInterval
+                      	swal({
+                      	  title: 'Correcto',
+                      	  html: '<h1><i class="fa fa-thumbs-up"></i></h1>',
+                      	  timer: 1500,
+                      	  onClose: () => {
+                      	    clearInterval(timerInterval)
+                      	  }
+                      	}).then((result) => {
+                      	  if (
+                      	    // Read more about handling dismissals
+                      	    result.dismiss === swal.DismissReason.timer
+                      	  ) {
+                      	    console.log('I was closed by the timer')
+                      	  }
+                      	})
                       }
                   });
+
+
+
+
+
+
                   e.preventDefault();
               });
 

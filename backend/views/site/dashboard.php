@@ -37,7 +37,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                 </h3>
                 <p>
 
-                    Paridad dolar PHC mayoristas
+                    Paridad dolar PCH mayoristas
                 </p>
             </div>
             <div class="icon">
@@ -120,7 +120,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
              <li>
              	<a data-toggle="tab" href="#tab_sync">
-             		<small id="bag_count_phc" class="label label-danger"><i class="fa fa-spinner fa-spin"></i></small> SUPER TIENDA - PHC
+             		<small id="bag_count_phc" class="label label-danger"><i class="fa fa-spinner fa-spin"></i></small> SUPER TIENDA - PCH
              	</a>
              </li>
              <li class="active"><a data-toggle="tab" href="#tab_super_tienda"><i class="fa fa-database"></i> SUPER TIENDA</a></li>
@@ -134,156 +134,337 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
 
                     <?php try {
-                        echo GridView::widget([
+                         echo GridView::widget([
                             'dataProvider' => $dataProvider,
                             'filterModel' => $searchModel,
 
                             'columns' => [
-                                'sku',
-                                'descripcion',
 
 
                                 [
-                                    'attribute' => 'precio',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return Yii::$app->formatter->asCurrency($data->precio);
+                                    'attribute'=>'sku',
+                                    'mergeHeader' => false,
+                                    'content'=>function($data){
+                                    return  Html::a( $data->sku, ['articulo/update','id'=>$data->sku]);
                                     }
-                                ],
-                                [
-                                    'attribute' => 'moneda',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return $data->moneda;
-                                    }
-                                ],
-
-                                [
-                                    'attribute' => 'utilidad_ml',
-                                    'header' => 'util',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return Yii::$app->formatter->asPercent($data->utilidad_ml);
-                                    },
-                                    'contentOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                    'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-
-                                ],
-
-
-                                [
-                                    'header' => 'publico',
-                                    'attribute' => 'utilidad_ml',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return Yii::$app->formatter->asCurrency(($data->precio * 1) * (1.00 + $data->utilidad_ml));
-                                    },
-                                    'contentOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                    'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                ],
-
-
-                                [
-                                    'attribute' => 'utilidad_ps',
-                                    'header' => 'util',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return Yii::$app->formatter->asPercent($data->utilidad_ps);
-                                    },
-
-
-                                    'contentOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                    'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-
-
-                                ],
-                                [
-                                    'header' => 'publico',
-                                    'attribute' => 'utilidad_ps',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return Yii::$app->formatter->asCurrency(($data->precio * 1) * (1.00 + $data->utilidad_ps));
-                                    },
-                                    'contentOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                    'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-
-                                ],
-
-
-                                [
-                                    'attribute' => 'existencia',
-                                    'header' => 'PHC',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return $data->existencia;
-                                    }
-                                ],
-                                [
-                                    'attribute' => 'existencia_ml',
-                                    'header' => 'MLibre',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return $data->existencia_ml;
-                                    },
-                                    'contentOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                    'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                ],
-                                [
-                                    'attribute' => 'existencia_ps',
-                                    'header' => 'PShop',
-                                    'mergeHeader' => true,
-                                    'content' => function ($data) {
-                                        return $data->existencia_ps;
-                                    },
-                                    'contentOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                    'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                ],
-
-                                [
-                                    'header' => 'Tot',
-                                    'mergeHeader' => true,
-
-                                    'content' => function ($data) {
-                                        return $data->existencia + $data->existencia_ml + $data->existencia_ps;
-                                    }
-                                ],
-
-
-                            ],
-                            'toolbar' => [
-                                ['content' =>
-                                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], ['class' => 'btn btn-default', 'title' => 'Reiniciar grid'])
-                                ],
-                                '{export}',
-                                '{toggleData}'
-                            ],
-
-
-                            'beforeHeader' => [
-                                [
-                                    'columns' => [
-                                        ['content' => '<i class="fa fa-mixcloud"></i> Articulo', 'options' => ['colspan' => 4, 'class' => 'text text-center',]],
-                                        ['content' => '<i class="fa fa-truck"></i> Me Libre', 'options' => ['colspan' => 2, 'class' => 'text text-left', 'style' => 'border: 1px solid #FFF159']],
-                                        ['content' => '<i class="fa fa-sellsy"></i> PrestaShop', 'options' => ['colspan' => 2, 'class' => 'text text-left', 'style' => 'border: 1px solid #FF95C5']],
-                                        ['content' => '<i class="fa fa-database"></i> Existencias', 'options' => ['colspan' => 4, 'class' => 'text text-center', 'style' => 'border: 2px solid']],
                                     ],
-                                    //  'options'=>['class'=>'skip-export'] // remove this row from export
-                                ]
-                            ],
+
+                                    'descripcion',
 
 
-                            'pjax' => true,
-                            'bordered' => true,
-                            'striped' => true,
-                            'condensed' => true,
-                            'responsive' => true,
-                            'hover' => true,
-                            'floatHeader' => false,
-                            'floatHeaderOptions' => ['scrollingTop' => true],
-                            'panel' => [
-                                'type' => GridView::TYPE_PRIMARY
-                            ],
-                        ]);
+
+                                    [
+
+
+                                        'attribute'=>'precio',
+                                        'mergeHeader' => true,
+                                        'content'=>function($data) use ($dollar) {
+
+                                        return  ($data->moneda == 'USD') ? Yii::$app->formatter->asCurrency($data->precio * $dollar) : Yii::$app->formatter->asCurrency($data->precio) ;
+
+                                        }
+                                        ],
+
+                                        [
+                                            'attribute'=>'moneda',
+                                            'mergeHeader' => true,
+                                            'content'=>function($data) {
+                                            return  ($data->moneda == 'USD') ? 'USD (' .  Yii::$app->formatter->asCurrency($data->precio) . ')' :$data->moneda ;
+
+                                            }
+                                            ],
+                                            [
+
+                                                'attribute'=>'tipo_utilidad_ml',
+                                                'mergeHeader' => true,
+
+                                                'content'=>function($data){
+
+                                                return   ($data->tipo_utilidad_ml == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ml == 2)?'monto': null) ;
+
+                                                },
+
+                                                'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
+                                                'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
+
+                                                ],
+
+
+                                                [
+                                                    'attribute'=>'utilidad_ml',
+                                                    'format' => ['percent'],
+                                                    'header'=>'util',
+                                                    'mergeHeader' => true,
+                                                    'content'=>function($data){
+
+                                                    return  ($data->tipo_utilidad_ml == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ml):  ( ($data->tipo_utilidad_ml == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ml): null) ;
+
+                                                    },
+                                                    'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
+                                                    'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
+
+
+                                                    ],
+
+                                                    [
+                                                        'attribute'=>'comision_ml',
+                                                        'mergeHeader' => true,
+                                                        'content'=>function($data) use ($dollar){
+
+
+                                                        $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
+
+
+                                                        if ($data->comision_ml*1 == 1){
+
+
+
+                                                            $precio *=1.16;
+
+                                                            if ($precio*1 < 1001){
+
+                                                                $utility =  $precio * 0.13;
+                                                            }elseif ($precio*1 < 5001){
+
+                                                                $utility = (130 +  (($precio-1000) * 0.1)) ;
+                                                            }else{
+
+                                                                $utility = (530 +  (($precio-5000) * 0.07) );
+                                                            }
+
+                                                        }elseif($data->comision_ml*1 == 2){
+
+                                                            if ($precio*1 < 1001){
+
+                                                                $utility = ( $precio * 0.175);
+                                                            }elseif ($precio*1 < 5001){
+
+                                                                $utility = ( (175 +  (($precio-1000) * 0.145))  );
+                                                            }else{
+
+                                                                $utility = ( (755 +  (($precio-5000) * 0.115) ) );
+                                                            }
+
+                                                        }else{
+
+                                                            $utility = 0;
+                                                        }
+
+
+                                                        $utility = Yii::$app->formatter->asCurrency ($utility);
+
+
+                                                        return   ($data->comision_ml == 1) ? "Basica ($utility) " :  ( ($data->comision_ml == 2)?"Premium ($utility)": null) ;
+
+                                                        },
+
+                                                        'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
+                                                        'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
+
+                                                        ],
+
+
+                                                        [
+
+                                                            'header'=>'Publico (+IVA)',
+                                                            'attribute'=>'utilidad_ml',
+
+                                                            'mergeHeader' => true,
+                                                            'content'=>function($data) use($dollar){
+
+
+                                                            $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
+
+                                                            $precio *=1.16;
+
+                                                            $utility = 0;
+                                                            $mlUtility = 0;
+
+
+
+                                                            if ($data->comision_ml*1 == 1){
+
+                                                                if ($precio*1 < 1001){
+
+                                                                    $mlUtility =  $precio * 0.13;
+                                                                }elseif ($precio*1 < 5001){
+
+                                                                    $mlUtility = (130 +  (($precio-1000) * 0.1)) ;
+                                                                }else{
+
+                                                                    $mlUtility = (530 +  (($precio-5000) * 0.07) );
+                                                                }
+
+                                                            }elseif($data->comision_ml*1 == 2){
+
+                                                                if ($precio*1 < 1001){
+
+                                                                    $mlUtility = ( $precio * 0.175);
+                                                                }elseif ($precio*1 < 5001){
+
+                                                                    $mlUtility = ( (175 +  (($precio-1000) * 0.145))  );
+                                                                }else{
+
+                                                                    $mlUtility = ( (755 +  (($precio-5000) * 0.115) ) );
+                                                                }
+
+                                                            }
+
+
+                                                            switch ($data->tipo_utilidad_ml*1){
+
+                                                                case 1:
+
+                                                                    $utility  =  $precio * $data->utilidad_ml;
+
+                                                                    break;
+
+                                                                case 2:
+
+                                                                    $utility =  $data->utilidad_ml;
+
+                                                                    break;
+
+
+                                                                default:
+                                                                    break;
+
+                                                            }
+
+
+                                                            return Yii::$app->formatter->asCurrency (($precio*1) +  $utility + $mlUtility);
+
+
+
+                                                            },
+                                                            'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
+                                                            'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
+                                                            ],
+
+
+
+                                                            [
+                                                                'attribute'=>'tipo_utilidad_ps',
+                                                                'mergeHeader' => true,
+
+
+                                                                'content'=>function($data){
+
+                                                                return   ($data->tipo_utilidad_ps == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ps == 2)?'Monto': null) ;
+
+                                                                },
+                                                                'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
+                                                                'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
+
+                                                                ],
+
+                                                                [
+                                                                    'attribute'=>'utilidad_ps',
+                                                                    'header'=>'util',
+                                                                    'mergeHeader' => true,
+                                                                    'content'=>function($data){
+                                                                    return  ($data->tipo_utilidad_ps == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ps):  ( ($data->tipo_utilidad_ps == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ps): null) ;
+                                                                    },
+
+
+                                                                    'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
+                                                                    'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
+
+
+
+                                                                    ],
+                                                                    [
+                                                                        'header'=>'publico',
+                                                                        'attribute'=>'utilidad_ps',
+                                                                        'mergeHeader' => true,
+                                                                        'content'=>function($data){
+                                                                        return Yii::$app->formatter->asCurrency (($data->precio*1) +  (($data->tipo_utilidad_ps == 1) ? ($data->precio * $data->utilidad_ps) : (($data->tipo_utilidad_ps == 2) ? $data->utilidad_ps : 0)));
+                                                                        },
+                                                                        'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
+                                                                        'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
+
+                                                                        ],
+
+
+
+                                                                        [
+                                                                            'attribute'=>'existencia',
+                                                                            'header'=>'PCH',
+                                                                            'mergeHeader' => true,
+                                                                            'content'=>function($data){
+                                                                            return        $data->existencia;
+                                                                            }
+                                                                            ],
+
+                                                                            [
+                                                                                'attribute'=>'existencia_ml',
+
+                                                                                'header'=>'MLibre',
+                                                                                'mergeHeader' => true,
+                                                                                'content'=>function($data){
+                                                                                return     $data->existencia_ml;
+                                                                                },
+                                                                                'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
+                                                                                'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
+                                                                                ],
+                                                                                [
+                                                                                    'attribute'=>'existencia_ps',
+
+                                                                                    'header'=>'PShop',
+                                                                                    'mergeHeader' => true,
+                                                                                    'content'=>function($data){
+                                                                                    return  $data->existencia_ps;
+                                                                                    },
+                                                                                    'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
+                                                                                    'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
+                                                                                    ],
+
+
+                                                                                    ],
+                                                                                    'toolbar' =>  [
+                                                                                        ['content'=>
+                                                                                            '<a   class = "btn btn-success" title="Precio dolar"><i class="fa fa-money"></i>  '. Yii::$app->formatter->asCurrency( $dollar) .'</a>'
+                                                                                        ],
+
+                                                                                        ['content'=>
+                                                                                            '<a  href="'.
+                                                                                            Yii::$app->request->url
+                                                                                            .'"  id="reset_grid" class = "btn btn-info" title="Buscar cambios"> <i class="fa fa-refresh"></i></a>'
+                                                                                        ],
+
+                                                                                        ['content' =>
+                                                                                            Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], ['class' => 'btn btn-default', 'title' => 'Reiniciar grid'])
+                                                                                        ],
+                                                                                        '{export}',
+                                                                                        '{toggleData}'
+                                                                                    ],
+
+
+                                                                                    'beforeHeader'=>[
+                                                                                        [
+                                                                                            'columns'=>[
+                                                                                                ['content'=>'<i class="fa fa-mixcloud"></i> Articulo', 'options'=>['colspan'=>4, 'class'=>'text text-center',]],
+                                                                                                ['content'=>'<i class="fa fa-truck"></i> Me Libre', 'options'=>['colspan'=>4, 'class'=>'text text-left','style' => 'border: 1px solid #FFF159']],
+                                                                                                ['content'=>'<i class="fa fa-sellsy"></i> PrestaShop', 'options'=>['colspan'=>3, 'class'=>'text text-left','style' => 'border: 1px solid #FF95C5']],
+                                                                                                ['content'=>'<i class="fa fa-database"></i> Existencias', 'options'=>['colspan'=>3, 'class'=>'text text-center' ,'style' => 'border: 2px solid']],
+                                                                                            ],
+                                                                                            //  'options'=>['class'=>'skip-export'] // remove this row from export
+                                                                                        ]
+                                                                                    ],
+
+
+                                                                                    'pjax' => true,
+                                                                                    'bordered' => true,
+                                                                                    'striped' => true,
+                                                                                    'condensed' => true,
+                                                                                    'responsive' => true,
+                                                                                    'hover' => true,
+                                                                                    'floatHeader' => false,
+                                                                                    'floatHeaderOptions' => ['scrollingTop' => true],
+                                                                                    'panel' => [
+                                                                                        'type' => GridView::TYPE_PRIMARY
+                                                                                    ],
+                                                                                    ]);
                     } catch (Exception $e) {
                         echo 'No se pudo cargar la tabla';
                     } ?>
@@ -306,7 +487,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                                     <div id="phcMayoristaSync">
 
                                         <img src="/img/loading.gif"/>
-                                        <p class="text text-info">Consultando servicio PHC Mayorista ....</p>
+                                        <p class="text text-info">Consultando servicio PCH Mayorista ....</p>
 
                                     </div>
                                 </div>

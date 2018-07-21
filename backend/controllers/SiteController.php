@@ -30,28 +30,47 @@ class SiteController extends \yii\web\Controller
         $this->layout = Yii::$app->user->isGuest || !Yii::$app->user->can('loginToBackend') ? 'base' : 'common';
         return parent::beforeAction($action);
     }
-    
-    
+
+
     public function actionDashboard(){
-        
-        
+
+
         $searchModel = new ArticuloSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        
+
         $searchModelML = new ArticuloMeliSearch();
         $dataProviderML = $searchModelML->search(Yii::$app->request->queryParams);
-          
-        
+
+
         $searchModelPS = new ArticuloPrestashopSearch();
         $dataProviderPS = $searchModelPS->search(Yii::$app->request->queryParams);
-        
+
+
+        $wsdl =
+        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
+
+        $cliente =
+        \Yii::$app->keyStorage->get('config.phc.webservice.cliente', '50527');
+
+        $llave =
+        \Yii::$app->keyStorage->get('config.phc.webservice.llave', '487478');
+
+        $params = "<cliente>$cliente</cliente><llave>$llave</llave>";
+
+        $client = new \SoapClient($wsdl);
+        //$valores = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+
+        $dollar =  (float)$client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
+
+
         return $this->render('dashboard', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'searchModelML' => $searchModelML,
             'dataProviderML' => $dataProviderML,
             'searchModelPS' => $searchModelPS,
-            'dataProviderPS' => $dataProviderPS
+            'dataProviderPS' => $dataProviderPS,
+            'dollar'=>$dollar
         ]);
     }
 

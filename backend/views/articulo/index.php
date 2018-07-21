@@ -3,6 +3,7 @@
 use kartik\grid\GridView;
 use richardfan\widget\JSRegister;
 use yii\helpers\Html;
+use backend\assets\SwalAsset;
 use backend\models\Articulo;
 
 Yii::$app->formatter->locale = 'es-MX';
@@ -16,6 +17,10 @@ $this->title = 'Mi tienda';
 $this->params['subtitle'] = 'Administración de productos.';
 $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
 $this->params['breadcrumbs'][] = $this->title;
+
+
+SwalAsset::register($this);
+
 ?>
 <div class="row">
 
@@ -182,7 +187,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             'attribute'=>'comision_ml',
                                                             'mergeHeader' => true,
                                                             'refreshGrid' => true,
-                                                            'content'=>function($data){
+                                                            'content'=>function($data) use ($dollar){
 
 
                                                             $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
@@ -308,7 +313,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                                                 default:
-                                                                    return null;
+                                                                   break;
 
                                                             }
 
@@ -419,10 +424,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 ],
                                                 'toolbar' =>  [
                                                     ['content'=>
+                                                        '<a   class = "btn btn-success" title="Precio dolar"><i class="fa fa-money"></i>  '. Yii::$app->formatter->asCurrency( $dollar) .'</a>'
+                                                    ],
+
+                                                    ['content'=>
                                                         '<a  href="'.
                                                         Yii::$app->request->url
                                                          .'"  id="reset_grid" class = "btn btn-info" title="Buscar cambios"> <i class="fa fa-refresh"></i></a>'
                                                     ],
+
                                                     ['content' =>
                                                         Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], ['class' => 'btn btn-default', 'title' => 'Reiniciar grid'])
                                                     ],
@@ -576,24 +586,58 @@ $this->params['breadcrumbs'][] = $this->title;
     	                        var form = $(this);
     	                        var formData = form.serialize();
 
-    	                        var table = $('#comparegrid').DataTable();
-           	                          table
-           	                             .row( $(this).parents('tr') )
-           	                             .remove()
-           	                             .draw();
+
 
 
     	                        $.ajax({
     	                            url: form.attr("action"),
     	                            type: form.attr("method"),
     	                            data: formData,
+    	                            beforeSend: function () {
+    	                            	form.find(':submit')
+    	                                    .html('Aplicando <i class="fa fa-spinner fa-spin"></i>')
+    	                                    .prop('disabled', true);
+    	                            },
     	                            success: function (data) {
 
     	                                $('#reset_grid').trigger('click');
 
+
+    	                                var table = $('#comparegrid').DataTable();
+             	                          table
+             	                             .row( form.parents('tr') )
+             	                             .remove()
+             	                             .draw();
+
+
+
+
     	                            },
-    	                            error: function () {
-    	                                alert("Error al actualizar.");
+    	                            error: function (msg) {
+    	                                console.log(msg);
+    	                                swal({
+    	                                    title: 'Servicio no disponible por el momento.',
+    	                                    text: 'Por favor consulte a su proveedor',
+    	                                    type: 'error'
+    	                                });
+    	                            },
+    	                            complete: function () {
+    	                            	let timerInterval
+    	                            	swal({
+    	                            	  title: 'Correcto',
+    	                            	  html: '<h1><i class="fa fa-thumbs-up"></i></h1>',
+    	                            	  timer: 1500,
+    	                            	  onClose: () => {
+    	                            	    clearInterval(timerInterval)
+    	                            	  }
+    	                            	}).then((result) => {
+    	                            	  if (
+    	                            	    // Read more about handling dismissals
+    	                            	    result.dismiss === swal.DismissReason.timer
+    	                            	  ) {
+    	                            	    console.log('I was closed by the timer')
+    	                            	  }
+    	                            	})
     	                            }
     	                        });
     	                        e.preventDefault();
