@@ -28,6 +28,11 @@ $this->registerJsFile('@web/js/meli.js', ['depends' => [\yii\web\JqueryAsset::cl
             <div class="box-header with-border">
                 <i class="fa fa-th"></i>
                 <h3 class="box-title">Proveedor</h3>
+                <div class="box-tools pull-right">
+                    <button title="ocultar/mostrar" data-toggle="tooltip" data-widget="collapse"
+                            class="btn btn-default btn-xs" data-original-title="Collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
             </div>
             <div class="box-body">
                 <div class="col-md-3">
@@ -78,6 +83,11 @@ $this->registerJsFile('@web/js/meli.js', ['depends' => [\yii\web\JqueryAsset::cl
                 <i class="fa fa-th"></i>
                 <h3 class="box-title">Precios actuales en
                     Mercado Libre <?php echo date('d/M/Y H:i:s ') ?></h3>
+                <div class="box-tools pull-right">
+                    <button title="ocultar/mostrar" data-toggle="tooltip" data-widget="collapse"
+                            class="btn btn-default btn-xs" data-original-title="Collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
             </div>
             <div class="box-body">
                 <?php Pjax::begin(['id' => 'meli_articles']) ?>
@@ -113,6 +123,11 @@ $this->registerJsFile('@web/js/meli.js', ['depends' => [\yii\web\JqueryAsset::cl
                 <i class="fa fa-th"></i>
                 <h3 class="box-title">Precios que se pueden actualizar en
                     Mercado Libre <?php echo date('d/M/Y H:i:s ') ?></h3>
+                <div class="box-tools pull-right">
+                    <button title="ocultar/mostrar" data-toggle="tooltip" data-widget="collapse"
+                            class="btn btn-default btn-xs" data-original-title="Collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
             </div>
             <div class="box-body" id="wizard">
 

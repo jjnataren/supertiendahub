@@ -49,7 +49,9 @@ class ArticuloMeliController extends Controller
         $items = [];
 
         try {
-            $url = 'users/215058471/items/search';
+            $security = Yii::$app->getSecurity();
+            $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne(' config.meli.client.userid')->value), env('SECRET_KEY'));
+            $url = 'users/' . $userId . '/items/search';
             $articlesMeli = $client->get($url)->getData()['results'];
 
 
@@ -103,7 +105,10 @@ class ArticuloMeliController extends Controller
 
         foreach ($articles as $article) {
             try {
-                $url = 'users/215058471/items/search';
+                $security = Yii::$app->getSecurity();
+                $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne(' config.meli.client.userid')->value), env('SECRET_KEY'));
+
+                $url = 'users/' . $userId . '/items/search';
                 $articlesMeli = $client->get($url, ['sku=' . $article->sku])->getData()['results'];
 
                 if (\count($articlesMeli) > 0) {
@@ -465,8 +470,11 @@ class ArticuloMeliController extends Controller
 
         $formatter = \Yii::$app->formatter;
 
+        $security = Yii::$app->getSecurity();
+        $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne(' config.meli.client.userid')->value), env('SECRET_KEY'));
+
         $client = $this->getClient();
-        $url = 'users/215058471/items/search';
+        $url = 'users/' . $userId . '/items/search';
         $ids = implode(',', $client->get($url)->getData()['results']);
 
         $items = $client->get('items', ['ids=' . $ids])->getData();
