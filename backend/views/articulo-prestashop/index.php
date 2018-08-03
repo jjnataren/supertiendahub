@@ -90,7 +90,7 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                 </div>
             </div>
             <div class="box-body">
-                <?php Pjax::begin(['id' => 'prestashop_articles']) ?>
+                <?php Pjax::begin(['id' => 'prestashop_articles', 'timeout' => 5000]) ?>
                 <?php
                 try {
                     echo \yii\grid\GridView::widget([

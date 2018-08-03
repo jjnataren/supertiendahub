@@ -90,7 +90,7 @@ $this->registerJsFile('@web/js/meli.js', ['depends' => [\yii\web\JqueryAsset::cl
                 </div>
             </div>
             <div class="box-body">
-                <?php Pjax::begin(['id' => 'meli_articles']) ?>
+                <?php Pjax::begin(['id' => 'meli_articles', 'timeout' => 5000]) ?>
                 <?php
                 try {
                     echo \yii\grid\GridView::widget([
