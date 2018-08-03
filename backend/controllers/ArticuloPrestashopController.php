@@ -218,7 +218,7 @@ class ArticuloPrestashopController extends Controller
 
                 if ($tipoOperacion === TipoCambio::NUEVO) {
                     $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
-                    $articlePrestashop = ArticuloPrestashopSearch::find()->where(['sku' => $product['sku']])->one();
+                    $articlePrestashop = ArticuloPrestashop::find()->where(['sku' => $product['sku']])->one();
 
                     if ($article->moneda === 'MN') {
                         $precio = $article->precio;

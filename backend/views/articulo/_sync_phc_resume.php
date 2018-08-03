@@ -23,7 +23,7 @@ $changes=[];
 								<th>SKU</th>
 								<th>Descripción</th>
 								<th />
-								<th>$ Mi tienda</th>
+								<th>$ ST</th>
 								<th>$ PCH</th>
 								<th />
 						</tr>

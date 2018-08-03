@@ -240,9 +240,9 @@
                 $('#update_button')
                     .html('<i class="fa fa-refresh"></i>Actualizar')
                     .prop('disabled', true);
-                $.pjax.reload({
-                    container: '#prestashop_articles'
-                });
+                //$.pjax.reload({
+                //    container: '#prestashop_articles'
+                //});
             }
         });
     };

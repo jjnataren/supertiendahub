@@ -191,13 +191,34 @@ SwalAsset::register($this);
 
 
                                                             $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
+                                                            $utility = 0;
+                                                            switch ($data->tipo_utilidad_ml*1){
+
+                                                                case 1:
+
+                                                                    $utility  =  $precio * $data->utilidad_ml;
+
+                                                                    break;
+
+                                                                case 2:
+
+                                                                    $utility =  $data->utilidad_ml;
+
+                                                                    break;
+
+
+                                                                default:
+                                                                    break;
+
+                                                            }
+
+
+                                                            $precio += $utility;
+                                                            $precio*= 1.16;
 
 
                                                             if ($data->comision_ml*1 == 1){
 
-
-
-                                                                $precio *=1.16;
 
                                                                 if ($precio*1 < 1001){
 
@@ -261,11 +282,32 @@ SwalAsset::register($this);
 
                                                             $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
 
-                                                            $precio *=1.16;
-
                                                             $utility = 0;
                                                             $mlUtility = 0;
 
+
+                                                            switch ($data->tipo_utilidad_ml*1){
+
+                                                                case 1:
+
+                                                                    $utility  =  $precio * $data->utilidad_ml;
+
+                                                                    break;
+
+                                                                case 2:
+
+                                                                    $utility =  $data->utilidad_ml;
+
+                                                                    break;
+
+
+                                                                default:
+                                                                    break;
+
+                                                            }
+
+                                                            $precio += $utility;
+                                                            $precio*= 1.16;
 
 
                                                             if ($data->comision_ml*1 == 1){
@@ -297,28 +339,9 @@ SwalAsset::register($this);
                                                             }
 
 
-                                                            switch ($data->tipo_utilidad_ml*1){
-
-                                                                case 1:
-
-                                                                    $utility  =  $precio * $data->utilidad_ml;
-
-                                                                    break;
-
-                                                                case 2:
-
-                                                                    $utility =  $data->utilidad_ml;
-
-                                                                    break;
 
 
-                                                                default:
-                                                                   break;
-
-                                                            }
-
-
-                                                            return Yii::$app->formatter->asCurrency (($precio*1) +  $utility + $mlUtility);
+                                                            return Yii::$app->formatter->asCurrency ($precio  + $mlUtility);
 
 
 
@@ -444,7 +467,7 @@ SwalAsset::register($this);
                                                 'beforeHeader'=>[
                                                     [
                                                         'columns'=>[
-                                                            ['content'=>'<i class="fa fa-mixcloud"></i> Articulo', 'options'=>['colspan'=>4, 'class'=>'text text-center',]],
+                                                            ['content'=>'<i class="fa fa-mixcloud"></i> Super Tienda', 'options'=>['colspan'=>4, 'class'=>'text text-center',]],
                                                             ['content'=>'<i class="fa fa-truck"></i> Me Libre', 'options'=>['colspan'=>4, 'class'=>'text text-left','style' => 'border: 1px solid #FFF159']],
                                                             ['content'=>'<i class="fa fa-sellsy"></i> PrestaShop', 'options'=>['colspan'=>3, 'class'=>'text text-left','style' => 'border: 1px solid #FF95C5']],
                                                             ['content'=>'<i class="fa fa-database"></i> Existencias', 'options'=>['colspan'=>3, 'class'=>'text text-center' ,'style' => 'border: 2px solid']],

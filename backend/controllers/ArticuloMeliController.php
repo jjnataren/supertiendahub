@@ -50,7 +50,7 @@ class ArticuloMeliController extends Controller
 
         try {
             $security = Yii::$app->getSecurity();
-            $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne(' config.meli.client.userid')->value), env('SECRET_KEY'));
+            $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.userid')->value), env('SECRET_KEY'));
             $url = 'users/' . $userId . '/items/search';
             $articlesMeli = $client->get($url)->getData()['results'];
 
