@@ -207,6 +207,11 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                                 <i class="fa fa-arrow-right"></i>
                                 Siguiente
                             </button>
+
+                            <button class="btn btn-app" id="validation_button_back">
+                                <i class="fa fa-arrow-left"></i>
+                                Atr&aacute;s
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -256,6 +261,11 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                                 <i class="fa fa-arrow-right"></i>
                                 Siguiente
                             </button>
+
+                            <button class="btn btn-app" id="snapshot_button_back">
+                                <i class="fa fa-arrow-left"></i>
+                                Atr&aacute;s
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -293,6 +303,11 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                             <button class="btn btn-app" id="update_button">
                                 <i class="fa fa-refresh"></i>
                                 Actualizar
+                            </button>
+
+                            <button class="btn btn-app" id="cancel_button">
+                                <i class="fa fa-ban"></i>
+                                Cancelar
                             </button>
                         </div>
                     </div>

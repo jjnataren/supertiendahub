@@ -136,29 +136,6 @@ CREATE TABLE IF NOT EXISTS `tbl_articulo` (
   PRIMARY KEY (`sku`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
---
--- Dumping data for table `tbl_articulo`
---
-
-INSERT INTO `tbl_articulo` (`sku`, `descripcion`, `sku_fabricante`, `seccion`, `linea`, `marca`, `serie`, `precio`, `peso`, `alto`, `largo`, `ancho`, `moneda`, `almacen`, `existencia`, `disponible`, `ultima_modificacion`, `id_usuario_modifico`, `id_snap`, `utilidad_ml`, `utilidad_ps`, `existencia_ml`, `existencia_ps`, `utilidad_monto_ml`, `utilidad_monto_ps`, `tipo_utilidad_ml`, `tipo_utilidad_ps`) VALUES
-('AC-2098484-11', 'KIT ACTECK WKTE-006 TECLADO MULTIMEDIA / MOUSE / BOCINAS USB AK3-2700', '', 'ACCESORIOS', 'KIT', 'ACTECK', 'USB', '4200.26', 1.3, 8.5, 45.8, 2, 'MN', NULL, 4, NULL, '2018-06-13 17:03:46', NULL, NULL, 0.02, 0.02, 10, 6, '3.00', '2.00', NULL, 2),
-('AC-230663-110', 'TECLADO LOGITECH K230 INALAMBRICO USB NEGRO (920-004424)', NULL, 'ACCESORIOS', 'TECLADOS', 'LOGITECH', 'INALAMBRICO', '205.56', 0.5, 20, 40, 2, 'MN', NULL, 5, NULL, '2018-06-14 18:54:57', NULL, NULL, 0.1, 0.07, 11, 2, NULL, NULL, 1, 2),
-('AC-353503-12', 'CABLE CORRIENTE CPU/MON-PARED MANHATTAN 1.8M BOLSA 300179', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'USB', '45.91', 0.4, 3, 10, 10, 'MN', NULL, 6, NULL, '2018-06-12 21:26:52', NULL, NULL, 0.02, 0.02, 12, 3, NULL, NULL, 2, 1),
-('AC-353503-13', 'CABLE VIDEO HDMI MANHATTAN 1.3 M-M  1.8M BOLSA 306119', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'HDMI', '48.15', 0.6, 3, 10, 10, 'MN', NULL, 1, NULL, '2018-06-12 22:28:34', NULL, NULL, 0.02, 0.09, 12, 5, NULL, NULL, 2, 2),
-('AC-353503-14', 'CABLE VIDEO HDMI MANHATTAN 1.3 M-M  3.0M BOLSA 306126', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'HDMI', '95.26', 0.6, 3, 10, 10, 'MN', NULL, 2, NULL, '2018-06-13 16:58:52', NULL, NULL, 0.01, 0.03, 4, 6, '5.00', '6.00', 1, 2),
-('AC-353503-15', 'CABLE VIDEO HDMI MANHATTAN 1.3 M-M  5.0M BOLSA 306133', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'HDMI', '149.22', 0.6, 3, 10, 10, 'MN', NULL, 3, NULL, NULL, NULL, NULL, 0.02, 0.04, 45, 8, NULL, NULL, 2, 2),
-('AC-353503-16', 'CABLE MONITOR SVGA MANHATTAN 8MM HD15M-H  1.8M 309011', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'VGA', '59.54', 0.6, 3, 10, 10, 'MN', NULL, 4, NULL, '2018-06-12 21:23:54', NULL, NULL, 0.03, 0.03, 6, 10, NULL, NULL, 1, 1),
-('AC-353503-29', 'CABLE USB V2.0 MANHATTAN EXT. 4.5M PLATA 340502', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'USB', '64.91', 0.3, 4, 10, 10, 'MN', NULL, 7, NULL, '2018-06-12 22:15:17', NULL, NULL, 0.03, 0.02, 23, 78, NULL, NULL, 2, 1),
-('AC-353503-3', 'EXTENSOR VIDEO MANHATTAN SVGA+AUDIO HASTA 300M 177344', NULL, 'ACCESORIOS', 'ADAPTADORES', 'MANHATTAN', 'EXTENSOR', '2900.78', 0.25, 12, 7.2, 2.5, 'MN', NULL, 8, NULL, '2018-06-13 15:33:34', NULL, NULL, 0.04, 0.03, 9, 2, NULL, NULL, 1, 1),
-('AC-353503-30', 'CABLE SATA HDD MANHATTAN 50CM 340700', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'SATA', '24.73', 0.3, 4, 10, 10, 'MN', NULL, 2, NULL, '2018-06-12 21:24:21', NULL, NULL, 0.035, 0.02, 45, 11, NULL, NULL, 1, 1),
-('AC-353503-31', 'CABLE MANHATTAN USB EXTENSION 4.5M GRIS 340960', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'USB', '54.16', 0.4, 3, 10, 10, 'MN', NULL, 14, NULL, NULL, NULL, NULL, 0.05, 0.02, 24, 2, NULL, NULL, 2, 2),
-('AC-353503-45', 'MUX KVM MINI USB 4:1 MANHATTAN CON CABLES + AUDIO 151269', NULL, 'ACCESORIOS', 'ADAPTADORES', 'MANHATTAN', 'USB', '1552.92', 0.9, 1.85, 8.6, 2.6, 'MN', NULL, 12, NULL, NULL, NULL, NULL, 0.02, 0.01, 10, 3, NULL, NULL, 1, 1),
-('AC-353503-46', 'BARRA MULTICONTACTO CON PROTECCION MANHATTAN 6 CONTACTOS 161138', NULL, 'ENERGIA', 'SUPRESORES', 'MANHATTAN', '6 CONTACTOS', '80.27', 0.24, 26, 4.9, 3, 'MN', NULL, 4, NULL, '2018-06-13 15:36:08', NULL, NULL, 0.04, 0.03, 2, 8, NULL, NULL, 2, 1),
-('AC-353503-5', 'CARGADOR UNIVERSAL MANHATTAN PARA LAPTOP 70W 100854', NULL, 'ACCESORIOS', 'CARGADORES', 'MANHATTAN', 'UNIVERSAL', '357.90', 0.35, 5.8, 3.6, 11.5, 'MN', NULL, 7, NULL, '2018-06-12 21:23:10', NULL, NULL, 0.02, 0.04, 2, 9, NULL, NULL, 2, 1),
-('AC-353503-56', 'CONVERTIDOR VIDEO MANHATTAN HDMI A SVGA+AUDIO 151559', NULL, 'ACCESORIOS', 'ADAPTADORES', 'MANHATTAN', 'CONVERTIDOR', '338.95', 0.3, 5, 19, 18, 'MN', NULL, 8, NULL, '2018-06-12 22:29:26', NULL, NULL, 0.02, 0.03, 5, 7, NULL, NULL, 2, 2),
-('VP-427370-2', 'PROYECTOR EPSON POWERLITE 935W WXGA 3700 LUM HDMI (V11H565020)', NULL, 'PROYECTORES', 'VIDEOPROYECTOR', 'EPSON', 'WXGA', '24285.50', 2.9, 29.5, 22.9, 7.6, 'MN', NULL, 8, NULL, NULL, NULL, NULL, 0.02, 0.04, 3, 12, NULL, NULL, 1, 2),
-('VP-427431-13', 'PROYECTOR BENQ MW820ST DLP LUM 3000 WXGA 1280x800 LAM 6500H HDMI 3D', NULL, 'PROYECTORES', 'VIDEOPROYECTOR', 'BENQ', 'WXGA', '13521.43', 2.8, 12, 23.5, 29, 'MN', NULL, 9, NULL, '2018-06-12 22:09:34', NULL, NULL, 0.01, 0.04, 5, 4, NULL, NULL, 2, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -193,25 +170,6 @@ CREATE TABLE IF NOT EXISTS `tbl_articulo_mayorista` (
 -- Dumping data for table `tbl_articulo_mayorista`
 --
 
-INSERT INTO `tbl_articulo_mayorista` (`sku`, `descripcion`, `sku_fabricante`, `seccion`, `linea`, `marca`, `serie`, `precio`, `peso`, `alto`, `largo`, `ancho`, `moneda`, `almacen`, `existencia`, `disponible`, `ultima_modificacion`, `id_usuario_modifico`, `id_snap`) VALUES
-('AC-2098484-11', 'KIT ACTECK WKTE-006 TECLADO MULTIMEDIA / MOUSE / BOCINAS USB AK3-2700', '', NULL, 'KIT', 'ACTECK', 'USB', '201.26', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-230663-110', 'TECLADO LOGITECH K230 INALAMBRICO USB NEGRO (920-004424)', '', NULL, 'TECLADOS', 'LOGITECH', 'INALAMBRICO', '205.56', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-343772-1', 'MEMORIA ADATA OTG AI920, USB 3.1-LIGHTNING, 32GB,NEGRO(AAI920-32G-CBK)', '', NULL, 'ACCESORIOS', 'ADATA', '32GB', '28.00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-12', 'CABLE CORRIENTE CPU/MON-PARED MANHATTAN 1.8M BOLSA 300179', '', 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'USB', '45.91', 0.4, 3, 10, 10, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-14', 'CABLE VIDEO HDMI MANHATTAN 1.3 M-M  3.0M BOLSA 306126', '', 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'HDMI', '95.26', 0.6, 3, 10, 10, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-15', 'CABLE VIDEO HDMI MANHATTAN 1.3 M-M  5.0M BOLSA 306133', '', 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'HDMI', '149.22', 0.6, 3, 10, 10, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-16', 'CABLE MONITOR SVGA MANHATTAN 8MM HD15M-H  1.8M 309011', '', 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'VGA', '59.54', 0.6, 3, 10, 10, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-29', 'CABLE USB V2.0 MANHATTAN EXT. 4.5M PLATA 340502', '', 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'USB', '62.91', 0.3, 4, 10, 10, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-3', 'EXTENSOR VIDEO MANHATTAN SVGA+AUDIO HASTA 300M 177344', NULL, 'ACCESORIOS', 'ADAPTADORES', 'MANHATTAN', 'EXTENSOR', '2900.78', 0.25, 12, 7.2, 2.5, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-30', 'CABLE SATA HDD MANHATTAN 50CM 340700', NULL, 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'SATA', '24.73', 0.3, 4, 10, 10, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-31', 'CABLE MANHATTAN USB EXTENSION 4.5M GRIS 340960', '', 'ACCESORIOS', 'CABLES', 'MANHATTAN', 'USB', '54.16', 0.4, 3, 10, 10, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-45', 'MUX KVM MINI USB 4:1 MANHATTAN CON CABLES + AUDIO 151269', NULL, 'ACCESORIOS', 'ADAPTADORES', 'MANHATTAN', 'USB', '1552.92', 0.9, 1.85, 8.6, 2.6, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-46', 'BARRA MULTICONTACTO CON PROTECCION MANHATTAN 6 CONTACTOS 161138', NULL, 'ENERGIA', 'SUPRESORES', 'MANHATTAN', '6 CONTACTOS', '80.27', 0.24, 26, 4.9, 3, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-5', 'CARGADOR UNIVERSAL MANHATTAN PARA LAPTOP 70W 100854', NULL, 'ACCESORIOS', 'CARGADORES', 'MANHATTAN', 'UNIVERSAL', '357.90', 0.35, 5.8, 3.6, 11.5, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('AC-353503-56', 'CONVERTIDOR VIDEO MANHATTAN HDMI A SVGA+AUDIO 151559', NULL, 'ACCESORIOS', 'ADAPTADORES', 'MANHATTAN', 'CONVERTIDOR', '338.95', 0.3, 5, 19, 18, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('VP-427370-2', 'PROYECTOR EPSON POWERLITE 935W WXGA 3700 LUM HDMI (V11H565020)', NULL, 'PROYECTORES', 'VIDEOPROYECTOR', 'EPSON', 'WXGA', '24285.50', 2.9, 29.5, 22.9, 7.6, 'MN', NULL, NULL, NULL, NULL, NULL, NULL),
-('VP-427431-13', 'PROYECTOR BENQ MW820ST DLP LUM 3000 WXGA 1280x800 LAM 6500H HDMI 3D', '', 'PROYECTORES', 'VIDEOPROYECTOR', 'BENQ', 'WXGA', '13521.43', 2.8, 12, 23.5, 29, 'MN', NULL, NULL, NULL, NULL, NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -239,13 +197,14 @@ CREATE TABLE IF NOT EXISTS `tbl_articulo_mayorista_snap` (
 
 DROP TABLE IF EXISTS `tbl_articulo_meli`;
 CREATE TABLE IF NOT EXISTS `tbl_articulo_meli` (
-  `sku` varchar(200) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `sku` varchar(200) COLLATE utf8_spanish2_ci NOT NULL,
   `id` varchar(200) COLLATE utf8_spanish2_ci NOT NULL,
   `marca` varchar(200) COLLATE utf8_spanish2_ci DEFAULT NULL,
   `serie` varchar(200) COLLATE utf8_spanish2_ci DEFAULT NULL,
   `precio` double DEFAULT NULL,
   `precio_original` double DEFAULT NULL,
   `cambio` int(11) DEFAULT NULL,
+  `tipo_cambio` int(1) NOT NULL DEFAULT '4',
   `site_id` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
   `title` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
   `subtitle` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
@@ -302,8 +261,7 @@ CREATE TABLE IF NOT EXISTS `tbl_articulo_meli` (
   `date_created` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
   `last_updated` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
   `health` varchar(45) COLLATE utf8_spanish2_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_meli` (`id`)
+  PRIMARY KEY (`sku`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 
@@ -324,10 +282,6 @@ COMMIT;
 --
 -- Dumping data for table `tbl_articulo_meli`
 --
-
-INSERT INTO `tbl_articulo_meli` (`sku`, `id`, `marca`, `serie`, `precio`, `cambio`, `site_id`, `title`, `subtitle`, `seller_id`, `category_id`, `price`, `base_price`, `original_price`, `currency_id`, `initial_quantity`, `available_quantity`, `sold_quantity`, `sale_terms`, `buying_mode`, `listing_type_id`, `start_time`, `historical_start_time`, `stop_time`, `end_time`, `expiration_time`, `condition`, `permalink`, `thumbnail`, `secure_thumbnail`, `pictures`, `video_id`, `descriptions`, `accepts_mercadopago`, `non_mercado_pago_payment_methods`, `shipping`, `international_delivery_mode`, `seller_address`, `seller_contact`, `location`, `geolocation`, `coverage_areas`, `attributes`, `warnings`, `listing_source`, `variations`, `status`, `sub_status`, `tags`, `warranty`, `catalog_product_id`, `domain_id`, `tbl_articulo_melicol`, `seller_custom_field`, `tbl_articulo_melicol1`, `parent_item_id`, `differential_pricing`, `deal_ids`, `automatic_relist`, `date_created`, `last_updated`, `health`) VALUES
-('AC-2098484-11', 'MLM627624429', 'ACTECK', 'USB', 200.26, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -341,9 +295,10 @@ CREATE TABLE IF NOT EXISTS `tbl_articulo_prestashop` (
   `marca` varchar(200) CHARACTER SET utf8 COLLATE utf8_spanish2_ci DEFAULT NULL,
   `serie` varchar(200) CHARACTER SET utf8 COLLATE utf8_spanish2_ci DEFAULT NULL,
   `precio` float NOT NULL,
-  `cambio` int(11) NOT NULL,
+  `cambio` int(11) NULL,
   `precio_original` double NOT NULL DEFAULT '0',
-  UNIQUE KEY `id_prestashop_index` (`id_prestashop`)
+  `tipo_cambio` int(1) NOT NULL DEFAULT '4',
+  PRIMARY KEY (`sku`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 -- --------------------------------------------------------
@@ -519,6 +474,8 @@ insert into `tbl_key_storage_item` values ('config.meli.client.url.token', 'yZ7n
 insert into `tbl_key_storage_item` values ('config.meli.client.url.api', 'LxMT2gtcmue5Nahbe5HpWjQxNDM0YTBmMmEzZGY0MTNhN2ViYTE5MDIwZWMzMDYxZmM5YmU4NDViYmU0MjIxZTA4MTFlYjA0NGNiZTFmMTOQcd3NFZHm2DwfNGLk85BdlLGho7t9GNtdrX9OecGvrKUEYqrFxX7KzwCnD+Uz0ZQ=', 'URL para conectarse a Mercado Libre', 1527308303, 1527098083);
 insert into `tbl_key_storage_item` values ('config.meli.client.filter', 'N/lU1w8XxivpMkrmcw2BgzI3NDdjMjI5NWJlZjY4MDJhNWM3ZDg4ODkzMTQwOWM0ZDA1ZTE5YzdkZmU4MDQxOGFkNjUwOGM4ZGQ4YWRjZmYjWWx69Rb1VHIhJn6JaaollN1tSO9Yi5Ha2MzjaAQGkA==', 'Filtro de búsqueda para Mercado Libre', 1527308303, 1527098083);
 insert into `tbl_key_storage_item` values ('config.meli.client.timeout', 'W/pAfzrpmP68h0/h7aw0wTI4M2JjMzMxODJkNGU1MDcwZjU2ZmEzODVlOGIzODY2Y2FlYzJlNGU3ZWY3NjUwYzc1MThkZWE4OWI1YmU5NTJ9RU3pNU/j1YSPZwfyy08M7cVZcsBiKu3goHuqEfWt8A==', 'Timeout de respuesta del servicio', 1527308303, 1527098083);
+
+
 -- --------------------------------------------------------
 
 --

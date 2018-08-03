@@ -30,7 +30,7 @@ class ArticuloPrestashop extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['sku', 'id_prestashop', 'precio', 'cambio', 'precio_original'], 'required'],
+            [['sku', 'id_prestashop', 'precio', 'precio_original'], 'required'],
             [['precio', 'cambio', 'tipo_cambio'], 'number'],
             [['sku', 'id_prestashop', 'marca', 'serie'], 'string', 'max' => 200],
             [['sku'], 'unique'],

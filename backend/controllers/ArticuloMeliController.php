@@ -124,11 +124,11 @@ class ArticuloMeliController extends Controller
                             $precio = $article->precio * (double)$dollarPrice;
                         }
 
-                        if ($article->tipo_utilidad_ps === 1) {
-                            $utilidad = $article->utilidad_ps + 1;
+                        if ($article->tipo_utilidad_ml === 1) {
+                            $utilidad = $article->utilidad_ml + 1;
                             $precio *= $utilidad;
                         } else {
-                            $utilidad = $article->utilidad_ps;
+                            $utilidad = $article->utilidad_ml;
                             $precio += $utilidad;
                         }
 
@@ -247,11 +247,11 @@ class ArticuloMeliController extends Controller
                         $precio = $article->precio * (double)$dollarPrice;
                     }
 
-                    if ($article->tipo_utilidad_pl === 1) {
-                        $utilidad = $article->utilidad_pl + 1;
+                    if ($article->tipo_utilidad_ml === 1) {
+                        $utilidad = $article->utilidad_ml + 1;
                         $precio *= $utilidad;
                     } else {
-                        $utilidad = $article->utilidad_pl;
+                        $utilidad = $article->utilidad_ml;
                         $precio += $utilidad;
                     }
 

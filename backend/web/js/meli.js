@@ -39,6 +39,9 @@
                 }
             } if (currentIndex === 1 && newIndex === 2) {
 
+            } if (currentIndex === 1 && newIndex === 0) {
+                emptyTable(dataTable);
+                emptyTable(dataTableSelection);
             }
             return true;
         },
@@ -198,6 +201,11 @@
 
     };
 
+    let emptyTable = function (table) {
+        table.clear();
+        table.draw();
+    };
+
     let isTableEmpty = function (table) {
         return table === null || table.data().length === 0;
     };
@@ -265,6 +273,10 @@
     };
 
     let wizardNext = function () {
+        $('#wizard').steps("next");
+    };
+
+    let wizardBack = function () {
         $('#wizard').steps("next");
     };
 
