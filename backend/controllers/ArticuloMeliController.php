@@ -244,7 +244,7 @@ class ArticuloMeliController extends Controller
 
                     $url = 'items';
 
-                    $response = $client->add($url, $json);
+                    $response = $client->add($url, Json::encode($json));
 
                     $articleMeli->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
                     $articleMeli->precio = $precio;

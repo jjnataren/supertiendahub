@@ -18,7 +18,7 @@ class ArticuloMeliSearch extends ArticuloMeli
     public function rules()
     {
         return [
-            [['sku', 'id_meli', 'marca', 'serie'], 'safe'],
+            [['sku', 'id', 'marca', 'serie'], 'safe'],
             [['precio'], 'number'],
             [['cambio'], 'integer'],
         ];
@@ -58,7 +58,7 @@ class ArticuloMeliSearch extends ArticuloMeli
         ]);
 
         $query->andFilterWhere(['like', 'sku', $this->sku])
-            ->andFilterWhere(['like', 'id_meli', $this->id_meli])
+            ->andFilterWhere(['like', 'id', $this->id])
             ->andFilterWhere(['like', 'marca', $this->marca])
             ->andFilterWhere(['like', 'serie', $this->serie]);
 
