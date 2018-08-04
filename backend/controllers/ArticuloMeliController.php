@@ -118,21 +118,7 @@ class ArticuloMeliController extends Controller
 
                     if ($articleMeli !== null) {
 
-                        if ($article->moneda === 'MN') {
-                            $precio = $article->precio;
-                        } else {
-                            $precio = $article->precio * (double)$dollarPrice;
-                        }
-
-                        if ($article->tipo_utilidad_ml === 1) {
-                            $utilidad = $article->utilidad_ml + 1;
-                            $precio *= $utilidad;
-                        } else {
-                            $utilidad = $article->utilidad_ml;
-                            $precio += $utilidad;
-                        }
-
-                        $precio = round($precio, 2, PHP_ROUND_HALF_UP);
+                        $precio = $this->obtenerPrecio($article, $dollarPrice);
                         $precio_meli = round((float)$articleMeliJson['price'], 2, PHP_ROUND_HALF_UP);
 
                         if (number_format($precio_meli, 3) !== number_format($articleMeli->precio, 3)) {
@@ -241,21 +227,7 @@ class ArticuloMeliController extends Controller
                     $article = ArticuloSearch::find()->where(['sku' => $product['sku']])->one();
                     $articleMeli = ArticuloMeliSearch::find()->where(['sku' => $product['sku']])->one();
 
-                    if ($article->moneda === 'MN') {
-                        $precio = $article->precio;
-                    } else {
-                        $precio = $article->precio * (double)$dollarPrice;
-                    }
-
-                    if ($article->tipo_utilidad_ml === 1) {
-                        $utilidad = $article->utilidad_ml + 1;
-                        $precio *= $utilidad;
-                    } else {
-                        $utilidad = $article->utilidad_ml;
-                        $precio += $utilidad;
-                    }
-
-                    $precio = round($precio, 2, PHP_ROUND_HALF_UP);
+                    $precio = $this->obtenerPrecio($article, $dollarPrice);
 
                     $json = new MeliModel();
                     $json->site_id = 'MLM';
@@ -294,22 +266,7 @@ class ArticuloMeliController extends Controller
                     } else if ($tipoOperacion === TipoCambio::HABILITAR) {
                         $meliModel->status = 'active';
                     } else if ($tipoOperacion === TipoCambio::ALTA_SISTEMA || $tipoOperacion === TipoCambio::CAMBIO_PRECIO) {
-                        if ($article->moneda === 'MN') {
-                            $precio = $article->precio;
-                        } else {
-                            $precio = $article->precio * (double)$dollarPrice;
-                        }
-
-                        if ($article->tipo_utilidad_ml === 1) {
-                            $utilidad = $article->utilidad_ml + 1;
-                            $precio *= $utilidad;
-                        } else {
-                            $utilidad = $article->utilidad_ml;
-                            $precio += $utilidad;
-                        }
-
-                        $precio = round($precio, 2, PHP_ROUND_HALF_UP);
-
+                        $precio = $this->obtenerPrecio($article, $dollarPrice);
                         $meliModel->price = $precio;
                         $articleMeli->precio = $precio;
                         $articleMeli->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
@@ -495,6 +452,54 @@ class ArticuloMeliController extends Controller
         }
 
         return $results;
+    }
+
+    private function obtenerPrecio($article, $dollarPrice) {
+        if ($article->moneda === 'MN') {
+            $precio = $article->precio;
+        } else {
+            $precio = $article->precio * (double)$dollarPrice;
+        }
+
+        if ($article->tipo_utilidad_ml === 1) {
+            $utilidad = $article->utilidad_ml + 1;
+            $precio *= $utilidad;
+        } else {
+            $utilidad = $article->utilidad_ml;
+            $precio += $utilidad;
+        }
+
+        $precio *= 1.16;
+
+        if ($article->comision_ml * 1 === 1) {
+            if ($precio * 1 < 1001) {
+
+                $utility = $precio * 0.13;
+            } elseif ($precio * 1 < 5001) {
+
+                $utility = (130 + (($precio - 1000) * 0.1));
+            } else {
+
+                $utility = (530 + (($precio - 5000) * 0.07));
+            }
+        } elseif ($article->comision_ml * 1 === 2) {
+            if ($precio * 1 < 1001) {
+
+                $utility = ($precio * 0.175);
+            } elseif ($precio * 1 < 5001) {
+
+                $utility = (175 + (($precio - 1000) * 0.145));
+            } else {
+
+                $utility = (755 + (($precio - 5000) * 0.115));
+            }
+        } else {
+            $utility = 0;
+        }
+
+        $precio += $utility;
+
+        return round($precio, 2, PHP_ROUND_HALF_UP);
     }
 
 }
