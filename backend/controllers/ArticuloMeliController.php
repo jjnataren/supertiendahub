@@ -106,7 +106,7 @@ class ArticuloMeliController extends Controller
         foreach ($articles as $article) {
             try {
                 $security = Yii::$app->getSecurity();
-                $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne(' config.meli.client.userid')->value), env('SECRET_KEY'));
+                $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.userid')->value), env('SECRET_KEY'));
 
                 $url = 'users/' . $userId . '/items/search';
                 $articlesMeli = $client->get($url, ['sku=' . $article->sku])->getData()['results'];
@@ -171,7 +171,7 @@ class ArticuloMeliController extends Controller
                         $articleMeli = new ArticuloMeli();
                         $articleMeli->precio = round($article->precio, 2, PHP_ROUND_HALF_UP);
                         $articleMeli->sku = $article->sku;
-                        $articleMeli->id = $articlesMeli[0];
+                        $articleMeli->id = '-1';
                         $articleMeli->marca = $article->marca;
                         $articleMeli->serie = $article->serie;
                         $articleMeli->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
@@ -185,6 +185,7 @@ class ArticuloMeliController extends Controller
                 }
 
             } catch (\Exception $e) {
+                return $e;
             }
         }
         return $meli;
@@ -197,10 +198,59 @@ class ArticuloMeliController extends Controller
             $client = new \SoapClient($wsdl);
             $paridad = $client->ObtenerParidad('50527', '487478');
         } catch (\Exception $e) {
-            $paridad = 0;
+            return 0;
         }
 
         return $paridad->datos;
+    }
+
+    private function obtenerPrecio($article, $dollarPrice)
+    {
+        if ($article->moneda === 'MN') {
+            $precio = $article->precio;
+        } else {
+            $precio = $article->precio * (double)$dollarPrice;
+        }
+
+        if ($article->tipo_utilidad_ml === 1) {
+            $utilidad = $article->utilidad_ml + 1;
+            $precio *= $utilidad;
+        } else {
+            $utilidad = $article->utilidad_ml;
+            $precio += $utilidad;
+        }
+
+        $precio *= 1.16;
+
+        if ($article->comision_ml * 1 === 1) {
+            if ($precio * 1 < 1001) {
+
+                $utility = $precio * 0.13;
+            } elseif ($precio * 1 < 5001) {
+
+                $utility = (130 + (($precio - 1000) * 0.1));
+            } else {
+
+                $utility = (530 + (($precio - 5000) * 0.07));
+            }
+        } elseif ($article->comision_ml * 1 === 2) {
+            if ($precio * 1 < 1001) {
+
+                $utility = ($precio * 0.175);
+            } elseif ($precio * 1 < 5001) {
+
+                $utility = (175 + (($precio - 1000) * 0.145));
+            } else {
+
+                $utility = (755 + (($precio - 5000) * 0.115));
+            }
+        } else {
+            $utility = 0;
+        }
+
+        $precio += $utility;
+
+        return round($precio, 2, PHP_ROUND_HALF_UP);
     }
 
     private function compareStock($articleMeliJson, $existencia_ml)
@@ -231,7 +281,12 @@ class ArticuloMeliController extends Controller
 
                     $json = new MeliModel();
                     $json->site_id = 'MLM';
-                    $json->title = $article->descripcion;
+                    if (\strlen($article->descripcion) > 60) {
+                        $json->title = substr($article->descripcion, 0, 60);
+                    } else {
+                        $json->title = $article->descripcion;
+                    }
+
                     $json->category_id = 'MLM57494';
                     $json->price = $precio;
                     $json->currency_id = 'MXN';
@@ -428,7 +483,7 @@ class ArticuloMeliController extends Controller
         $formatter = \Yii::$app->formatter;
 
         $security = Yii::$app->getSecurity();
-        $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne(' config.meli.client.userid')->value), env('SECRET_KEY'));
+        $userId = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.meli.client.userid')->value), env('SECRET_KEY'));
 
         $client = $this->getClient();
         $url = 'users/' . $userId . '/items/search';
@@ -452,54 +507,6 @@ class ArticuloMeliController extends Controller
         }
 
         return $results;
-    }
-
-    private function obtenerPrecio($article, $dollarPrice) {
-        if ($article->moneda === 'MN') {
-            $precio = $article->precio;
-        } else {
-            $precio = $article->precio * (double)$dollarPrice;
-        }
-
-        if ($article->tipo_utilidad_ml === 1) {
-            $utilidad = $article->utilidad_ml + 1;
-            $precio *= $utilidad;
-        } else {
-            $utilidad = $article->utilidad_ml;
-            $precio += $utilidad;
-        }
-
-        $precio *= 1.16;
-
-        if ($article->comision_ml * 1 === 1) {
-            if ($precio * 1 < 1001) {
-
-                $utility = $precio * 0.13;
-            } elseif ($precio * 1 < 5001) {
-
-                $utility = (130 + (($precio - 1000) * 0.1));
-            } else {
-
-                $utility = (530 + (($precio - 5000) * 0.07));
-            }
-        } elseif ($article->comision_ml * 1 === 2) {
-            if ($precio * 1 < 1001) {
-
-                $utility = ($precio * 0.175);
-            } elseif ($precio * 1 < 5001) {
-
-                $utility = (175 + (($precio - 1000) * 0.145));
-            } else {
-
-                $utility = (755 + (($precio - 5000) * 0.115));
-            }
-        } else {
-            $utility = 0;
-        }
-
-        $precio += $utility;
-
-        return round($precio, 2, PHP_ROUND_HALF_UP);
     }
 
 }
