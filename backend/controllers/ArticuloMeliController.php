@@ -171,7 +171,7 @@ class ArticuloMeliController extends Controller
                         $articleMeli = new ArticuloMeli();
                         $articleMeli->precio = round($article->precio, 2, PHP_ROUND_HALF_UP);
                         $articleMeli->sku = $article->sku;
-                        $articleMeli->id = -1;
+                        $articleMeli->id = '-1';
                         $articleMeli->marca = $article->marca;
                         $articleMeli->serie = $article->serie;
                         $articleMeli->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
@@ -281,7 +281,12 @@ class ArticuloMeliController extends Controller
 
                     $json = new MeliModel();
                     $json->site_id = 'MLM';
-                    $json->title = $article->descripcion;
+                    if (\strlen($article->descripcion) > 60) {
+                        $json->title = substr($article->descripcion, 0, 60);
+                    } else {
+                        $json->title = $article->descripcion;
+                    }
+
                     $json->category_id = 'MLM57494';
                     $json->price = $precio;
                     $json->currency_id = 'MXN';
