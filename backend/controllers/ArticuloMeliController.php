@@ -250,7 +250,7 @@ class ArticuloMeliController extends Controller
                     $articleMeli->precio = $precio;
                     $articleMeli->marca = $article->marca;
                     $articleMeli->serie = $article->serie;
-                    $articleMeli->id = $response['id'];
+                    $articleMeli->id = $response->getData()['id'];
                     $articleMeli->tipo_cambio = TipoCambio::SIN_CAMBIOS;
                     $articleMeli->cambio = 0;
 
