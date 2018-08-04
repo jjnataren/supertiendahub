@@ -304,11 +304,6 @@ $this->registerJsFile('@web/js/meli.js', ['depends' => [\yii\web\JqueryAsset::cl
                                 <i class="fa fa-refresh"></i>
                                 Actualizar
                             </button>
-
-                            <button class="btn btn-app" id="cancel_button">
-                                <i class="fa fa-ban"></i>
-                                Cancelar
-                            </button>
                         </div>
                     </div>
                 </div>

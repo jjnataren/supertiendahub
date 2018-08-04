@@ -304,11 +304,6 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                                 <i class="fa fa-refresh"></i>
                                 Actualizar
                             </button>
-
-                            <button class="btn btn-app" id="cancel_button">
-                                <i class="fa fa-ban"></i>
-                                Cancelar
-                            </button>
                         </div>
                     </div>
                 </div>

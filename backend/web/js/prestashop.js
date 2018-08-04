@@ -51,7 +51,6 @@
         enableAllSteps: false,
         enableKeyNavigation: false,
         enablePagination: false,
-        forceMoveForward: true,
         labels: {
             cancel: 'Cancelar',
             current: 'Actual',
@@ -269,6 +268,10 @@
         $('#wizard').steps("next");
     };
 
+    let wizardPrevious = function () {
+        $('#wizard').steps("previous");
+    };
+
     let scrollable = function () {
         console.log('Entre al scroll');
         $('.content').css({"overflow": "scroll"})
@@ -281,6 +284,8 @@
     $('#synchronize_button_next').on('click', wizardNext);
     $('#validation_button_next').on('click', wizardNext);
     $('#snapshot_button_next').on('click', wizardNext);
+    $('#validation_button_back').on('click', wizardPrevious);
+    $('#snapshot_button_back').on('click', wizardPrevious);
 
 
 })(jQuery);
