@@ -84,20 +84,21 @@ class ArticuloPrestashopController extends Controller
                             $precio += $utilidad;
                         }
 
+                        $articlePrestashop->id_prestashop = $id;
                         $precio = round($precio, 2, PHP_ROUND_HALF_UP);
                         $precio_prestashop = round((float)$articleXml->price, 2, PHP_ROUND_HALF_UP);
 
-                        if (number_format($precio_prestashop, 3) !== number_format($articlePrestashop->precio, 3)) {
+                        if (number_format($precio_prestashop, 2) !== number_format($articlePrestashop->precio, 2)) {
                             $articlePrestashop->cambio = 1;
                             $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
                             $prestashop[] = $articlePrestashop;
                             $articlePrestashop->save();
-                        } else if (number_format($article->precio, 3) !== number_format($articlePrestashop->precio_original, 3)) {
+                        } else if (number_format($article->precio, 2) !== number_format($articlePrestashop->precio_original, 2)) {
                             $articlePrestashop->cambio = 1;
                             $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
                             $prestashop[] = $articlePrestashop;
                             $articlePrestashop->save();
-                        } else if (number_format($precio, 3) !== number_format($articlePrestashop->precio, 3)) {
+                        } else if (number_format($precio, 2) !== number_format($articlePrestashop->precio, 2)) {
                             $articlePrestashop->cambio = 1;
                             $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
                             $prestashop[] = $articlePrestashop;
