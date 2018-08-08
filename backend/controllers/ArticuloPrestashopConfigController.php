@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\client\PrestashopClient;
 use backend\models\search\KeyStorageItemSearch;
 use common\models\KeyStorageItem;
 use Intervention\Image\Exception\NotFoundException;
@@ -46,11 +47,27 @@ class ArticuloPrestashopConfigController extends \yii\web\Controller
 
     }
 
-    protected function findModel($id) {
+    protected function findModel($id)
+    {
         if (($model = KeyStorageItem::findOne($id)) !== null) {
             return $model;
         }
         throw new NotFoundException('The requested page does not exist.');
+    }
+
+    public function actionProofService()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $client = $this->getClient();
+        return $client->checkStatus();
+    }
+
+    private function getClient()
+    {
+        $security = Yii::$app->getSecurity();
+        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
+        $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
+        return new PrestashopClient($apiUrl, $key);
     }
 
 }
