@@ -75,6 +75,7 @@
                     {"data": "sku", defaultContent: contenidoDefault},
                     {"data": "precio", defaultContent: contenidoDefault},
                     {"data": "precio_original", defaultContent: contenidoDefault},
+                    {"data": "tipo_cambio", render: formatTipoCambio, defaultContent: contenidoDefault},
                 ],
                 language: language
             });
@@ -96,7 +97,6 @@
                     {"data": "serie", defaultContent: contenidoDefault},
                     {"data": "precio", defaultContent: contenidoDefault},
                     {"data": "precio_original", defaultContent: contenidoDefault},
-                    {"data": "cambio", defaultContent: contenidoDefault},
                     {"data": "tipo_cambio", render: formatTipoCambio, defaultContent: contenidoDefault}
                 ],
                 language: language
@@ -156,7 +156,6 @@
                     {"data": "serie", defaultContent: contenidoDefault},
                     {"data": "precio", defaultContent: contenidoDefault},
                     {"data": "precio_original", defaultContent: contenidoDefault},
-                    {"data": "cambio", defaultContent: contenidoDefault}
                 ],
                 language: language
             });

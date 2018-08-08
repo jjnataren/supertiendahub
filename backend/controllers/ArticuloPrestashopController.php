@@ -91,16 +91,19 @@ class ArticuloPrestashopController extends Controller
                         if (number_format($precio_prestashop, 2) !== number_format($articlePrestashop->precio, 2)) {
                             $articlePrestashop->cambio = 1;
                             $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $articlePrestashop->precio = $precio;
                             $prestashop[] = $articlePrestashop;
                             $articlePrestashop->save();
                         } else if (number_format($article->precio, 2) !== number_format($articlePrestashop->precio_original, 2)) {
                             $articlePrestashop->cambio = 1;
                             $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $articlePrestashop->precio = $precio;
                             $prestashop[] = $articlePrestashop;
                             $articlePrestashop->save();
                         } else if (number_format($precio, 2) !== number_format($articlePrestashop->precio, 2)) {
                             $articlePrestashop->cambio = 1;
                             $articlePrestashop->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
+                            $articlePrestashop->precio = $precio;
                             $prestashop[] = $articlePrestashop;
                             $articlePrestashop->save();
                         } else if ($articlePrestashop->cambio === 1) {
@@ -132,7 +135,7 @@ class ArticuloPrestashopController extends Controller
                     if ($articlePrestashop === null) {
                         $articlePrestashop = new ArticuloPrestashop();
                         $articlePrestashop->sku = $article->sku;
-                        $articlePrestashop->id_prestashop = '-1';
+                        $articlePrestashop->id_prestashop = 'Sin asignar';
                         $articlePrestashop->precio = round($article->precio, 2, PHP_ROUND_HALF_UP);
                         $articlePrestashop->precio_original = round($article->precio, 2, PHP_ROUND_HALF_UP);
                         $articlePrestashop->save();
