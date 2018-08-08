@@ -121,17 +121,18 @@ class ArticuloMeliController extends Controller
                         $precio = $this->obtenerPrecio($article, $dollarPrice);
                         $precio_meli = round((float)$articleMeliJson['price'], 2, PHP_ROUND_HALF_UP);
 
-                        if (number_format($precio_meli, 3) !== number_format($articleMeli->precio, 3)) {
+                        $articleMeli->id = $articlesMeli[0];
+                        if (number_format($precio_meli, 2) !== number_format($articleMeli->precio, 2)) {
                             $articleMeli->cambio = 1;
                             $articleMeli->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
                             $meli[] = $articleMeli;
                             $articleMeli->save();
-                        } else if (number_format($article->precio, 3) !== number_format($articleMeli->precio_original, 3)) {
+                        } else if (number_format($article->precio, 2) !== number_format($articleMeli->precio_original, 2)) {
                             $articleMeli->cambio = 1;
                             $articleMeli->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
                             $meli[] = $articleMeli;
                             $articleMeli->save();
-                        } else if (number_format($precio, 3) !== number_format($articleMeli->precio, 3)) {
+                        } else if (number_format($precio, 2) !== number_format($articleMeli->precio, 2)) {
                             $articleMeli->cambio = 1;
                             $articleMeli->tipo_cambio = TipoCambio::CAMBIO_PRECIO;
                             $meli[] = $articleMeli;
@@ -339,7 +340,7 @@ class ArticuloMeliController extends Controller
                     $articleMeli->cambio = 0;
                     $articleMeli->tipo_cambio = TipoCambio::SIN_CAMBIOS;
 
-                    $response = $client->edit($url, Json::encode($meliModel));
+                    $client->edit($url, Json::encode($meliModel));
 
                     $articleMeli->save();
 
