@@ -14,6 +14,7 @@ Yii::$app->formatter->locale = 'es-MX';
 
 SwalAsset::register($this);
 $this->registerJsFile('@web/js/swalalert.js', ['depends' => [\yii\web\YiiAsset::class]]);
+$this->registerJsFile('@web/js/prestashop.config.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 
 /* @var $searchModel backend\models\search\KeyStorageItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -62,6 +63,11 @@ $this->registerJsFile('@web/js/swalalert.js', ['depends' => [\yii\web\YiiAsset::
                 } catch (Exception $e) {
                     echo 'No se pudo obtener la tabla: ', $e;
                 } ?>
+            </div>
+            <div class="box-footer">
+                <button type="button" class="btn btn-app btn-primary" id="validate_conifg">
+                    Validar configuraci&oacute;n
+                </button>
             </div>
         </div>
     </div>

@@ -9,7 +9,7 @@ if ($items): ?>
 			
 			
 		
-				<table class="table table-bordered" id="ps_data_grid" >
+				<table class="table table-bordered table-responsive" style="width: 100%" id="ps_data_grid" >
 					<thead>
 						<tr>
     						<th colspan="5">#Total Articulos <?=count($items)?></th>

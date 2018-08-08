@@ -155,7 +155,6 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                                         <th>Serie</th>
                                         <th>Precio</th>
                                         <th>Precio Original</th>
-                                        <th>Cambio</th>
                                         <th>Tipo de cambio</th>
                                     </tr>
                                     </thead>
@@ -195,6 +194,7 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                                         <th>SKU</th>
                                         <th>Precio</th>
                                         <th>Precio Original</th>
+                                        <th>Tipo de cambio</th>
                                     </tr>
                                     </thead>
                                 </table>
@@ -291,7 +291,6 @@ $this->registerJsFile('@web/js/prestashop.js', ['depends' => [\yii\web\JqueryAss
                                         <th>Serie</th>
                                         <th>Precio</th>
                                         <th>Precio Original</th>
-                                        <th>Cambio</th>
                                     </tr>
                                     </thead>
                                 </table>

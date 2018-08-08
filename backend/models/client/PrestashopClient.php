@@ -206,7 +206,6 @@ class PrestashopClient
      */
     public function add($options)
     {
-        $xml = '';
         if (isset($options['resource'], $options['postXml']) || isset($options['url'], $options['postXml'])) {
             $url = (isset($options['resource']) ? $this->url . '/api/' . $options['resource'] : $options['url']);
             $xml = $options['postXml'];
@@ -222,6 +221,17 @@ class PrestashopClient
         $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'POST', CURLOPT_POSTFIELDS => $xml));
         $this->checkStatusCode($request['status_code']);
         return $this->parseXML($request['response']);
+    }
+
+    public function checkStatus() {
+        $url = $this->url . '/api/products';
+        try {
+            $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'HEAD'));
+            $this->checkStatusCode($request['status_code']);
+        } catch (PrestaShopWebserviceException $e) {
+            return false;
+        }
+        return true;
     }
 
 }

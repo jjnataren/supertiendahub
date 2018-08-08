@@ -688,6 +688,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                             <div class="panel">
                                 <div class="panel-body">
                                     <table id="meli_hub_online_table"
+                                           style="width: 100%"
                                            class="table table-bordered table-hover table-responsive">
                                         <thead>
                                         <tr>
