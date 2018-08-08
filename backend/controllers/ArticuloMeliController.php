@@ -339,7 +339,7 @@ class ArticuloMeliController extends Controller
                     $articleMeli->cambio = 0;
                     $articleMeli->tipo_cambio = TipoCambio::SIN_CAMBIOS;
 
-                    $client->edit($url, Json::encode($meliModel));
+                    $response = $client->edit($url, Json::encode($meliModel));
 
                     $articleMeli->save();
 
