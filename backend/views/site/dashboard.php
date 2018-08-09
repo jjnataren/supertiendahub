@@ -108,7 +108,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
     </div><!-- ./col -->
 </div><!-- /.row -->
 <h4 class="page-header" id="anchor_supertienda">
-    Artículos de SUPER TIENDA
+    Articulos de SUPER TIENDA
     <small>almacenados en base de datos.</small>
 </h4>
 
@@ -180,7 +180,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
                                                 'content'=>function($data){
 
-                                                return   ($data->tipo_utilidad_ml == 1) ? 'Porcentaje' :  ( ($data->tipo_utilidad_ml == 2)?'Monto': null) ;
+                                                return   ($data->tipo_utilidad_ml == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ml == 2)?'monto': null) ;
 
                                                 },
 
@@ -193,7 +193,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                                                 [
                                                     'attribute'=>'utilidad_ml',
                                                     'format' => ['percent'],
-                                                    'header'=>'Útil',
+                                                    'header'=>'util',
                                                     'mergeHeader' => true,
                                                     'content'=>function($data){
 
@@ -276,7 +276,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                                                         $utility = Yii::$app->formatter->asCurrency ($utility);
 
 
-                                                        return   ($data->comision_ml == 1) ? "Básica ($utility) " :  ( ($data->comision_ml == 2)?"Premium ($utility)": null) ;
+                                                        return   ($data->comision_ml == 1) ? "Basica ($utility) " :  ( ($data->comision_ml == 2)?"Premium ($utility)": null) ;
 
                                                         },
 
@@ -288,7 +288,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
                                                         [
 
-                                                            'header'=>'Público (+IVA)',
+                                                            'header'=>'Publico (+IVA)',
                                                             'attribute'=>'utilidad_ml',
 
                                                             'mergeHeader' => true,
@@ -398,7 +398,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
                                                                     ],
                                                                     [
-                                                                        'header'=>'Público',
+                                                                        'header'=>'publico',
                                                                         'attribute'=>'utilidad_ps',
                                                                         'mergeHeader' => true,
                                                                         'content'=>function($data){
@@ -602,7 +602,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                             'beforeHeader' => [
                                 [
                                     'columns' => [
-                                        ['content' => 'Precios de la última imagen tomada', 'options' => ['colspan' => 3, 'class' => 'text text-left']],
+                                        ['content' => 'Precios de la ultima imagen tomada', 'options' => ['colspan' => 3, 'class' => 'text text-left']],
                                         ['content' => Yii::$app->formatter->asDate(date('Y-m-d')), 'options' => ['colspan' => 2, 'class' => 'text-center']],
                                     ],
                                     //  'options'=>['class'=>'skip-export'] // remove this row from export
@@ -784,7 +784,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                             'beforeHeader' => [
                                 [
                                     'columns' => [
-                                        ['content' => 'Precios de la última imagen tomada', 'options' => ['colspan' => 3, 'class' => 'text text-left']],
+                                        ['content' => 'Precios de la ultima imagen tomada', 'options' => ['colspan' => 3, 'class' => 'text text-left']],
                                         ['content' => Yii::$app->formatter->asDate(date('Y-m-d')), 'options' => ['colspan' => 2, 'class' => 'text-center']],
                                     ],
                                     //  'options'=>['class'=>'skip-export'] // remove this row from export
