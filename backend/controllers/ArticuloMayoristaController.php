@@ -14,6 +14,7 @@ use backend\models\search\ArticuloMayoristaSnapSearch;
 use backend\models\search\KeyStorageItemSearch;
 use common\models\KeyStorageItem;
 use common\commands\AddToTimelineCommand;
+use yii\web\BadRequestHttpException;
 
 /**
  * ArticuloMayoristaController implements the CRUD actions for ArticuloMayorista model.
@@ -59,6 +60,10 @@ class ArticuloMayoristaController extends Controller
 
 
 
+
+
+
+
     /**
      * Gets paridad dollar from PHC Mayoristas
      * @return mixed
@@ -83,6 +88,44 @@ class ArticuloMayoristaController extends Controller
         return json_encode( $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos );
 
     }
+
+
+    /**
+     * Gets paridad dollar from PHC Mayoristas
+     * @return mixed
+     */
+    public function actionValidatePchOnline()
+    {
+
+
+        $wsdl =
+        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
+
+        $cliente =
+        \Yii::$app->keyStorage->get('config.phc.webservice.cliente', '50566');
+
+        $llave =
+        \Yii::$app->keyStorage->get('config.phc.webservice.llave', '487556');
+
+        $params = "<cliente>$cliente</cliente><llave>$llave</llave>";
+
+        $client = new \SoapClient($wsdl);
+
+        $result =  $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML));
+
+
+        if(!$result)
+            throw new BadRequestHttpException('Error desconocido intente mas tarde');
+
+        if(!$result->estatus)
+            throw new BadRequestHttpException(isset($result->mensaje)?$result->mensaje:'No tiene acceso' );
+
+        //$valores = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+
+        return json_encode( $client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos );
+
+    }
+
 
 
     /**

@@ -70,7 +70,7 @@ class Articulo extends \yii\db\ActiveRecord
     {
         return [
             'sku' => 'Sku',
-            'descripcion' => 'Descripcion',
+            'descripcion' => 'Descripción',
             'sku_fabricante' => 'Sku Fabricante',
             'seccion' => 'Seccion',
             'linea' => 'Linea',
@@ -94,9 +94,9 @@ class Articulo extends \yii\db\ActiveRecord
             'existencia_ps' => 'Existencia Ps',
             'utilidad_monto_ml' => 'Utilidad Monto Ml',
             'utilidad_monto_ps' => 'Utilidad Monto Ps',
-            'tipo_utilidad_ml' => 'Tipo Utilidad Ml',
-            'tipo_utilidad_ps' => 'Tipo Utilidad Ps',
-            'comision_ml' => 'Comision',
+            'tipo_utilidad_ml' => 'Utilidad Ml',
+            'tipo_utilidad_ps' => 'Utilidad Ps',
+            'comision_ml' => 'Comisión',
         ];
     }
 }

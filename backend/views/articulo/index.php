@@ -52,7 +52,7 @@ SwalAsset::register($this);
                 <dt><i class="fa fa-industry"></i>  Nombre de mi tienda </dt>
                <dd>Super tienda</dd>
 
-                <dt><i class="fa fa-map-marker"></i> Direccion</dt>
+                <dt><i class="fa fa-map-marker"></i> Dirección</dt>
                 <dd>Los Reyes la paz, edo. Mex</dd>
                <dt><i class="fa fa-black-tie"></i> Responsable</dt>
                 <dd>Omar Mondragón</dd>
@@ -70,7 +70,7 @@ SwalAsset::register($this);
               	<dt><i class="fa fa-envelope"></i>Correo electrónico</dt>
                 <dd>omar@mondragon.com.mx</dd>
 
-                <dt>Ultima actualización</dt>
+                <dt>Última actualización</dt>
                <dd><?= ( $articulo =  Articulo::findBySql('select * from tbl_articulo order by ultima_modificacion desc limit 1')->one() ) ? Yii::$app->formatter->asDatetime( $articulo->ultima_modificacion) :  '--'; ?></dd>
 
                 <dt>Estatus</dt>
@@ -146,7 +146,7 @@ SwalAsset::register($this);
                                                          'refreshGrid' => true,
                                                          'content'=>function($data){
 
-                                                         return   ($data->tipo_utilidad_ml == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ml == 2)?'monto': null) ;
+                                                         return   ($data->tipo_utilidad_ml == 1) ? 'Porcentaje' :  ( ($data->tipo_utilidad_ml == 2)?'Monto': null) ;
 
                                                          },
                                                          'editableOptions'=> [
@@ -253,7 +253,7 @@ SwalAsset::register($this);
                                                             $utility = Yii::$app->formatter->asCurrency ($utility);
 
 
-                                                            return   ($data->comision_ml == 1) ? "Basica ($utility) " :  ( ($data->comision_ml == 2)?"Premium ($utility)": null) ;
+                                                            return   ($data->comision_ml == 1) ? "Básica ($utility) " :  ( ($data->comision_ml == 2)?"Premium ($utility)": null) ;
 
                                                             },
                                                             'editableOptions'=> [
@@ -262,7 +262,7 @@ SwalAsset::register($this);
                                                                 'asPopover' => true,
 
                                                                 'options' => [
-                                                                    'data' =>  [ '1' => 'Basica', '2' => 'Premium'],
+                                                                    'data' =>  [ '1' => 'Básica', '2' => 'Premium'],
                                                                 ]
                                                             ],
                                                             'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
@@ -273,7 +273,7 @@ SwalAsset::register($this);
 
                                                         [
 
-                                                            'header'=>'Publico (+IVA)',
+                                                            'header'=>'Público (+IVA)',
                                                             'attribute'=>'utilidad_ml',
 
                                                             'mergeHeader' => true,
@@ -368,7 +368,7 @@ SwalAsset::register($this);
 
                                                                 'content'=>function($data){
 
-                                                                return   ($data->tipo_utilidad_ps == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ps == 2)?'Monto': null) ;
+                                                                return   ($data->tipo_utilidad_ps == 1) ? 'Porcentaje' :  ( ($data->tipo_utilidad_ps == 2)?'Monto': null) ;
 
                                                                 },
                                                                 'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
@@ -396,7 +396,7 @@ SwalAsset::register($this);
 
                                                         ],
                                                             [
-                                                                'header'=>'publico',
+                                                                'header'=>'Público',
                                                                 'attribute'=>'utilidad_ps',
                                                                 'mergeHeader' => true,
                                                                 'content'=>function($data){
