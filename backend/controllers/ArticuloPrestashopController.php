@@ -274,6 +274,12 @@ class ArticuloPrestashopController extends Controller
 
                     $articlePrestashop->save();
 
+                    try {
+                        $this->getAndUpdateStock($articlePrestashop->id_prestashop, $article->existencia_ps);
+                    } catch (PrestaShopWebserviceException $e) {
+
+                    }
+
                     $prestashop[] = $articlePrestashop;
                 } else {
                     try {
@@ -431,6 +437,20 @@ class ArticuloPrestashopController extends Controller
         $opt['schema'] = 'blank';
 
         return $client->get($opt);
+    }
+
+    /**
+     * @param $id_prestashop
+     * @param $quantity
+     * @throws PrestaShopWebserviceException
+     */
+    private function getAndUpdateStock($id_prestashop, $quantity) {
+        $client = $this->getClient();
+        $opt = array('resource' => 'products');
+        $opt['id'] = $id_prestashop;
+        $xml = $client->get($opt);
+
+        $this->editStock($xml, $quantity);
     }
 
     /**

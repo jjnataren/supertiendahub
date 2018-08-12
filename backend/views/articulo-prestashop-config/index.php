@@ -65,7 +65,7 @@ $this->registerJsFile('@web/js/prestashop.config.js', ['depends' => [\yii\web\Jq
                 } ?>
             </div>
             <div class="box-footer">
-                <button type="button" class="btn btn-app btn-primary" id="validate_conifg">
+                <button type="button" class="btn btn-primary" id="validate_conifg">
                     Validar configuraci&oacute;n
                 </button>
             </div>
