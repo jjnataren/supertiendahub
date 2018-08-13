@@ -253,11 +253,11 @@ class ArticuloPrestashopController extends Controller
                     $xml->product->price = $precio;
                     $xml->product->active = 0;
 
-                    $xml->product->link_rewrite->language[0] = $article->descripcion;
-                    $xml->product->link_rewrite->language[1] = $article->descripcion;
+                    $xml->product->link_rewrite->language[0] = str_replace(';', ' ', $article->descripcion);
+                    $xml->product->link_rewrite->language[1] = str_replace(';', ' ', $article->descripcion);
 
-                    $xml->product->name->language[0] = $article->descripcion;
-                    $xml->product->name->language[1] = $article->descripcion;
+                    $xml->product->name->language[0] = str_replace(';', ' ', $article->descripcion);
+                    $xml->product->name->language[1] = str_replace(';', ' ', $article->descripcion);
 
                     $opt = array('resource' => 'products');
                     $opt['postXml'] = $xml->asXML();
