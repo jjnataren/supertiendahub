@@ -225,6 +225,11 @@
             success: function (data) {
                 console.log(data);
                 generarTablaActualizacion(data);
+                swal({
+                    title: '&Eacute;xito.',
+                    text: 'Se actualizó de forma correcta',
+                    type: 'success'
+                });
             },
             error: function (msg) {
                 console.log(msg);
