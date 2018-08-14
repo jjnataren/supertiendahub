@@ -253,11 +253,11 @@ class ArticuloPrestashopController extends Controller
                     $xml->product->price = $precio;
                     $xml->product->active = 0;
 
-                    $xml->product->link_rewrite->language[0] = $article->descripcion;
-                    $xml->product->link_rewrite->language[1] = $article->descripcion;
+                    $xml->product->link_rewrite->language[0] = str_replace(';', ' ', $article->descripcion);
+                    $xml->product->link_rewrite->language[1] = str_replace(';', ' ', $article->descripcion);
 
-                    $xml->product->name->language[0] = $article->descripcion;
-                    $xml->product->name->language[1] = $article->descripcion;
+                    $xml->product->name->language[0] = str_replace(';', ' ', $article->descripcion);
+                    $xml->product->name->language[1] = str_replace(';', ' ', $article->descripcion);
 
                     $opt = array('resource' => 'products');
                     $opt['postXml'] = $xml->asXML();
@@ -273,6 +273,12 @@ class ArticuloPrestashopController extends Controller
                     $articlePrestashop->cambio = 0;
 
                     $articlePrestashop->save();
+
+                    try {
+                        $this->getAndUpdateStock($articlePrestashop->id_prestashop, $article->existencia_ps);
+                    } catch (PrestaShopWebserviceException $e) {
+
+                    }
 
                     $prestashop[] = $articlePrestashop;
                 } else {
@@ -431,6 +437,20 @@ class ArticuloPrestashopController extends Controller
         $opt['schema'] = 'blank';
 
         return $client->get($opt);
+    }
+
+    /**
+     * @param $id_prestashop
+     * @param $quantity
+     * @throws PrestaShopWebserviceException
+     */
+    private function getAndUpdateStock($id_prestashop, $quantity) {
+        $client = $this->getClient();
+        $opt = array('resource' => 'products');
+        $opt['id'] = $id_prestashop;
+        $xml = $client->get($opt);
+
+        $this->editStock($xml, $quantity);
     }
 
     /**
