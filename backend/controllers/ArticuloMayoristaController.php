@@ -249,7 +249,7 @@ class ArticuloMayoristaController extends Controller
 
                 Yii::$app->commandBus->handle($addToTimelineCommand);
 
-                return true;
+                return json_encode([true]);
 
 
         }
