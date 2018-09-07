@@ -605,66 +605,6 @@ SwalAsset::register($this);
     	                         });
 
 
-    	                $('[id^=phcform]').on('submit', function(e){
-    	                        var form = $(this);
-    	                        var formData = form.serialize();
-
-
-
-
-    	                        $.ajax({
-    	                            url: form.attr("action"),
-    	                            type: form.attr("method"),
-    	                            data: formData,
-    	                            beforeSend: function () {
-    	                            	form.find(':submit')
-    	                                    .html('Aplicando <i class="fa fa-spinner fa-spin"></i>')
-    	                                    .prop('disabled', true);
-    	                            },
-    	                            success: function (data) {
-
-    	                                $('#reset_grid').trigger('click');
-
-
-    	                                var table = $('#comparegrid').DataTable();
-             	                          table
-             	                             .row( form.parents('tr') )
-             	                             .remove()
-             	                             .draw();
-
-
-
-
-    	                            },
-    	                            error: function (msg) {
-    	                                console.log(msg);
-    	                                swal({
-    	                                    title: 'Servicio no disponible por el momento.',
-    	                                    text: 'Por favor consulte a su proveedor',
-    	                                    type: 'error'
-    	                                });
-    	                            },
-    	                            complete: function () {
-    	                            	let timerInterval
-    	                            	swal({
-    	                            	  title: 'Correcto',
-    	                            	  html: '<h1><i class="fa fa-thumbs-up"></i></h1>',
-    	                            	  timer: 1500,
-    	                            	  onClose: () => {
-    	                            	    clearInterval(timerInterval)
-    	                            	  }
-    	                            	}).then((result) => {
-    	                            	  if (
-    	                            	    // Read more about handling dismissals
-    	                            	    result.dismiss === swal.DismissReason.timer
-    	                            	  ) {
-    	                            	    console.log('I was closed by the timer')
-    	                            	  }
-    	                            	})
-    	                            }
-    	                        });
-    	                        e.preventDefault();
-    	                    });
 
 
     	        }, error: function(result) {

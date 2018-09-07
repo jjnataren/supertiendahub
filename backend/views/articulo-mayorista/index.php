@@ -170,18 +170,10 @@ $this->registerJs(
 
        			 <?php echo Html::a('<i class="fa fa-refresh"></i> Actualizar', ['#'], ['class' => 'btn btn-primary','id'=>'syncrequest']) ?>
 
-       			  <?php echo Html::a('<i class="fa fa-refresh"></i> Sincronizar SUPER TIENDA y PHC', ['import'], ['class' => 'btn btn-success','data' => [
-                        'confirm' => 'Al sincronizar las fuentes de datos, se descartaran los precios de la versión anterior, sin embargo se guardara un respaldo del estado actual.',
-                        'method' => 'post',
-                    ],]) ?>
 
 
-       			  <?php echo Html::a('<i class="fa fa-print"></i> Imprimir', ['print-report'], [
-                    'class' => 'btn btn-primary',
-                    'data' => [
-                        'method' => 'get',
-                    ],
-                ]) ?>
+
+
 
      </div>
 
@@ -371,6 +363,8 @@ $.ajax({
                       });
 
 
+
+
                  $('#sync_success').click(function() {
 
 
@@ -402,63 +396,7 @@ $.ajax({
                    });
 
 
-          $('[id^=phcform]').on('submit', function(e){
-                  var form = $(this);
-                  var formData = form.serialize();
 
-                  $.ajax({
-                      url: 'sync-phc-resume-save', //form.attr("sync-phc-resume-save"),
-                      type: 'POST',//form.attr("post"),
-                      data: formData,
-                      beforeSend: function () {
-                      	form.find(':submit')
-                              .html('Aplicando <i class="fa fa-spinner fa-spin"></i>')
-                              .prop('disabled', true);
-                      },
-                      success: function (data) {
-
-                    	  var table = $('#comparegrid').DataTable();
-	                          table
-	                             .row( form.parents('tr') )
-	                             .remove()
-	                             .draw();
-
-                      },
-                      error: function () {
-                    	  console.log(msg);
-                          swal({
-                              title: 'Servicio no disponible por el momento.',
-                              text: 'Por favor consulte a su proveedor',
-                              type: 'error'
-                          });
-                      },
-                      complete: function () {
-                      	let timerInterval
-                      	swal({
-                      	  title: 'Correcto',
-                      	  html: '<h1><i class="fa fa-thumbs-up"></i></h1>',
-                      	  timer: 1500,
-                      	  onClose: () => {
-                      	    clearInterval(timerInterval)
-                      	  }
-                      	}).then((result) => {
-                      	  if (
-                      	    // Read more about handling dismissals
-                      	    result.dismiss === swal.DismissReason.timer
-                      	  ) {
-                      	    console.log('I was closed by the timer')
-                      	  }
-                      	})
-                      }
-                  });
-
-
-
-
-
-
-                  e.preventDefault();
-              });
 
 
   }, error: function(result) {

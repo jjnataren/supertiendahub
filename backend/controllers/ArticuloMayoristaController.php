@@ -180,6 +180,7 @@ class ArticuloMayoristaController extends Controller
 
         foreach ($soap_response as $articulo){
 
+
             $model =  new Articulo();
             $model->attributes = get_object_vars($articulo);
             $model->existencia = $articulo->inventario[0]->existencia;

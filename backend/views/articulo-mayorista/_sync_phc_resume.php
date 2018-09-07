@@ -58,7 +58,7 @@ $changes=[];
     						     <td> <?=isset($item['model']->existencia)?$item['model']->existencia:'--'   ?></td>
     						     <td>
 
-    							<?php $form = ActiveForm::begin(['action' => ['sync-phc-resume-save'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
+    							<?php $form = ActiveForm::begin(['action' => ['#'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
 
 
     						     	 <?php echo $form->field($item['model'], 'sku')->hiddenInput()->label(false); ?>
@@ -76,7 +76,63 @@ $changes=[];
 									 <?php echo $form->field($item['model'], 'linea')->hiddenInput()->label(false); ?>
 
     						      <?=  Html::submitButton(($art_status == 'info')?'<i class="fa fa-cloud-download"></i> Importar ' :
-    						             ( ($art_status == 'warning')? '<i class="fa fa-warning"></i> Actualizar' : '<i class="fa fa-thumbs-o-up"></i> Actualizar'  ),  ['class' =>'btn btn-' .$art_status ])  ?>
+    						             ( ($art_status == 'warning')? '<i class="fa fa-warning"></i> Actualizar' : '<i class="fa fa-thumbs-o-up"></i> Actualizar'  ),  ['class' =>'btn btn-' .$art_status,'onclick'=>'$("#phcform_'.$key.'").submit(function(e) {
+
+
+
+                        var form = $(this);
+                       var formData = form.serialize();
+
+                       $.ajax({
+                           url: \'articulo-mayorista/sync-phc-resume-save\', //form.attr("sync-phc-resume-save"),
+                           type: "POST",//form.attr("post"),
+                           data: formData,
+                           beforeSend: function () {
+                           	form.find(":submit")
+                                   .html(\'Aplicando <i class="fa fa-spinner fa-spin"></i>\')
+                                   .prop("disabled", true);
+                           },
+                           success: function (data) {
+
+                         	  var table = $("#comparegrid").DataTable();
+     	                          table
+     	                             .row( form.parents("tr") )
+     	                             .remove()
+     	                             .draw();
+
+                           },
+                           error: function () {
+                         	  console.log(msg);
+                               swal({
+                                   title: "Servicio no disponible por el momento.",
+                                   text: "Por favor consulte a su proveedor",
+                                   type: "error"
+                               });
+                           },
+                           complete: function () {
+                           	let timerInterval
+                           	swal({
+                           	  title: "Correcto",
+                           	  html: \'<h1><i class="fa fa-thumbs-up"></i></h1>\',
+                           	  timer: 1500,
+                           	  onClose: () => {
+                           	    clearInterval(timerInterval)
+                           	  }
+                           	}).then((result) => {
+                           	  if (
+                           	    // Read more about handling dismissals
+                           	    result.dismiss === swal.DismissReason.timer
+                           	  ) {
+                           	    console.log("I was closed by the timer")
+                           	  }
+                           	})
+                           }
+                       });
+
+                    e.preventDefault();
+
+
+});' ])  ?>
 
     						    <?php ActiveForm::end(); ?>
 
