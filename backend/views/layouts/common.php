@@ -239,6 +239,12 @@ $currentUrl =  Yii::$app->request->url ;
                                 'active' => strpos(   $currentUrl   , 'articulo-prestashop/index'),
                             ],
                             [
+                                'label' => 'Prestashop a HUB',
+                                'url' => '/articulo-prestashop-to-hub/index',
+                                'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                'active' => strpos(   $currentUrl   , 'articulo-prestashop-to-hub/index'),
+                            ],
+                            [
                                 'label' => 'Configuración',
                                 'url' => '/articulo-prestashop-config/index',
                                 'icon' => '<i class="fa fa-angle-double-right"></i>',
