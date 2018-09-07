@@ -58,7 +58,7 @@ $changes=[];
     						     <td> <?=isset($item['model']->existencia)?$item['model']->existencia:'--'   ?></td>
     						     <td>
 
-    							<?php $form = ActiveForm::begin(['action' => ['#'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
+    							<?php $form = ActiveForm::begin(['action' => ['sync-phc-resume-save'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$key ]]); ?>
 
 
     						     	 <?php echo $form->field($item['model'], 'sku')->hiddenInput()->label(false); ?>
@@ -84,7 +84,7 @@ $changes=[];
                        var formData = form.serialize();
 
                        $.ajax({
-                           url: \'articulo-mayorista/sync-phc-resume-save\', //form.attr("sync-phc-resume-save"),
+                           url: form.attr("action"),
                            type: "POST",//form.attr("post"),
                            data: formData,
                            beforeSend: function () {
