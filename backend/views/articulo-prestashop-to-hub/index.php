@@ -39,6 +39,7 @@ $this->registerJsFile('@web/js/prestashop.to.hub.js', ['depends' => [\backend\as
                 echo Html::beginTag('tr');
                 echo Html::tag('th', 'Id PrestaShop');
                 echo Html::tag('th', 'Sku');
+                echo Html::tag('th', 'Descripción');
                 echo Html::tag('th', 'Cantidad Prestashop');
                 echo Html::tag('th', 'Cantidad HUB');
                 echo Html::tag('th', 'Importar a HUB');
@@ -50,6 +51,7 @@ $this->registerJsFile('@web/js/prestashop.to.hub.js', ['depends' => [\backend\as
                     echo Html::beginTag('tr');
                     echo Html::tag('td', $r['id_prestashop']);
                     echo Html::tag('td', $r['reference']);
+                    echo Html::tag('td', $r['description']);
                     echo Html::tag('td', $r['quantity']);
                     echo Html::tag('td', $r['quantity_hub']);
                     echo Html::beginTag('td');

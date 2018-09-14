@@ -34,6 +34,29 @@
             success: function (data) {
                 console.log(data);
                 row.remove().draw();
+
+
+                let timerInterval
+            	swal({
+            	  title: "Correcto",
+            	  html: '<h1><i class="fa fa-thumbs-up"></i></h1>',
+            	  timer: 1500,
+            	  onClose: () => {
+            	    clearInterval(timerInterval)
+            	  }
+            	}).then((result) => {
+            	  if (
+            	    // Read more about handling dismissals
+            	    result.dismiss === swal.DismissReason.timer
+            	  ) {
+            	    console.log("I was closed by the timer")
+            	  }
+            	});
+
+
+
+
+
             }
         });
     };

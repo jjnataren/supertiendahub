@@ -42,7 +42,8 @@ class ArticuloPrestashopToHubController extends \yii\web\Controller
                         'id_prestashop' => $item['id'],
                         'reference' => $item['reference'],
                         'quantity' => $quantity_ps,
-                        'quantity_hub' => $quantity_hub
+                        'quantity_hub' => $quantity_hub,
+                        'description'=>$article->descripcion
                     );
 
                     $results[] = $result;
