@@ -942,6 +942,8 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
                 $('#comparegrid').DataTable({});
 
+                $('#comparegridquantity').DataTable({});
+
 
                 $('#sync_success').click(function () {
 

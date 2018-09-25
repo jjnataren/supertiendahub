@@ -43,8 +43,7 @@ class ArticuloPrestashopToHubController extends \yii\web\Controller
                         'id_prestashop' => $item['id'],
                         'reference' => $item['reference'],
                         'quantity' => $quantity_ps,
-                        'quantity_hub' => $quantity_hub,
-                        'description'=>$article->descripcion
+                        'quantity_hub' => $quantity_hub
                     );
 
                     $results[] = $result;
@@ -77,8 +76,9 @@ class ArticuloPrestashopToHubController extends \yii\web\Controller
             'display' => '[quantity,id_product]'
         ]);
 
-        $items = json_decode(json_encode((array)$xml), TRUE)
-                                ['stock_availables']['stock_available'];
+        $items = json_decode(json_encode((array)$xml)
+            , TRUE)
+        ['stock_availables']['stock_available'];
 
         $responses = array();
 
