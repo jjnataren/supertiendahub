@@ -129,200 +129,209 @@ $currentUrl =  Yii::$app->request->url ;
                 </div>
             </div>
             <!-- sidebar menu: : style can be found in sidebar.less -->
-            <?php echo Menu::widget([
-                'options' => ['class' => 'sidebar-menu'],
-                'linkTemplate' => '<a href="{url}">{icon}<span>{label}</span>{right-icon}{badge}</a>',
-                'submenuTemplate' => "\n<ul class=\"treeview-menu\">\n{items}\n</ul>\n",
-                'activateParents' => true,
-                'items' => [
-                    [
-                        'label' => Yii::t('backend', 'Main'),
-                        'options' => ['class' => 'header']
-                    ],
-                    [
-                        'label' => Yii::t('backend', 'Timeline'),
-                        'icon' => '<i class="fa fa-bar-chart-o"></i>',
-                        'url' => ['/timeline-event/index'],
-                        'badge' => TimelineEvent::find()->today()->count(),
-                        'badgeBgClass' => 'label-success',
-                    ],
+            <?php try {
+                echo Menu::widget([
+                    'options' => ['class' => 'sidebar-menu'],
+                    'linkTemplate' => '<a href="{url}">{icon}<span>{label}</span>{right-icon}{badge}</a>',
+                    'submenuTemplate' => "\n<ul class=\"treeview-menu\">\n{items}\n</ul>\n",
+                    'activateParents' => true,
+                    'items' => [
                         [
-                        'label'=>Yii::t('backend', 'Administración'),
-                        'options'=>['class'=>'header'],
-                        'icon'=>'<i class="fa fa-paint-brush"></i>',
+                            'label' => Yii::t('backend', 'Main'),
+                            'options' => ['class' => 'header']
+                        ],
+                        [
+                            'label' => Yii::t('backend', 'Timeline'),
+                            'icon' => '<i class="fa fa-bar-chart-o"></i>',
+                            'url' => ['/timeline-event/index'],
+                            'badge' => TimelineEvent::find()->today()->count(),
+                            'badgeBgClass' => 'label-success',
+                        ],
+                        [
+                            'label' => Yii::t('backend', 'Administración'),
+                            'options' => ['class' => 'header'],
+                            'icon' => '<i class="fa fa-paint-brush"></i>',
                         ],
 
-                    ['label' => 'Inicio',
-                        'url' => ['/index.php'],
-                        'icon' => '<i class="fa fa-home"></i>',
-                        'active' => strpos(   $currentUrl   , '/index.php')],
-
-                    [
-                        'label' => Yii::t('backend', 'Mi tienda'),
-                        'url' => ['/articulo-mayorista/index-tienda'],
-                        'icon' => '<i class="fa fa-sitemap"></i>',
-
-                        'options' => ['class' => 'treeview'],
-                        'active' => strpos(   $currentUrl   , 'articulo/'),
-                        'items' => [
-                            ['label' => 'Inicio',
-                                'url' => ['/articulo/index'],
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo/index')],
-                            ['label' => 'Configuración',
-                                'url' => ['/articulo/config'],
-                                'icon' => '<i class="fa fa-cog"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo/config')],
-                        ]
-
-
-                    ],
-
-
-                    [
-                        'label'=>Yii::t('backend', 'Proveedor PCH'),
-                        'url' => ['#'],
-                        'icon'=>'<i class="fa fa-cart-arrow-down"></i>',
-                        'options'=>['class'=>'treeview'],
-                        'active' =>  strpos($currentUrl,'articulo-mayorista')  ,
-                        'items' => [
-                            ['label' => 'Inicio',
-                                'url' => ['/articulo-mayorista/index'],
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-mayorista/index')],
-                            ['label' => 'Configuración',
-                                'url' => ['/articulo-mayorista/super-tienda-config'],
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-mayorista/super-tienda-config')],
-                        ]
-
-                    ],
-                    [
-                        'label'=>Yii::t('backend', 'Mercado Libre'),
-                        'url' => ['#'],
-                        'icon'=>'<i class="fa fa-truck"></i>',
-                        'options'=>['class'=>'treeview'],
-                        'active'=> strpos($currentUrl, 'articulo-meli'),
-                        'items' => [
-                            [
-                                'label' => 'Inicio',
-                                'url' => '/articulo-meli/index' ,
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-meli/index'),
-                            ],
-                            [
-                                'label' => 'Configuración',
-                                'url' => '/articulo-meli-config/index' ,
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-meli-config/index'),
-                            ],
-                            [
-                                'label' => 'Snapshots',
-                                'url' => '/articulo-meli-snap/index' ,
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-meli-snap/index'),
-                            ]
-                        ]
-                    ],
-
-                    [
-                        'label'=>Yii::t('backend', 'PrestaShop'),
-                        'url' => ['#'],
-                        'icon'=>'<i class="fa fa-sellsy"></i>',
-                        'options'=>['class'=>'treeview'],
-                        'active' => strpos($currentUrl, 'articulo-prestashop/index'),
-                        'items' => [
-                            [
-                                'label' => 'Inicio',
-                                'url' => '/articulo-prestashop/index',
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-prestashop/index'),
-                            ],
-                            [
-                                'label' => 'Cantidad HUB a Prestashop',
-                                'url' => '/articulo-prestashop-quantity-from-hub/index',
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-prestashop-quantity-from-hub/index'),
-                            ],
-                            [
-                                'label' => 'Prestashop a HUB',
-                                'url' => '/articulo-prestashop-to-hub/index',
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-prestashop-to-hub/index'),
-                            ],
-                            [
-                                'label' => 'Configuración',
-                                'url' => '/articulo-prestashop-config/index',
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-prestashop-config/index'),
-                            ],
-                            [
-                                'label' => 'Snapshots',
-                                'url' => '/articulo-prestashop-snap/index',
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'active' => strpos(   $currentUrl   , 'articulo-prestashop-snap/index'),
-                            ]
-                        ]
-                    ],
+                        ['label' => 'Inicio',
+                            'url' => ['/index.php'],
+                            'icon' => '<i class="fa fa-home"></i>',
+                            'active' => strpos($currentUrl, '/index.php')],
 
                         [
-                            'label'=>Yii::t('backend', 'Amazon'),
-                            'url' => '#',
-                            'icon'=>'<i class="fa fa-amazon"></i>',
-                            'options'=>['class'=>'treeview'],
+                            'label' => Yii::t('backend', 'Mi tienda'),
+                            'url' => ['/articulo-mayorista/index-tienda'],
+                            'icon' => '<i class="fa fa-sitemap"></i>',
+
+                            'options' => ['class' => 'treeview'],
+                            'active' => strpos($currentUrl, 'articulo/'),
+                            'items' => [
+                                ['label' => 'Inicio',
+                                    'url' => ['/articulo/index'],
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo/index')],
+                                ['label' => 'Configuración',
+                                    'url' => ['/articulo/config'],
+                                    'icon' => '<i class="fa fa-cog"></i>',
+                                    'active' => strpos($currentUrl, 'articulo/config')],
+                            ]
+
 
                         ],
 
 
-                    [
-                        'label' => Yii::t('backend', 'System'),
-                        'options' => ['class' => 'header']
-                    ],
-                    [
-                        'label' => Yii::t('backend', 'Users'),
-                        'icon' => '<i class="fa fa-users"></i>',
-                        'url' => ['/user/index'],
-                        'active' => (\Yii::$app->controller->id == 'user'),
-                        'visible' => Yii::$app->user->can('administrator')
-                    ],
-                    [
-                        'label' => Yii::t('backend', 'Other'),
-                        'url' => '#',
-                        'icon' => '<i class="fa fa-cogs"></i>',
-                        'options' => ['class' => 'treeview'],
-                        'active' => in_array(\Yii::$app->controller->id,['i18n-source-message','i18n-message','key-storage','file-storage','cache','file-manager','system-information', 'log']),
-                        'items' => [
-                            [
-                                'label' => Yii::t('backend', 'i18n'),
-                                'url' => '#',
-                                'icon' => '<i class="fa fa-flag"></i>',
-                                'options' => ['class' => 'treeview'],
-                                'active' => in_array(\Yii::$app->controller->id,['i18n-source-message','i18n-message']),
-                                'items' => [
-                                    ['label' => Yii::t('backend', 'i18n Source Message'), 'url' => ['/i18n/i18n-source-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
-                                    ['label' => Yii::t('backend', 'i18n Message'), 'url' => ['/i18n/i18n-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-message')],
+                        [
+                            'label' => Yii::t('backend', 'Proveedor PCH'),
+                            'url' => ['#'],
+                            'icon' => '<i class="fa fa-cart-arrow-down"></i>',
+                            'options' => ['class' => 'treeview'],
+                            'active' => strpos($currentUrl, 'articulo-mayorista'),
+                            'items' => [
+                                ['label' => 'Inicio',
+                                    'url' => ['/articulo-mayorista/index'],
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-mayorista/index')],
+                                ['label' => 'Configuración',
+                                    'url' => ['/articulo-mayorista/super-tienda-config'],
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-mayorista/super-tienda-config')],
+                            ]
+
+                        ],
+                        [
+                            'label' => Yii::t('backend', 'Mercado Libre'),
+                            'url' => ['#'],
+                            'icon' => '<i class="fa fa-truck"></i>',
+                            'options' => ['class' => 'treeview'],
+                            'active' => strpos($currentUrl, 'articulo-meli'),
+                            'items' => [
+                                [
+                                    'label' => 'Inicio',
+                                    'url' => '/articulo-meli/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-meli/index'),
+                                ],
+                                [
+                                    'label' => 'Configuración',
+                                    'url' => '/articulo-meli-config/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-meli-config/index'),
+                                ],
+                                [
+                                    'label' => 'Snapshots',
+                                    'url' => '/articulo-meli-snap/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-meli-snap/index'),
                                 ]
-                            ],
-                            ['label' => Yii::t('backend', 'Key-Value Storage'), 'url' => ['/key-storage/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'key-storage')],
-                            ['label' => Yii::t('backend', 'File Storage'), 'url' => ['/file-storage/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'file-storage')],
-                            ['label' => Yii::t('backend', 'Cache'), 'url' => ['/cache/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'File Manager'), 'url' => ['/file-manager/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            [
-                                'label' => Yii::t('backend', 'System Information'),
-                                'url' => ['/system-information/index'],
-                                'icon' => '<i class="fa fa-angle-double-right"></i>'
-                            ],
-                            [
-                                'label' => Yii::t('backend', 'Logs'),
-                                'url' => ['/log/index'],
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'badge' => SystemLog::find()->count(),
-                                'badgeBgClass' => 'label-danger',
-                            ],
+                            ]
+                        ],
+
+                        [
+                            'label' => Yii::t('backend', 'PrestaShop'),
+                            'url' => ['#'],
+                            'icon' => '<i class="fa fa-sellsy"></i>',
+                            'options' => ['class' => 'treeview'],
+                            'active' => strpos($currentUrl, 'articulo-prestashop/index'),
+                            'items' => [
+                                [
+                                    'label' => 'Inicio',
+                                    'url' => '/articulo-prestashop/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-prestashop/index'),
+                                ],
+                                [
+                                    'label' => 'Cantidad HUB a Prestashop',
+                                    'url' => '/articulo-prestashop-quantity-from-hub/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-prestashop-quantity-from-hub/index'),
+                                ],
+                                [
+                                    'label' => 'Precio HUB a Prestashop',
+                                    'url' => '/articulo-prestashop-price-from-hub/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-prestashop-price-from-hub/index'),
+                                ],
+                                [
+                                    'label' => 'Prestashop a HUB',
+                                    'url' => '/articulo-prestashop-to-hub/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-prestashop-to-hub/index'),
+                                ],
+                                [
+                                    'label' => 'Configuración',
+                                    'url' => '/articulo-prestashop-config/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-prestashop-config/index'),
+                                ],
+                                [
+                                    'label' => 'Snapshots',
+                                    'url' => '/articulo-prestashop-snap/index',
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'active' => strpos($currentUrl, 'articulo-prestashop-snap/index'),
+                                ]
+                            ]
+                        ],
+
+                        [
+                            'label' => Yii::t('backend', 'Amazon'),
+                            'url' => '#',
+                            'icon' => '<i class="fa fa-amazon"></i>',
+                            'options' => ['class' => 'treeview'],
+
+                        ],
+
+
+                        [
+                            'label' => Yii::t('backend', 'System'),
+                            'options' => ['class' => 'header']
+                        ],
+                        [
+                            'label' => Yii::t('backend', 'Users'),
+                            'icon' => '<i class="fa fa-users"></i>',
+                            'url' => ['/user/index'],
+                            'active' => (\Yii::$app->controller->id == 'user'),
+                            'visible' => Yii::$app->user->can('administrator')
+                        ],
+                        [
+                            'label' => Yii::t('backend', 'Other'),
+                            'url' => '#',
+                            'icon' => '<i class="fa fa-cogs"></i>',
+                            'options' => ['class' => 'treeview'],
+                            'active' => in_array(\Yii::$app->controller->id, ['i18n-source-message', 'i18n-message', 'key-storage', 'file-storage', 'cache', 'file-manager', 'system-information', 'log']),
+                            'items' => [
+                                [
+                                    'label' => Yii::t('backend', 'i18n'),
+                                    'url' => '#',
+                                    'icon' => '<i class="fa fa-flag"></i>',
+                                    'options' => ['class' => 'treeview'],
+                                    'active' => in_array(\Yii::$app->controller->id, ['i18n-source-message', 'i18n-message']),
+                                    'items' => [
+                                        ['label' => Yii::t('backend', 'i18n Source Message'), 'url' => ['/i18n/i18n-source-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-source-message')],
+                                        ['label' => Yii::t('backend', 'i18n Message'), 'url' => ['/i18n/i18n-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'i18n-message')],
+                                    ]
+                                ],
+                                ['label' => Yii::t('backend', 'Key-Value Storage'), 'url' => ['/key-storage/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'key-storage')],
+                                ['label' => Yii::t('backend', 'File Storage'), 'url' => ['/file-storage/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>', 'active' => (\Yii::$app->controller->id == 'file-storage')],
+                                ['label' => Yii::t('backend', 'Cache'), 'url' => ['/cache/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                                ['label' => Yii::t('backend', 'File Manager'), 'url' => ['/file-manager/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                                [
+                                    'label' => Yii::t('backend', 'System Information'),
+                                    'url' => ['/system-information/index'],
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>'
+                                ],
+                                [
+                                    'label' => Yii::t('backend', 'Logs'),
+                                    'url' => ['/log/index'],
+                                    'icon' => '<i class="fa fa-angle-double-right"></i>',
+                                    'badge' => SystemLog::find()->count(),
+                                    'badgeBgClass' => 'label-danger',
+                                ],
+                            ]
                         ]
                     ]
-                ]
-            ]) ?>
+                ]);
+            } catch (Exception $e) {
+            } ?>
         </section>
         <!-- /.sidebar -->
     </aside>
