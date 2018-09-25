@@ -237,12 +237,15 @@ class ArticuloController extends Controller
                 $model =  new Articulo();
 
                 $model->attributes = get_object_vars($objectModel);
+
+                $model->existencia  = isset( $objectModel->inventario[0]->existencia )? $objectModel->inventario[0]->existencia : 0;
+
             }else{
 
               $model = null;
             }
 
-            if(  (!$model && (  $dbModel->existencia > 0 || $dbModel->existencia_ml > 0 || $dbModel->existencia_ps > 0 )) || ($model &&  $dbModel->precio*1 !==  $model->precio*1) )
+            if(  (!$model && (  $dbModel->existencia > 0 || $dbModel->existencia_ml > 0 || $dbModel->existencia_ps > 0 )) || ($model &&  $dbModel->precio*1 !==  $model->precio*1) || ( isset($model->existencia) && $model->existencia*1 !== $dbModel->existencia * 1 ) )
                 $articles[$dbModel->sku] = ['dbmodel'=>$dbModel, 'model'=>$model];
         }
 

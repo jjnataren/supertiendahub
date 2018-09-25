@@ -29,12 +29,13 @@ class ArticuloPrestashopToHubController extends \yii\web\Controller
 
         $results = array();
 
+        $quantities = $this->getQuantity();
+
         foreach ($items as $item) {
             $article = Articulo::find()->where(['sku' => $item['reference']])->one();
 
-            if ($article !== null) {
-
-                $quantity_ps = (int)$item['quantity'];
+            if ($article !== null && isset($quantities[$item['id']])) {
+                $quantity_ps = (int)$quantities[$item['id']];
                 $quantity_hub = (int)$article['existencia_ps'];
 
                 if ($quantity_ps !== $quantity_hub) {
@@ -48,27 +49,11 @@ class ArticuloPrestashopToHubController extends \yii\web\Controller
 
                     $results[] = $result;
                 }
-
             }
 
         }
 
         return $this->render('index', ['result' => $results]);
-    }
-
-    /**
-     * @return array
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function actionImport() {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $tochannge = Yii::$app->getRequest()->getBodyParams();
-
-        $articulo = Articulo::find()->where(['sku' => $tochannge['reference']])->one();
-        $articulo->existencia_ps = $tochannge['quantity'];
-        $articulo->save();
-
-        return $tochannge;
     }
 
     private function getClient()
@@ -77,6 +62,47 @@ class ArticuloPrestashopToHubController extends \yii\web\Controller
         $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
         $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
         return new PrestashopClient($apiUrl, $key);
+    }
+
+    /**
+     * @param $id_product
+     * @return array
+     * @throws \backend\models\client\PrestaShopWebserviceException
+     */
+    private function getQuantity()
+    {
+        $client = $this->getClient();
+
+        $xml = $client->get(['resource' => 'stock_availables',
+            'display' => '[quantity,id_product]'
+        ]);
+
+        $items = json_decode(json_encode((array)$xml), TRUE)
+                                ['stock_availables']['stock_available'];
+
+        $responses = array();
+
+        foreach ($items as $item) {
+            $responses[(string)$item['id_product']] = $item['quantity'];
+        }
+
+        return $responses;
+    }
+
+    /**
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionImport()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $tochannge = Yii::$app->getRequest()->getBodyParams();
+
+        $articulo = Articulo::find()->where(['sku' => $tochannge['reference']])->one();
+        $articulo->existencia_ps = $tochannge['quantity'];
+        $articulo->save();
+
+        return $tochannge;
     }
 
 }

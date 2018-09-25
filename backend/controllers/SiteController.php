@@ -3,10 +3,13 @@
 namespace backend\controllers;
 
 use common\components\keyStorage\FormModel;
+use common\models\KeyStorageItem;
 use Yii;
 use backend\models\search\ArticuloSearch;
 use backend\models\search\ArticuloMeliSearch;
 use backend\models\search\ArticuloPrestashopSearch;
+use backend\models\Articulo;
+use backend\models\client\PrestashopClient;
 
 /**
  * Site controller
@@ -62,6 +65,50 @@ class SiteController extends \yii\web\Controller
 
         $dollar =  (float)$client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
 
+        $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
+
+        $pchItems = [];
+
+
+
+        $psClient = $this->getPsClient();
+
+        $xml = $psClient->get(['resource' => 'products',
+            'display' => '[id,reference,price,quantity]'
+        ]);
+
+        $items = json_decode(json_encode((array)$xml)
+            , TRUE)
+            ['products']['product'];
+
+        $quantities = $this->getQuantity();
+
+        $psItems = [];
+
+         foreach ($items as $item) {
+
+
+             $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
+               $psItems[$item['reference']] = $item;
+
+         }
+
+
+        foreach ($soap_response as $articulo){
+
+
+            $model =  new Articulo();
+            $model->attributes = get_object_vars($articulo);
+            $model->existencia = $articulo->inventario[0]->existencia;
+
+            $pchItems[$model->sku] = $model;
+
+        }
+
+
+        $hubItems = Articulo::find()->all();
+
+
 
         return $this->render('dashboard', [
             'searchModel' => $searchModel,
@@ -70,7 +117,10 @@ class SiteController extends \yii\web\Controller
             'dataProviderML' => $dataProviderML,
             'searchModelPS' => $searchModelPS,
             'dataProviderPS' => $dataProviderPS,
-            'dollar'=>$dollar
+            'dollar'=>$dollar,
+            'pchItems'=>$pchItems,
+            'psItems'=>$psItems,
+            'hubItems'=>$hubItems
         ]);
     }
 
@@ -123,4 +173,45 @@ class SiteController extends \yii\web\Controller
 
         return $this->render('settings', ['model' => $model]);
     }
+
+/**
+ * Gets PrestashopClient by own
+ * @return \backend\models\client\PrestashopClient
+ */
+    private function getPsClient()
+    {
+        $security = Yii::$app->getSecurity();
+        $apiUrl = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
+        $key = $security->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.password')->value), env('SECRET_KEY'));
+        return new PrestashopClient($apiUrl, $key);
+    }
+
+
+
+    /**
+     * @param $id_product
+     * @return array
+     * @throws \backend\models\client\PrestaShopWebserviceException
+     */
+    private function getQuantity()
+    {
+        $client = $this->getPsClient();
+
+        $xml = $client->get(['resource' => 'stock_availables',
+            'display' => '[quantity,id_product]'
+        ]);
+
+        $items = json_decode(json_encode((array)$xml), TRUE)
+        ['stock_availables']['stock_available'];
+
+        $responses = array();
+
+        foreach ($items as $item) {
+            $responses[(string)$item['id_product']] = $item['quantity'];
+        }
+
+        return $responses;
+    }
+
+
 }

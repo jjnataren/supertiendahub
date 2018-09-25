@@ -210,3 +210,6 @@
     $('#tabs_prestashop a[data-toggle="tab"]').on('shown.bs.tab', showHubPrestashopDiferences);
 
 })(jQuery);
+
+
+

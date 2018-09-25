@@ -5,6 +5,8 @@ use kartik\grid\GridView;
 use richardfan\widget\JSRegister;
 use yii\helpers\Html;
 use yii\web\View;
+use backend\models\util\Util;
+use backend\models\constants\Constantes;
 
 
 $this->title = '  SUPER TIENDA HUB';
@@ -21,6 +23,7 @@ $this->params['titleIcon'] = '<i class="fa fa-mixcloud fa-2x"></i>';
 SwalAsset::register($this);
 
 $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+
 
 ?>
 <!-- Small boxes (Stat box) -->
@@ -73,7 +76,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
     </div><!-- ./col -->
     <div class="col-md-3 col-xs-6">
         <!-- small box -->
-        <div class="small-box bg-green">
+        <div class="small-box bg-yellow">
             <div class="inner">
                 <h3>
                     <i class="fa  fa-truck"></i>
@@ -93,7 +96,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
     </div><!-- ./col -->
     <div class="col-md-3 col-xs-6">
         <!-- small box -->
-        <div class="small-box bg-light-blue">
+        <div class="small-box bg-purple">
             <div class="inner">
                 <h3><i class="fa fa-sellsy"></i> 7 </h3>
                 <p>Cambios en PrestaShop</p>
@@ -133,372 +136,159 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                 <div id="tab_super_tienda" class="tab-pane active">
 
 
-                    <?php try {
-                         echo GridView::widget([
-                            'dataProvider' => $dataProvider,
-                            'filterModel' => $searchModel,
-
-                            'columns' => [
-
-
-                                [
-                                    'attribute'=>'sku',
-                                    'mergeHeader' => false,
-                                    'content'=>function($data){
-                                    return  Html::a( $data->sku, ['articulo/update','id'=>$data->sku]);
-                                    }
-                                    ],
-
-                                    'descripcion',
-
-
-
-                                    [
-
-
-                                        'attribute'=>'precio',
-                                        'mergeHeader' => true,
-                                        'content'=>function($data) use ($dollar) {
-
-                                        return  ($data->moneda == 'USD') ? Yii::$app->formatter->asCurrency($data->precio * $dollar) : Yii::$app->formatter->asCurrency($data->precio) ;
-
-                                        }
-                                        ],
-
-                                        [
-                                            'attribute'=>'moneda',
-                                            'mergeHeader' => true,
-                                            'content'=>function($data) {
-                                            return  ($data->moneda == 'USD') ? 'USD (' .  Yii::$app->formatter->asCurrency($data->precio) . ')' :$data->moneda ;
-
-                                            }
-                                            ],
-                                            [
-
-                                                'attribute'=>'tipo_utilidad_ml',
-                                                'mergeHeader' => true,
-
-                                                'content'=>function($data){
-
-                                                return   ($data->tipo_utilidad_ml == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ml == 2)?'monto': null) ;
-
-                                                },
-
-                                                'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
-                                                'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-
-                                                ],
-
-
-                                                [
-                                                    'attribute'=>'utilidad_ml',
-                                                    'format' => ['percent'],
-                                                    'header'=>'util',
-                                                    'mergeHeader' => true,
-                                                    'content'=>function($data){
-
-                                                    return  ($data->tipo_utilidad_ml == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ml):  ( ($data->tipo_utilidad_ml == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ml): null) ;
-
-                                                    },
-                                                    'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
-                                                    'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-
-
-                                                    ],
-
-                                                    [
-
-                                                        'attribute'=>'comision_ml',
-                                                        'mergeHeader' => true,
-                                                        'content'=>function($data) use ($dollar){
-
-
-                                                        $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
-                                                        $utility = 0;
-                                                        switch ($data->tipo_utilidad_ml*1){
-
-                                                            case 1:
-
-                                                                $utility  =  $precio * $data->utilidad_ml;
-
-                                                                break;
-
-                                                            case 2:
-
-                                                                $utility =  $data->utilidad_ml;
-
-                                                                break;
-
-
-                                                            default:
-                                                                break;
-
-                                                        }
-
-
-                                                        $precio += $utility;
-                                                        $precio*= 1.16;
-
-
-                                                        if ($data->comision_ml*1 == 1){
-
-
-                                                            if ($precio*1 < 1001){
-
-                                                                $utility =  $precio * 0.13;
-                                                            }elseif ($precio*1 < 5001){
-
-                                                                $utility = (130 +  (($precio-1000) * 0.1)) ;
-                                                            }else{
-
-                                                                $utility = (530 +  (($precio-5000) * 0.07) );
-                                                            }
-
-                                                        }elseif($data->comision_ml*1 == 2){
-
-                                                            if ($precio*1 < 1001){
-
-                                                                $utility = ( $precio * 0.175);
-                                                            }elseif ($precio*1 < 5001){
-
-                                                                $utility = ( (175 +  (($precio-1000) * 0.145))  );
-                                                            }else{
-
-                                                                $utility = ( (755 +  (($precio-5000) * 0.115) ) );
-                                                            }
-
-                                                        }else{
-
-                                                            $utility = 0;
-                                                        }
-
-
-                                                        $utility = Yii::$app->formatter->asCurrency ($utility);
-
-
-                                                        return   ($data->comision_ml == 1) ? "Basica ($utility) " :  ( ($data->comision_ml == 2)?"Premium ($utility)": null) ;
-
-                                                        },
-
-                                                        'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
-                                                        'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-
-                                                        ],
-
-
-                                                        [
-
-                                                            'header'=>'Publico (+IVA)',
-                                                            'attribute'=>'utilidad_ml',
-
-                                                            'mergeHeader' => true,
-                                                            'content'=>function($data) use($dollar){
-
-
-                                                            $precio = ($data->moneda =='USD') ? $data->precio  * $dollar  : $data->precio;
-
-                                                            $utility = 0;
-                                                            $mlUtility = 0;
-
-
-                                                            switch ($data->tipo_utilidad_ml*1){
-
-                                                                case 1:
-
-                                                                    $utility  =  $precio * $data->utilidad_ml;
-
-                                                                    break;
-
-                                                                case 2:
-
-                                                                    $utility =  $data->utilidad_ml;
-
-                                                                    break;
-
-
-                                                                default:
-                                                                    break;
-
-                                                            }
-
-                                                            $precio += $utility;
-                                                            $precio*= 1.16;
-
-
-                                                            if ($data->comision_ml*1 == 1){
-
-                                                                if ($precio*1 < 1001){
-
-                                                                    $mlUtility =  $precio * 0.13;
-                                                                }elseif ($precio*1 < 5001){
-
-                                                                    $mlUtility = (130 +  (($precio-1000) * 0.1)) ;
-                                                                }else{
-
-                                                                    $mlUtility = (530 +  (($precio-5000) * 0.07) );
-                                                                }
-
-                                                            }elseif($data->comision_ml*1 == 2){
-
-                                                                if ($precio*1 < 1001){
-
-                                                                    $mlUtility = ( $precio * 0.175);
-                                                                }elseif ($precio*1 < 5001){
-
-                                                                    $mlUtility = ( (175 +  (($precio-1000) * 0.145))  );
-                                                                }else{
-
-                                                                    $mlUtility = ( (755 +  (($precio-5000) * 0.115) ) );
-                                                                }
-
-                                                            }
-
-
-
-
-                                                            return Yii::$app->formatter->asCurrency ($precio  + $mlUtility);
-
-
-
-                                                            },
-                                                            'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
-                                                            'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                                            ],
-
-
-
-                                                            [
-                                                                'attribute'=>'tipo_utilidad_ps',
-                                                                'mergeHeader' => true,
-
-
-                                                                'content'=>function($data){
-
-                                                                return   ($data->tipo_utilidad_ps == 1) ? 'Porcetaje' :  ( ($data->tipo_utilidad_ps == 2)?'Monto': null) ;
-
-                                                                },
-                                                                'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
-                                                                'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-
-                                                                ],
-
-                                                                [
-                                                                    'attribute'=>'utilidad_ps',
-                                                                    'header'=>'util',
-                                                                    'mergeHeader' => true,
-                                                                    'content'=>function($data){
-                                                                    return  ($data->tipo_utilidad_ps == 1) ?   Yii::$app->formatter->asPercent($data->utilidad_ps):  ( ($data->tipo_utilidad_ps == 2)?   Yii::$app->formatter->asCurrency($data->utilidad_ps): null) ;
-                                                                    },
-
-
-                                                                    'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
-                                                                    'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-
-
-
-                                                                    ],
-                                                                    [
-                                                                        'header'=>'publico',
-                                                                        'attribute'=>'utilidad_ps',
-                                                                        'mergeHeader' => true,
-                                                                        'content'=>function($data){
-                                                                        return Yii::$app->formatter->asCurrency (($data->precio*1) +  (($data->tipo_utilidad_ps == 1) ? ($data->precio * $data->utilidad_ps) : (($data->tipo_utilidad_ps == 2) ? $data->utilidad_ps : 0)));
-                                                                        },
-                                                                        'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
-                                                                        'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-
-                                                                        ],
-
-
-
-                                                                        [
-                                                                            'attribute'=>'existencia',
-                                                                            'header'=>'PCH',
-                                                                            'mergeHeader' => true,
-                                                                            'content'=>function($data){
-                                                                            return        $data->existencia;
-                                                                            }
-                                                                            ],
-
-                                                                            [
-                                                                                'attribute'=>'existencia_ml',
-
-                                                                                'header'=>'MLibre',
-                                                                                'mergeHeader' => true,
-                                                                                'content'=>function($data){
-                                                                                return     $data->existencia_ml;
-                                                                                },
-                                                                                'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
-                                                                                'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
-                                                                                ],
-                                                                                [
-                                                                                    'attribute'=>'existencia_ps',
-
-                                                                                    'header'=>'PShop',
-                                                                                    'mergeHeader' => true,
-                                                                                    'content'=>function($data){
-                                                                                    return  $data->existencia_ps;
-                                                                                    },
-                                                                                    'contentOptions' =>['style' => 'border: 1px solid #FF95C5'],
-                                                                                    'headerOptions' => ['style' => 'border: 1px solid #FF95C5'],
-                                                                                    ],
-
-
-                                                                                    ],
-                                                                                    'toolbar' =>  [
-                                                                                        ['content'=>
-                                                                                            '<a   class = "btn btn-success" title="Precio dolar"><i class="fa fa-money"></i>  '. Yii::$app->formatter->asCurrency( $dollar) .'</a>'
-                                                                                        ],
-
-                                                                                        ['content'=>
-                                                                                            '<a  href="'.
-                                                                                            Yii::$app->request->url
-                                                                                            .'"  id="reset_grid" class = "btn btn-info" title="Buscar cambios"> <i class="fa fa-refresh"></i></a>'
-                                                                                        ],
-
-                                                                                        ['content' =>
-                                                                                            Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], ['class' => 'btn btn-default', 'title' => 'Reiniciar grid'])
-                                                                                        ],
-                                                                                        '{export}',
-                                                                                        '{toggleData}'
-                                                                                    ],
-
-
-                                                                                    'beforeHeader'=>[
-                                                                                        [
-                                                                                            'columns'=>[
-                                                                                                ['content'=>'<i class="fa fa-mixcloud"></i> Super Tienda', 'options'=>['colspan'=>4, 'class'=>'text text-center',]],
-                                                                                                ['content'=>'<i class="fa fa-truck"></i> Me Libre', 'options'=>['colspan'=>4, 'class'=>'text text-left','style' => 'border: 1px solid #FFF159']],
-                                                                                                ['content'=>'<i class="fa fa-sellsy"></i> PrestaShop', 'options'=>['colspan'=>3, 'class'=>'text text-left','style' => 'border: 1px solid #FF95C5']],
-                                                                                                ['content'=>'<i class="fa fa-database"></i> Existencias', 'options'=>['colspan'=>3, 'class'=>'text text-center' ,'style' => 'border: 2px solid']],
-                                                                                            ],
-                                                                                            //  'options'=>['class'=>'skip-export'] // remove this row from export
-                                                                                        ]
-                                                                                    ],
-
-
-                                                                                    'pjax' => true,
-                                                                                    'bordered' => true,
-                                                                                    'striped' => true,
-                                                                                    'condensed' => true,
-                                                                                    'responsive' => true,
-                                                                                    'hover' => true,
-                                                                                    'floatHeader' => false,
-                                                                                    'floatHeaderOptions' => ['scrollingTop' => true],
-                                                                                    'panel' => [
-                                                                                        'type' => GridView::TYPE_PRIMARY
-                                                                                    ],
-                                                                                    ]);
-                    } catch (Exception $e) {
-                        echo 'No se pudo cargar la tabla';
-                    } ?>
+                     			<table id="dashboard_table"
+                                           class="table table-bordered table-hover table-condensed">
+                                        <thead>
+                                         <tr>
+                                         	<th colspan="4" rowspan="2" style="text-align: center; vertical-align: middle;">
+                                         		<i class="fa fa-mixcloud"></i> Super Tienda
+                                         	</th>
+                                         	<th colspan="2" style="text-align: center;" class="bg-light-blue">
+                                         		<i class="fa fa-cart-arrow-down"></i> PCH
+                                         	</th>
+											<th colspan="4" class="bg-purple" style="text-align: center;" >
+												<i class="fa fa-sellsy"></i> Prestashop
+											</th>
+											<th colspan="4" style="text-align: center;" class="bg-yellow">
+												<i class="fa fa-truck"></i> Me Libre
+											</th>
+                                         </tr>
+                                          <tr>
+                                         	<th style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;" >
+                                         		<i class="fa fa-usd"></i>
+                                         	</th>
+                                         	<th style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;" >
+                                         		<i class="fa fa-cubes"></i>
+                                         	</th>
+
+											<th  colspan="2" style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+												<i class="fa fa-usd"></i>
+											</th>
+											<th colspan="2" style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+												<i class="fa fa-cubes"></i>
+											</th>
+
+											<th colspan="2" style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+												<i class="fa fa-usd"> </i>
+											</th>
+											<th colspan="2" style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+												<i class="fa fa-cubes"></i>
+											</th>
+                                         </tr>
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th>Descripción</th>
+                                            <th><i class="fa fa-usd"></i></th>
+                                            <th><i class="fa fa-cubes"></i></th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;">
+                                            	<small><i class="fa   fa-internet-explorer "></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;">
+                                            	<small><i class="fa   fa-internet-explorer "></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+                                            	<small><i class="fa  fa-database"></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+                                            	<small><i class="fa   fa-internet-explorer "></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+                                            	<small><i class="fa  fa-database"></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+                                            	<small><i class="fa   fa-internet-explorer "></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+                                            	<small><i class="fa  fa-database"></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+                                            	<small><i class="fa   fa-internet-explorer "></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+                                            	<small><i class="fa  fa-database"></i></small>
+                                            </th>
+                                            <th style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+                                            	<small><i class="fa   fa-internet-explorer "></i></small>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        <?php foreach($hubItems as $hubItem ): ?>
+                                        <?php $hubitemPrecio = ($hubItem->moneda == 'USD') ? $hubItem->precio * $dollar: $hubItem->precio ;
+
+                                            $pchItemExist =    isset( $pchItems[$hubItem->sku]);
+
+
+                                            $pchStyle =    ($pchItemExist && $hubItem->precio*1 !==  $pchItems[$hubItem->sku]->precio*1) ? "warning" : "";
+
+                                            $pchStyle = $pchItemExist ? $pchStyle :"danger";
+
+                                            $pricePSHub = round(Util::getPSFinalprice($hubItem->precio, $hubItem->utilidad_ps, $dollar, ($hubItem->moneda == 'USD')?Constantes::CURRENCY_US:Constantes::CURRENCY_MX  ,$hubItem->tipo_utilidad_ps),2);
+
+                                            $pricePSHub = $pricePSHub === null ? '--' : $pricePSHub;
+
+                                            $pricePSOnline = isset($psItems[$hubItem->sku])?round($psItems[$hubItem->sku]['price'],2):'--';
+
+                                            $pricePSNotSync = $pricePSOnline !== $pricePSHub;
+
+                                            $quantityPSHub =  $hubItem->existencia_ps?$hubItem->existencia_ps:'--';
+
+                                            $quantityPSOnline = isset($psItems[$hubItem->sku])?$psItems[$hubItem->sku]['quantity']:'--';
+
+                                            $quantityPSNotSync = $quantityPSHub !== $quantityPSOnline;
+
+                                        ?>
+                                        	<tr>
+                                        		<td><?=$hubItem->sku; ?></td>
+                                        		<td><?=$hubItem->descripcion; ?></td>
+                                        		<td><?=($hubItem->moneda == 'USD') ? $hubitemPrecio .  ' MN <br /><i>( ' .$hubItem->precio . ' ' .  $hubItem->moneda . ')</i>' : $hubItem->precio. ' ' .$hubItem->moneda; ?></td>
+                                        		<td><?=$hubItem->existencia; ?></td>
+                                        		<td class="<?= $pchStyle ?>" style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;">
+                                        			<?= isset($pchItems[$hubItem->sku]->precio)?$pchItems[$hubItem->sku]->precio. ' ' .$pchItems[$hubItem->sku]->moneda:'--' ?>
+                                        		</td>
+												<td  class="<?= $pchStyle ?>" style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;">
+													<?= isset($pchItems[$hubItem->sku]->existencia)?$pchItems[$hubItem->sku]->existencia:'--' ?>
+												</td>
+												<td <?=$pricePSNotSync ? "class='warning'":""; ?> style="border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+													<?= $pricePSHub; ?>
+												</td>
+                                        		<td <?=$pricePSNotSync ? "class='warning'":""; ?> style="border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+                                        			<?= $pricePSOnline; ?>
+                                        		</td>
+												<td <?=$quantityPSNotSync ? "class='warning'":""; ?> style="border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+													<?=$hubItem->existencia_ps?$hubItem->existencia_ps:'--'; ?>
+												</td>
+												<td <?=$quantityPSNotSync ? "class='warning'":""; ?> style="border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
+													<?= isset($psItems[$hubItem->sku])?$psItems[$hubItem->sku]['quantity']:'--'; ?>
+												</td>
+												<td style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+													<?= round(Util::getMLFinalprice($hubItem->precio, $hubItem->utilidad_ml, $dollar, ($hubItem->moneda == 'USD')?Constantes::CURRENCY_US:Constantes::CURRENCY_MX  , $hubItem->tipo_utilidad_ml, $hubItem->comision_ml),2); ?>
+												</td>
+												<td style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+													<?=0; ?>
+												</td>
+												<td style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+													<?=$hubItem->existencia_ml; ?>
+												</td>
+												<td style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
+													<?=0; ?>
+												</td>
+
+                                        	</tr>
+
+										<?php endforeach;?>
+                                        </tbody>
+                                    </table>
 
 
                     <p class="text-right">
                         <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda"
                                 data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
                         </button>
-                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['articulo/index',], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
+                        <?= Html::a('<i class="fa fa-mixcloud"></i> Administrar hub', ['articulo/index',], ['class' => 'btn btn-default btn-flat btn-sm']) ?>
+                    	<?= Html::a('<i class="fa fa-sellsy"></i> Administrar PrestaShop', ['articulo-prestashop-to-hub/index',], ['class' => 'btn btn-flat btn-sm bg-purple']) ?>
+
                     </p>
                 </div><!-- /.tab-pane -->
 
@@ -631,7 +421,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                         <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda"
                                 data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
                         </button>
-                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['comision-mixta-cap/dashboard', 'id' => 1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
+                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['#'], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
                     </p>
                 </div><!-- /.tab-pane -->
 
@@ -813,7 +603,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                         <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda"
                                 data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
                         </button>
-                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['comision-mixta-cap/dashboard', 'id' => 1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
+                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['#', 'id' => 1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
                     </p>
                 </div><!-- /.tab-pane -->
 
@@ -1198,6 +988,18 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         $('#ml_syncrequest').trigger('click');
         $('#ps_syncrequest').trigger('click');
         $('#request_paridad').trigger('click');
+
+
+        $('#dashboard_table').DataTable({
+            'scrollX': true,
+            'language': {
+                'lengthMenu': 'Display _MENU_ records per page',
+                'zeroRecords': 'Nothing found - sorry',
+                'info': 'Mostrando pagina _PAGE_ de _PAGES_',
+                'infoEmpty': 'No records available',
+                'infoFiltered': '(filtered from _MAX_ total records)'
+            }
+        });
 
 
     });
