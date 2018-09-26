@@ -45,6 +45,11 @@ class ArticuloPrestashopQuantityFromHubController extends \yii\web\Controller
         return $this->render('index', ['result' => $response]);
     }
 
+    /**
+     * @return array
+     * @throws PrestaShopWebserviceException
+     * @throws \yii\base\InvalidConfigException
+     */
     public function actionExport()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -55,6 +60,11 @@ class ArticuloPrestashopQuantityFromHubController extends \yii\web\Controller
         return $tochannge;
     }
 
+    /**
+     * @return array
+     * @throws PrestaShopWebserviceException
+     * @throws \yii\base\InvalidConfigException
+     */
     public function actionExportAll()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
