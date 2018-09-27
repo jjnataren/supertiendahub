@@ -38,6 +38,7 @@ class ArticuloPrestashopPriceFromHubController extends \yii\web\Controller
             $article = Articulo::find()->where(['sku' => $item['reference']])->one();
 
             if ($articlePrestashop !== null && $article !== null) {
+
                 if ($article->moneda === 'MN') {
                     $precio = $article->precio;
                 } else {
@@ -59,8 +60,8 @@ class ArticuloPrestashopPriceFromHubController extends \yii\web\Controller
                     $result = array(
                         'id_prestashop' => $item['id'],
                         'reference' => $item['reference'],
-                        'price' => '$' . $formatter->asCurrency($item['price'], 'MXN'),
-                        'price_hub' => '$' . $formatter->asCurrency($articlePrestashop->precio, 'MXN'),
+                        'price_hub' => '$' . $formatter->asCurrency($precio, 'MXN'),
+                        'price_ps' => '$' . $formatter->asCurrency($precio_prestashop, 'MXN'),
                         'tipo_cambio' => 'Diferencia Prestashop HUB - Prestashop Online'
                     );
 
@@ -69,8 +70,8 @@ class ArticuloPrestashopPriceFromHubController extends \yii\web\Controller
                     $result = array(
                         'id_prestashop' => $item['id'],
                         'reference' => $item['reference'],
-                        'price' => '$' . $formatter->asCurrency($item['price'], 'MXN'),
-                        'price_hub' => '$' . $formatter->asCurrency($articlePrestashop->precio, 'MXN'),
+                        'price_hub' => '$' . $formatter->asCurrency($precio, 'MXN'),
+                        'price_ps' => '$' . $formatter->asCurrency($precio_prestashop, 'MXN'),
                         'tipo_cambio' => 'Diferencia PCH - Prestashop HUB'
                     );
 
@@ -79,8 +80,8 @@ class ArticuloPrestashopPriceFromHubController extends \yii\web\Controller
                     $result = array(
                         'id_prestashop' => $item['id'],
                         'reference' => $item['reference'],
-                        'price' => '$' . $formatter->asCurrency($item['price'], 'MXN'),
-                        'price_hub' => '$' . $formatter->asCurrency($articlePrestashop->precio, 'MXN'),
+                        'price_hub' => '$' . $formatter->asCurrency($precio, 'MXN'),
+                        'price_ps' => '$' . $formatter->asCurrency($precio_prestashop, 'MXN'),
                         'tipo_cambio' => 'Diferencia PCH - Prestashop Online'
                     );
 
