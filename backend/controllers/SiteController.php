@@ -188,7 +188,7 @@ class SiteController extends \yii\web\Controller
         $psClient = $this->getPsClient();
 
         $xml = $psClient->get(['resource' => 'products',
-            'display' => '[id,reference,price,quantity]'
+            'display' => '[id,name,reference,price,quantity]'
         ]);
 
         $items = json_decode(json_encode((array)$xml)

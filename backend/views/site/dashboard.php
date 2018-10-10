@@ -1,6 +1,7 @@
 <?php
 
 use backend\assets\SwalAsset;
+use common\models\KeyStorageItem;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use richardfan\widget\JSRegister;
@@ -33,9 +34,9 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
             <div class="inner">
                 <h3>
                     <i class="fa fa-money"></i>
-                    <label id="label_paridad"></label>
+                    <label id="label_paridad"><?=$dollar?></label>
                     <label id="label_paridad_estatus"></label>
-               		<i id="paridad" class="fa fa-spinner fa-spin"></i>
+               		<i id="paridad" class=""></i>
                 </h3>
                 <p>
 
@@ -200,6 +201,143 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 </div>
 
 
+<h4 class="page-header" id="anchor_ps">
+
+    <i class="fa fa-sellsy"></i> PrestaShop
+    <small>Tienda online</small>
+
+
+</h4>
+
+<div class="row">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <!-- Custom Tabs (Pulled to the right) -->
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs pull-right" id="tabs_prestashop">
+                <?php $i = 1; ?>
+
+
+                <li><a data-toggle="tab" href="#tab_ps_request"><i class="fa fa-cloud"></i> PrestaShop Online</a></li>
+
+
+                <li class="pull-left header"><i class="fa fa-sellsy"></i> PrestaShop Hub</li>
+            </ul>
+            <div class="tab-content">
+
+
+                <div id="tab_ps_request" class="tab-pane active">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel">
+                                <div class="panel-body">
+                                    <div id="ps_sync">
+
+											<table class="table table-bordered table-responsive" style="width: 100%" id="ps_data_grid" >
+                            					<thead>
+                            						<tr>
+                                						<th colspan="5">#Total Articulos <?=count($psItems)?></th>
+                            						</tr>
+                            						<tr>
+
+                            							<th>id</th>
+                            							<th>reference</th>
+                            							<th>name</th>
+                            							<th>price</th>
+                            							<th>quantity</th>
+														<th></th>
+                            						</tr>
+                            					</thead>
+                            					<tbody>
+                            						<?php
+
+                            						$apiUrl = Yii::$app->getSecurity()->decryptByKey(base64_decode(KeyStorageItem::findOne('config.prestashop.client.url.api')->value), env('SECRET_KEY'));
+
+                            						foreach($psItems as $articulo): ?>
+                            						<tr>
+                            						    <?php //TODO: take advantage of yii2 array helper?>
+                            							<td><?=isset($articulo['id'])?$articulo['id']:''?></td>
+                            							<td><?=(isset($articulo['reference']) && !is_array($articulo['reference']) ) ?$articulo['reference']:''?></td>
+                            							<td><?=isset($articulo['name']['language'][0])?$articulo['name']['language'][0]:''?></td>
+                            							<td><?=isset($articulo['price'])?$articulo['price']:''?></td>
+                            							<td><?=isset($articulo['quantity'])?$articulo['quantity']:''?></td>
+														<td><a href="<?=$apiUrl?>/index.php?id_product=<?=isset($articulo['id'])?$articulo['id']:''?>&controller=product" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-plane"></i> Consultar</a></td>
+                            						</tr>
+                            					<?php endforeach;?>
+                            					</tbody>
+                            				</table>
+
+
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+
+                                    <a class="btn btn-primary" id="ps_syncrequest"><i class="fa fa-refresh"></i> Actualizar </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="tab_ps_sync_comp" class="tab-pane">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel">
+                                <div class="panel-body">
+                                    <table id="prestashop_hub_table"
+                                           class="table table-bordered table-hover table-responsive">
+                                        <thead>
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th>Descripci&oacute;n</th>
+                                            <th>Precio HUB</th>
+                                            <th>Precio Prestashop HUB</th>
+                                            <th>Precio Prestashop Ganancia HUB</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab_sync_ps_pson" class="tab-pane">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel">
+                                <div class="panel-body">
+                                    <table id="prestashop_hub_online_table"
+                                           class="table table-bordered table-hover table-responsive">
+                                        <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Referencia</th>
+                                            <th>Precio</th>
+                                            <th>Precio Prestashop HUB</th>
+
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /.tab-content -->
+        </div><!-- nav-tabs-custom -->
+    </div>
+
+
+</div>
+
+
+
+
 <h4 class="page-header" id="anchor_ml">
 
     <i class="fa fa-truck"></i> Mercado Libre
@@ -216,92 +354,14 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs pull-right" id="tabs_mercadolibre">
 
-                <li><a data-toggle="tab" href="#tab_ml_sync_comp_hub">ML HUB - ML Online</a></li>
-
-                <li><a data-toggle="tab" href="#tab_ml_sync_comp"><i class="fa fa-exchange"></i> MercadoLibre HUB -
-                        SuperTienda HUB</a></li>
                 <li><a data-toggle="tab" href="#tab_ml_request"><i class="fa fa-cloud"></i> MercadoLibre Online</a></li>
 
-                <li class="active"><a data-toggle="tab" href="#tab_mercado_libre"><i class="fa fa-database"> </i>
-                        MercadoLibre HUB</a></li>
                 <li class="pull-left header"><i class="fa fa-truck"></i> MercadoLibre HUB</li>
             </ul>
             <div class="tab-content">
 
-                <div id="tab_mercado_libre" class="tab-pane active">
 
-
-                    <?php try {
-                        echo GridView::widget([
-                            'dataProvider' => $dataProviderML,
-                            'filterModel' => $searchModelML,
-
-
-                            'columns' => [
-
-                                'sku',
-                                'id',
-                                [
-                                    'attribute' => 'precio',
-                                    'content' => function ($data) {
-                                        return Yii::$app->formatter->asCurrency($data->precio);
-                                    }
-                                ],
-
-                                'marca',
-
-
-                                ['class' => 'yii\grid\ActionColumn',
-                                    'options' => ['class' => 'skip-export']
-                                ],
-
-                            ],
-                            'toolbar' => [
-                                ['content' =>
-                                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], ['class' => 'btn btn-default', 'title' => 'Reiniciar grid'])
-                                ],
-                                '{export}',
-                                '{toggleData}'
-                            ],
-
-
-                            'beforeHeader' => [
-                                [
-                                    'columns' => [
-                                        ['content' => 'Precios de la ultima imagen tomada', 'options' => ['colspan' => 3, 'class' => 'text text-left']],
-                                        ['content' => Yii::$app->formatter->asDate(date('Y-m-d')), 'options' => ['colspan' => 2, 'class' => 'text-center']],
-                                    ],
-                                    //  'options'=>['class'=>'skip-export'] // remove this row from export
-                                ]
-                            ],
-
-
-                            'pjax' => true,
-                            'bordered' => true,
-                            'striped' => true,
-                            'condensed' => true,
-                            'responsive' => true,
-                            'hover' => true,
-                            'floatHeader' => true,
-                            'floatHeaderOptions' => ['scrollingTop' => true],
-                            'panel' => [
-                                'type' => GridView::TYPE_PRIMARY
-                            ],
-                        ]);
-                    } catch (Exception $e) {
-                        echo 'No se pudo cargar la tabla.';
-                    } ?>
-
-
-                    <p class="text-right">
-                        <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda"
-                                data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
-                        </button>
-                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['#'], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
-                    </p>
-                </div><!-- /.tab-pane -->
-
-                <div id="tab_ml_request" class="tab-pane">
+                <div id="tab_ml_request" class="tab-pane active">
 
                     <div class="row">
                         <div class="col-md-12">
@@ -316,7 +376,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                                 </div>
                                 <div class="panel-footer">
 
-                                    <a href="#anchor_ml" class="btn btn-primary" id="ml_syncrequest"><i
+                                    <a  class="btn btn-primary" id="ml_syncrequest"><i
                                                 class="fa fa-refresh"></i>Actualizar </a>
                                 </div>
                             </div>
@@ -378,185 +438,6 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
 </div>
 
-
-<h4 class="page-header" id="anchor_ps">
-
-    <i class="fa fa-sellsy"></i> PrestaShop
-    <small>Almacen de datos, online y comparador.</small>
-
-
-</h4>
-
-<div class="row">
-
-
-    <div class="col-md-12 col-sm-12 col-xs-12">
-        <!-- Custom Tabs (Pulled to the right) -->
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs pull-right" id="tabs_prestashop">
-                <?php $i = 1; ?>
-
-                <li><a data-toggle="tab" href="#tab_sync_ps_pson">PrestaShop - PrestaShop Online</a></li>
-
-                <li><a data-toggle="tab" href="#tab_ps_sync_comp"><i class="fa fa-exchange"></i> PrestaShop HUB -
-                        SuperTienda HUB</a></li>
-                <li><a data-toggle="tab" href="#tab_ps_request"><i class="fa fa-cloud"></i> PrestaShop Online</a></li>
-
-                <li class="active"><a data-toggle="tab" href="#tab_ps_hub"><i class="fa fa-database"> </i> Prestashop
-                        HUB</a></li>
-
-
-                <li class="pull-left header"><i class="fa fa-sellsy"></i> PrestaShop HUB</li>
-            </ul>
-            <div class="tab-content">
-
-                <div id="tab_ps_hub" class="tab-pane active">
-
-
-                    <?php try {
-                        echo GridView::widget([
-                            'dataProvider' => $dataProviderPS,
-                            'filterModel' => $searchModelPS,
-
-
-                            'columns' => [
-
-                                'sku',
-                                'id_prestashop',
-                                [
-                                    'attribute' => 'precio',
-                                    'content' => function ($data) {
-                                        return Yii::$app->formatter->asCurrency($data->precio);
-                                    }
-                                ],
-
-                                'marca',
-
-
-                                ['class' => 'yii\grid\ActionColumn',
-                                    'options' => ['class' => 'skip-export']
-                                ],
-
-                            ],
-                            'toolbar' => [
-                                ['content' =>
-                                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['index'], ['class' => 'btn btn-default', 'title' => 'Reiniciar grid'])
-                                ],
-                                '{export}',
-                                '{toggleData}'
-                            ],
-
-
-                            'beforeHeader' => [
-                                [
-                                    'columns' => [
-                                        ['content' => 'Precios de la ultima imagen tomada', 'options' => ['colspan' => 3, 'class' => 'text text-left']],
-                                        ['content' => Yii::$app->formatter->asDate(date('Y-m-d')), 'options' => ['colspan' => 2, 'class' => 'text-center']],
-                                    ],
-                                    //  'options'=>['class'=>'skip-export'] // remove this row from export
-                                ]
-                            ],
-
-
-                            'pjax' => true,
-                            'bordered' => true,
-                            'striped' => true,
-                            'condensed' => true,
-                            'responsive' => true,
-                            'hover' => true,
-                            'floatHeader' => true,
-                            'floatHeaderOptions' => ['scrollingTop' => true],
-                            'panel' => [
-                                'type' => GridView::TYPE_PRIMARY
-                            ],
-                        ]);
-                    } catch (Exception $e) {
-                        echo 'No se pudo cargar la tabla';
-                    } ?>
-
-
-                    <p class="text-right">
-                        <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda"
-                                data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
-                        </button>
-                        <?= Html::a('<i class="fa fa-cogs"></i> Administrar', ['#', 'id' => 1], ['class' => 'btn btn-info btn-flat btn-sm']) ?>
-                    </p>
-                </div><!-- /.tab-pane -->
-
-                <div id="tab_ps_request" class="tab-pane">
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="panel">
-                                <div class="panel-body">
-                                    <div id="ps_sync">
-
-                                        <img src="/img/loading.gif"/>
-                                        <p class="text text-info">Consultando servicio ....</p>
-
-                                    </div>
-                                </div>
-                                <div class="panel-footer">
-
-                                    <a href="#anchor_ps" class="btn btn-primary" id="ps_syncrequest">Actualizar </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div id="tab_ps_sync_comp" class="tab-pane">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="panel">
-                                <div class="panel-body">
-                                    <table id="prestashop_hub_table"
-                                           class="table table-bordered table-hover table-responsive">
-                                        <thead>
-                                        <tr>
-                                            <th>SKU</th>
-                                            <th>Descripci&oacute;n</th>
-                                            <th>Precio HUB</th>
-                                            <th>Precio Prestashop HUB</th>
-                                            <th>Precio Prestashop Ganancia HUB</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tab_sync_ps_pson" class="tab-pane">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="panel">
-                                <div class="panel-body">
-                                    <table id="prestashop_hub_online_table"
-                                           class="table table-bordered table-hover table-responsive">
-                                        <thead>
-                                        <tr>
-                                            <th>Id</th>
-                                            <th>Referencia</th>
-                                            <th>Precio</th>
-                                            <th>Precio Prestashop HUB</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div><!-- /.tab-content -->
-        </div><!-- nav-tabs-custom -->
-    </div>
-
-
-</div>
 
 
 <h4 class="page-header">
@@ -663,7 +544,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
                 <address>
                     <strong>Correo electronico</strong><br>
-                    <a href="mailto:#">  <?= Yii::$app->keyStorage->get('com.pinfo.contacto.email', 'admin.pinfo@pinfosoft.com.mx') ?></a>
+                    <a href="mailto:#">  <?= Yii::$app->keyStorage->get('com.pinfo.contacto.email', 'admin@pinfo.com.mx') ?></a>
                     <br/>
 
 
@@ -917,16 +798,23 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
     $(document).ready(function () {
 
-    	$('#dashboard_refreshss').trigger('click');
+    	//$('#dashboard_refreshss').trigger('click');
         $('#syncrequest').trigger('click');
         $('#ml_syncrequest').trigger('click');
-        $('#ps_syncrequest').trigger('click');
-        $('#request_paridad').trigger('click');
+       // $('#ps_syncrequest').trigger('click');
+        //$('#request_paridad').trigger('click');
 
 
-        $(function () {
-      	  $('[data-toggle="popover-ayuda"]').popover()
-      	})
+        $('#ps_data_grid').DataTable({
+            'scrollX': false,
+            'language': {
+                'lengthMenu': 'Display _MENU_ records per page',
+                'zeroRecords': 'Nothing found - sorry',
+                'info': 'Showing page _PAGE_ of _PAGES_',
+                'infoEmpty': 'No records available',
+                'infoFiltered': '(filtered from _MAX_ total records)'
+            }
+        });
 
 
 
