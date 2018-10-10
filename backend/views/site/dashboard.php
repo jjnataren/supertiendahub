@@ -1,12 +1,11 @@
 <?php
 
 use backend\assets\SwalAsset;
+use kartik\editable\Editable;
 use kartik\grid\GridView;
 use richardfan\widget\JSRegister;
 use yii\helpers\Html;
 use yii\web\View;
-use backend\models\util\Util;
-use backend\models\constants\Constantes;
 
 
 $this->title = '  SUPER TIENDA HUB';
@@ -126,7 +125,10 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
              		<small id="bag_count_phc" class="label label-danger"><i class="fa fa-spinner fa-spin"></i></small> SUPER TIENDA - PCH
              	</a>
              </li>
-             <li class="active"><a data-toggle="tab" href="#tab_super_tienda"><i class="fa fa-database"></i> SUPER TIENDA</a></li>
+             <li class="active">
+             	<a data-toggle="tab" href="#tab_super_tienda"><i class="fa fa-database"></i> SUPER TIENDA</a>
+
+             </li>
 
 
                 <li class="pull-left header"><i class="fa fa-mixcloud"></i> SUPER TIENDA HUB</li>
@@ -136,156 +138,30 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                 <div id="tab_super_tienda" class="tab-pane active">
 
 
-                     			<table id="dashboard_table"
-                                           class="table table-bordered table-hover table-condensed">
-                                        <thead>
-                                         <tr>
-                                         	<th colspan="4" rowspan="2" style="text-align: center; vertical-align: middle;">
-                                         		<i class="fa fa-mixcloud"></i> Super Tienda
-                                         	</th>
-                                         	<th colspan="2" style="text-align: center;" class="bg-light-blue">
-                                         		<i class="fa fa-cart-arrow-down"></i> PCH
-                                         	</th>
-											<th colspan="4" class="bg-purple" style="text-align: center;" >
-												<i class="fa fa-sellsy"></i> Prestashop
-											</th>
-											<th colspan="4" style="text-align: center;" class="bg-yellow">
-												<i class="fa fa-truck"></i> Me Libre
-											</th>
-                                         </tr>
-                                          <tr>
-                                         	<th style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;" >
-                                         		<i class="fa fa-usd"></i>
-                                         	</th>
-                                         	<th style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;" >
-                                         		<i class="fa fa-cubes"></i>
-                                         	</th>
 
-											<th  colspan="2" style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-												<i class="fa fa-usd"></i>
-											</th>
-											<th colspan="2" style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-												<i class="fa fa-cubes"></i>
-											</th>
+					<?php echo $this->render('_dashboard',
+                    ['dollar'=>$dollar,
+                    'pchItems'=>$pchItems,
+                    'psItems'=>$psItems,
 
-											<th colspan="2" style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-												<i class="fa fa-usd"> </i>
-											</th>
-											<th colspan="2" style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-												<i class="fa fa-cubes"></i>
-											</th>
-                                         </tr>
-                                        <tr>
-                                            <th>SKU</th>
-                                            <th>Descripción</th>
-                                            <th><i class="fa fa-usd"></i></th>
-                                            <th><i class="fa fa-cubes"></i></th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;">
-                                            	<small><i class="fa   fa-internet-explorer "></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;">
-                                            	<small><i class="fa   fa-internet-explorer "></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-                                            	<small><i class="fa  fa-database"></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-                                            	<small><i class="fa   fa-internet-explorer "></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-                                            	<small><i class="fa  fa-database"></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-                                            	<small><i class="fa   fa-internet-explorer "></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-                                            	<small><i class="fa  fa-database"></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-                                            	<small><i class="fa   fa-internet-explorer "></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-                                            	<small><i class="fa  fa-database"></i></small>
-                                            </th>
-                                            <th style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-                                            	<small><i class="fa   fa-internet-explorer "></i></small>
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
+                        'searchModel'=>$searchModel,
+                        'dataProvider'=>$dataProvider,
 
-                                        <?php foreach($hubItems as $hubItem ): ?>
-                                        <?php $hubitemPrecio = ($hubItem->moneda == 'USD') ? $hubItem->precio * $dollar: $hubItem->precio ;
-
-                                            $pchItemExist =    isset( $pchItems[$hubItem->sku]);
+                    ]);?>
 
 
-                                            $pchStyle =    ($pchItemExist && $hubItem->precio*1 !==  $pchItems[$hubItem->sku]->precio*1) ? "warning" : "";
-
-                                            $pchStyle = $pchItemExist ? $pchStyle :"danger";
-
-                                            $pricePSHub = round(Util::getPSFinalprice($hubItem->precio, $hubItem->utilidad_ps, $dollar, ($hubItem->moneda == 'USD')?Constantes::CURRENCY_US:Constantes::CURRENCY_MX  ,$hubItem->tipo_utilidad_ps),2);
-
-                                            $pricePSHub = $pricePSHub === null ? '--' : $pricePSHub;
-
-                                            $pricePSOnline = isset($psItems[$hubItem->sku])?round($psItems[$hubItem->sku]['price'],2):'--';
-
-                                            $pricePSNotSync = $pricePSOnline !== $pricePSHub;
-
-                                            $quantityPSHub =  $hubItem->existencia_ps?$hubItem->existencia_ps:'--';
-
-                                            $quantityPSOnline = isset($psItems[$hubItem->sku])?$psItems[$hubItem->sku]['quantity']:'--';
-
-                                            $quantityPSNotSync = $quantityPSHub !== $quantityPSOnline;
-
-                                        ?>
-                                        	<tr>
-                                        		<td><?=$hubItem->sku; ?></td>
-                                        		<td><?=$hubItem->descripcion; ?></td>
-                                        		<td><?=($hubItem->moneda == 'USD') ? $hubitemPrecio .  ' MN <br /><i>( ' .$hubItem->precio . ' ' .  $hubItem->moneda . ')</i>' : $hubItem->precio. ' ' .$hubItem->moneda; ?></td>
-                                        		<td><?=$hubItem->existencia; ?></td>
-                                        		<td class="<?= $pchStyle ?>" style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;">
-                                        			<?= isset($pchItems[$hubItem->sku]->precio)?$pchItems[$hubItem->sku]->precio. ' ' .$pchItems[$hubItem->sku]->moneda:'--' ?>
-                                        		</td>
-												<td  class="<?= $pchStyle ?>" style="align-content: center; text-align: center; border-bottom-color: #3c8dbc; border-left-color: #3c8dbc; border-right-color: #3c8dbc; border-top-color: #3c8dbc;">
-													<?= isset($pchItems[$hubItem->sku]->existencia)?$pchItems[$hubItem->sku]->existencia:'--' ?>
-												</td>
-												<td <?=$pricePSNotSync ? "class='warning'":""; ?> style="border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-													<?= $pricePSHub; ?>
-												</td>
-                                        		<td <?=$pricePSNotSync ? "class='warning'":""; ?> style="border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-                                        			<?= $pricePSOnline; ?>
-                                        		</td>
-												<td <?=$quantityPSNotSync ? "class='warning'":""; ?> style="border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-													<?=$hubItem->existencia_ps?$hubItem->existencia_ps:'--'; ?>
-												</td>
-												<td <?=$quantityPSNotSync ? "class='warning'":""; ?> style="border-bottom-color: #605ca8; border-left-color: #605ca8; border-right-color: #605ca8; border-top-color: #605ca8;">
-													<?= isset($psItems[$hubItem->sku])?$psItems[$hubItem->sku]['quantity']:'--'; ?>
-												</td>
-												<td style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-													<?= round(Util::getMLFinalprice($hubItem->precio, $hubItem->utilidad_ml, $dollar, ($hubItem->moneda == 'USD')?Constantes::CURRENCY_US:Constantes::CURRENCY_MX  , $hubItem->tipo_utilidad_ml, $hubItem->comision_ml),2); ?>
-												</td>
-												<td style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-													<?=0; ?>
-												</td>
-												<td style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-													<?=$hubItem->existencia_ml; ?>
-												</td>
-												<td style="align-content: center; text-align: center; border-bottom-color: #f39c12; border-left-color: #f39c12; border-right-color: #f39c12; border-top-color: #f39c12;">
-													<?=0; ?>
-												</td>
-
-                                        	</tr>
-
-										<?php endforeach;?>
-                                        </tbody>
-                                    </table>
 
 
-                    <p class="text-right">
-                        <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover" title="Ayuda"
+
+                    <p class="text-left">
+                        <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover-ayuda" title="Ayuda"
                                 data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
                         </button>
+
+                        <button id="dashboard_refresh" tabindex="0" type="button" class="btn btn-primary" data-toggle="popover" title="Actualizar tablero"
+                                data-content="Actualizar tablero"><i class="fa fa-refresh"></i>
+                        </button>
+
                         <?= Html::a('<i class="fa fa-mixcloud"></i> Administrar hub', ['articulo/index',], ['class' => 'btn btn-default btn-flat btn-sm']) ?>
                     	<?= Html::a('<i class="fa fa-sellsy"></i> Administrar PrestaShop', ['articulo-prestashop-to-hub/index',], ['class' => 'btn btn-flat btn-sm bg-purple']) ?>
 
@@ -835,6 +711,13 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
     });
 
 
+    $('#dashboard_refreshss').click(function () {
+
+        doAjaxGetDashboard("/site/get-dashboard");
+
+    });
+
+
     function doAjaxGetParidad(filterUrl) {
 
         $('#ps_sync').html("<img src='/img/loading.gif' /> <p class='text text-info'>Consultando servicio en linea ....</p>");
@@ -849,6 +732,55 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
             }, error: function (result) {
 
                 $('#label_paridad_estatus').html('Error ');
+
+            }
+        });
+    }
+
+
+    function doAjaxGetDashboard(filterUrl) {
+
+
+        $.ajax({
+            type: "GET",
+            url: filterUrl,
+            data: {},
+            success: function (result) {
+
+                 $('#general_dashboard').html(result);
+
+
+                 $('#dashboard_table').DataTable({
+                     'scrollX': true,
+                     'language': {
+                         'lengthMenu': 'Display _MENU_ records per page',
+                         'zeroRecords': 'Nothing found - sorry',
+                         'info': 'Mostrando pagina _PAGE_ de _PAGES_',
+                         'infoEmpty': 'No records available',
+                         'infoFiltered': '(filtered from _MAX_ total records)'
+                     }
+                 });
+
+
+             		$(function () {
+                	  $('[data-toggle="popover-st-quantity"]').popover()
+                	})
+
+
+
+
+
+
+            },
+            beforeSend: function (result) {
+
+            	$('#general_dashboard').html("<img src='/img/loading.gif' /> <p class='text text-info'> Revisando cambios ...</p>");
+
+
+            },
+            error: function (result) {
+
+                $('#general_dashboard').html('Error  ');
 
             }
         });
@@ -985,26 +917,24 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
     $(document).ready(function () {
 
-
+    	$('#dashboard_refreshss').trigger('click');
         $('#syncrequest').trigger('click');
         $('#ml_syncrequest').trigger('click');
         $('#ps_syncrequest').trigger('click');
         $('#request_paridad').trigger('click');
 
 
-        $('#dashboard_table').DataTable({
-            'scrollX': true,
-            'language': {
-                'lengthMenu': 'Display _MENU_ records per page',
-                'zeroRecords': 'Nothing found - sorry',
-                'info': 'Mostrando pagina _PAGE_ de _PAGES_',
-                'infoEmpty': 'No records available',
-                'infoFiltered': '(filtered from _MAX_ total records)'
-            }
-        });
+        $(function () {
+      	  $('[data-toggle="popover-ayuda"]').popover()
+      	})
+
+
+
 
 
     });
+
+
 
 
 </script>

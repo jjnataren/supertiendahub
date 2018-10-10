@@ -51,8 +51,8 @@ $this->registerJsFile('@web/js/price.from.hub.to.prestashop.js', ['depends' => [
                     echo Html::beginTag('tr');
                     echo Html::tag('td', $r['id_prestashop']);
                     echo Html::tag('td', $r['reference']);
-                    echo Html::tag('td', $r['price']);
                     echo Html::tag('td', $r['price_hub']);
+                    echo Html::tag('td', $r['price_ps']);
                     echo Html::tag('td', $r['tipo_cambio']);
                     echo Html::beginTag('td');
                     echo Html::tag('button', 'Exportar Precio', ['class' => 'btn btn-primary export-price',

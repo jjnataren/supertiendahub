@@ -148,6 +148,37 @@ class ArticuloController extends Controller
         }
     }
 
+
+
+    /**
+     * Updates an existing Articulo model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param string $id
+     * @return mixed
+     */
+    public function actionUpdateExistenciaAjax($id)
+    {
+        $model = $this->findModel($id);
+
+
+        $pchQuantity = Yii::$app->request->post('pchq');
+
+        $message = ( $pchQuantity !== null && ($pchQuantity < $model->existencia) ) ? "No disponible PCH":"wrong";
+
+        if (isset($_POST['hasEditable']) &&  $model->load(Yii::$app->request->post()) && $model->save()) {
+
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+            return ['output'=>$model->existencia, 'message'=>$message];
+
+
+        } else {
+            return ['output'=>'error', 'message'=>$message];
+        }
+    }
+
+
+
     /**
      * Deletes an existing Articulo model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

@@ -65,7 +65,8 @@
 		"richardfan1126/yii2-js-register": "*",
 		"miloschuman/yii2-highcharts-widget": "^6.0",
         "bower-asset/jquery-steps" : "^1.1.0",
-		"bower-asset/sweetalert2" : "*"
+		"bower-asset/sweetalert2" : "*",
+		"kartik-v/yii2-widget-touchspin": "*"
 	},
 	"require-dev" : {
 		"yiisoft/yii2-debug" : "^2.0.0",

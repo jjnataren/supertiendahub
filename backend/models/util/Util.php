@@ -35,7 +35,7 @@ class Util extends \Exception
 
            $price = ( ($currency == Constantes::CURRENCY_US) ? ($price * $dollar) : $price );
 
-           return  $price += (($hubUtility == Constantes::HUB_UT_PERCENT) ? ($price * $util) : (($hubUtility == Constantes::HUB_UT_AMOUNT) ? $util : 0));
+           return  $price += (($hubUtility == Constantes::HUB_UT_PERCENT) ? ($price * ($util/100)) : (($hubUtility == Constantes::HUB_UT_AMOUNT) ? $util : 0));
 
     }
 

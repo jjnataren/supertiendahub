@@ -9,7 +9,14 @@ use backend\models\search\ArticuloSearch;
 use backend\models\search\ArticuloMeliSearch;
 use backend\models\search\ArticuloPrestashopSearch;
 use backend\models\Articulo;
+use backend\models\client\PrestaShopWebserviceException;
 use backend\models\client\PrestashopClient;
+use yii\web\BadRequestHttpException;
+use yii\base\Model;
+use backend\models\ArticuloComp;
+use backend\models\ArticuloPrestashop;
+use backend\models\TipoCambio;
+use yii\web\NotFoundHttpException;
 
 /**
  * Site controller
@@ -38,8 +45,107 @@ class SiteController extends \yii\web\Controller
     public function actionDashboard(){
 
 
-        $searchModel = new ArticuloSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+
+        if (isset($_POST['hasEditable'])) {
+            // use Yii's response format to encode output as JSON
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+
+            $key = Yii::$app->request->post('editableIndex');
+            $sku = Yii::$app->request->post('editableKey');
+            $attr = Yii::$app->request->post('editableAttribute');
+
+            $model = Articulo::findOne($sku);
+
+            $existenciaPsPost= false;
+
+            if ($pchPrecio = Yii::$app->request->post('pch_precio') )
+                        $model->precio = $pchPrecio*1;
+                        elseif($pchExistencia = Yii::$app->request->post('pch_existencia') ){
+                          //  if($psExistencia*1>$model->existencia)
+                            //    throw new BadRequestHttpException('La cantidad excede.');
+                          $model->existencia=$pchExistencia;
+                        }elseif($psPrecioUtil = Yii::$app->request->post('ps_precio_util')){
+
+                            $model->attributes = Yii::$app->request->post('ArticuloComp');
+
+
+                        }elseif( isset($_POST['existencia_ps'])){
+
+                            $existenciaPs = Yii::$app->request->post('existencia_ps');
+
+                            $existenciaPsPost = true;
+
+                            $model->existencia_ps = $existenciaPs;
+
+
+                        }
+
+            // read your posted model attributes
+                        if ($model && isset($key) &&( ($model->attributes = Yii::$app->request->post('Articulo')[$key]) ||$existenciaPsPost ||$pchPrecio || $pchExistencia || $psPrecioUtil) ) {
+                // read or convert your posted information
+                                $model->ultima_modificacion = date ('Y-m-d H:i:s');
+                            if ($model->save())
+                               return ['output'=>'...', 'message'=>''];
+                            else return ['output'=>'', 'message'=>'No fue posible aplicar el cambio'];
+
+                        }elseif ($psPublicPrecio = Yii::$app->request->post('ps_public_precio')){
+
+                            $modelComplement = new ArticuloComp();
+
+
+                            $articuloComp = Yii::$app->request->post('ArticuloComp');
+                            $modelComplement->attributes = $articuloComp;
+                            $modelComplement->precioPs = $articuloComp['precioPs'];
+                            $modelComplement->precioPsOriginal = $articuloComp['precioPsOriginal'];
+
+
+                            if ($modelComplement->idPs = $articuloComp['idPs']){
+
+                                 $this->savePsPrice($modelComplement);
+                            }else{
+
+                                $this->publicNewPs($modelComplement);
+                            }
+
+                        }elseif( isset($_POST['ps_publicar_cantidad'])){
+
+                            $modelComplement = new ArticuloComp();
+                            $articuloComp = Yii::$app->request->post('ArticuloComp');
+                            $modelComplement->attributes = $articuloComp;
+                            $modelComplement->idPs = $articuloComp['idPs'];
+
+                            if($modelComplement->idPs)
+                                $this->updatePsQuantity($modelComplement);
+
+                        }elseif(  isset($_POST['ps_importar_cantidad_hub']) ){
+
+                            $modelComplement = new ArticuloComp();
+                            $articuloComp = Yii::$app->request->post('ArticuloComp');
+                            $modelComplement->attributes = $articuloComp;
+
+                            if(  $updatedModel = Articulo::findOne($modelComplement->sku) ){
+                                //TODO:Get quantity from Prestashop online
+                                $updatedModel->existencia_ps = $modelComplement->existencia_ps;
+
+                                if(!$updatedModel->save(false))
+                                    throw new BadRequestHttpException('Datos incorrectos');
+
+
+                            }else{
+
+                                throw new NotFoundHttpException('No existe el producto');
+                            }
+
+
+
+                        }
+            // else if nothing to do always return an empty JSON encoded output
+                         else {
+                                return ['output'=>'', 'message'=>'Err'];
+                            }
+        }
 
         $searchModelML = new ArticuloMeliSearch();
         $dataProviderML = $searchModelML->search(Yii::$app->request->queryParams);
@@ -49,8 +155,12 @@ class SiteController extends \yii\web\Controller
         $dataProviderPS = $searchModelPS->search(Yii::$app->request->queryParams);
 
 
+        $searchModel = new ArticuloSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+
         $wsdl =
-        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8088/servidor.php?wsdl');
+        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8089/servidor.php?wsdl');
 
         $cliente =
         \Yii::$app->keyStorage->get('config.phc.webservice.cliente', '50527');
@@ -64,8 +174,12 @@ class SiteController extends \yii\web\Controller
         //$valores = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
 
         $dollar =  (float)$client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
+        //$dollar =  (float)$client->ObtenerParidad(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+
 
         $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
+        //$soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+
 
         $pchItems = [];
 
@@ -81,33 +195,43 @@ class SiteController extends \yii\web\Controller
             , TRUE)
             ['products']['product'];
 
-        $quantities = $this->getQuantity();
+            $quantities = $this->getQuantity();
 
-        $psItems = [];
+            $psItems = [];
 
-         foreach ($items as $item) {
-
-
-             $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
-               $psItems[$item['reference']] = $item;
-
-         }
+            foreach ($items as $item) {
 
 
-        foreach ($soap_response as $articulo){
+                $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
+                $psItems[$item['reference']] = $item;
+
+            }
 
 
-            $model =  new Articulo();
-            $model->attributes = get_object_vars($articulo);
-            $model->existencia = $articulo->inventario[0]->existencia;
 
-            $pchItems[$model->sku] = $model;
+            $models = $dataProvider->getModels();
 
-        }
+            $pchItemsTmp = [];
+
+            foreach ($soap_response as $articulo){
 
 
-        $hubItems = Articulo::find()->all();
+                //  $model =  new Articulo();
+                //  $model->attributes = get_object_vars($articulo);
+                //   $model->existencia = $articulo->inventario[0]->existencia;
 
+                $pchItemsTmp[$articulo->sku] = $articulo;
+
+            }
+
+
+            foreach ($models as $mod){
+
+
+                if (isset  ($pchItemsTmp[$mod->sku]) )
+                    $pchItems [$mod->sku] =  $pchItemsTmp[$mod->sku];
+
+            }
 
 
         return $this->render('dashboard', [
@@ -120,9 +244,14 @@ class SiteController extends \yii\web\Controller
             'dollar'=>$dollar,
             'pchItems'=>$pchItems,
             'psItems'=>$psItems,
-            'hubItems'=>$hubItems
+
         ]);
     }
+
+
+
+
+
 
     public function actionSettings()
     {
@@ -213,5 +342,245 @@ class SiteController extends \yii\web\Controller
         return $responses;
     }
 
+
+    /**
+     * @param ArticuloComp
+     * @throws PrestaShopWebserviceException
+     */
+    private function savePsPrice($article)
+    {
+
+
+
+        $opt = array('resource' => 'products');
+        $opt['id'] = $article->idPs;
+
+        $xml = $this->getPsClient()->get($opt);
+        $children = $xml->children()->children();
+        unset($children->manufacturer_name, $children->quantity);
+
+        $children->price = $article->precioPs;
+
+        if(!($articuloPrestashop = ArticuloPrestashop::findOne($article->sku))){
+             $articuloPrestashop = new ArticuloPrestashop();
+                $articuloPrestashop->sku = $article->sku;
+                $articuloPrestashop->precio = $article->precioPs;
+                $articuloPrestashop->precio_original = $article->precioPsOriginal;
+                $articuloPrestashop->id_prestashop = $article->idPs;
+        }else{
+
+            $articuloPrestashop->precio = $article->precioPs;
+            $articuloPrestashop->precio_original = $article->precioPsOriginal;
+
+        }
+
+
+        $opt = array('resource' => 'products');
+        $opt['putXml'] = $xml->asXML();
+        $opt['id'] = $article->precioPs;
+
+        try {
+            $this->getPsClient()->edit($opt);
+        } catch (PrestaShopWebserviceException $e) {
+        }
+
+        $articuloPrestashop->save(false);
+    }
+
+
+
+    /**
+     *
+     * @param ArticuloComp $articuloComp
+     * @throws PrestaShopWebserviceException
+     */
+    private function publicNewPs($articuloComp){
+
+
+
+        $xml = $this->obtenerXmlNuevoProducto();
+
+        $client = $this->getPsClient();
+
+        $xml->product->id_manufacturer = 0;
+        $xml->product->id_supplier = 0;
+        $xml->product->id_category_default = 2;
+        $xml->product->cache_default_attribute = 0;
+        $xml->product->id_tax_rules_group = 0;
+        $xml->product->type = 'simple';
+        $xml->product->id_shop_default = 1;
+        $xml->product->reference = $articuloComp->sku;
+        $xml->product->price = $articuloComp->precioPs;
+        $xml->product->active = 0;
+
+        $xml->product->link_rewrite->language[0] = str_replace(';', ' ', $articuloComp->descripcion);
+        $xml->product->link_rewrite->language[1] = str_replace(';', ' ', $articuloComp->descripcion);
+
+        $xml->product->name->language[0] = str_replace(';', ' ', $articuloComp->descripcion);
+        $xml->product->name->language[1] = str_replace(';', ' ', $articuloComp->descripcion);
+
+        $opt = array('resource' => 'products');
+        $opt['postXml'] = $xml->asXML();
+
+        $response = $client->add($opt);
+
+        if(!($articlePrestashop = ArticuloPrestashop::findOne($articuloComp->sku))){
+            $articlePrestashop = new ArticuloPrestashop();
+            $articlePrestashop->sku = $articuloComp->sku;
+        }
+        $articlePrestashop->precio = $articuloComp->precioPs;
+        $articlePrestashop->precio_original = $articuloComp->precioPsOriginal;
+        $articlePrestashop->id_prestashop = (string)$response->product->id;
+        $articlePrestashop->tipo_cambio = TipoCambio::SIN_CAMBIOS;
+        $articlePrestashop->cambio = 0;
+        $articlePrestashop->save(false);
+
+        if ($articuloComp->existencia_ps>0)
+            try {
+                $this->getAndUpdateStock( $articlePrestashop->id_prestashop, $articuloComp->existencia_ps);
+            } catch (PrestaShopWebserviceException $e) {
+                throw $e;
+            }
+
+    }
+
+
+    /**
+     * Updates ps-item quantity
+     * @param ArticuloComp $articleComp
+     * @throws PrestaShopWebserviceException
+     */
+    private function updatePsQuantity($articleComp){
+
+        try {
+            $this->getAndUpdateStock( $articleComp->idPs, $articleComp->existencia_ps);
+        } catch (PrestaShopWebserviceException $e) {
+            throw $e;
+        }
+
+    }
+
+
+    /**
+     * @return \SimpleXMLElement
+     * @throws PrestaShopWebserviceException
+     */
+    private function obtenerXmlNuevoProducto()
+    {
+        $xml = $this->obtenerNuevoSchemaCreateProduct();
+
+        unset(
+            $xml->product->id,
+            $xml->product->new,
+            $xml->product->id_default_image,
+            $xml->product->id_default_combination,
+            $xml->product->position_in_category,
+            $xml->product->supplier_reference,
+            $xml->product->location,
+            $xml->product->width,
+            $xml->product->height,
+            $xml->product->depth,
+            $xml->product->weight,
+            $xml->product->quantity_discount,
+            $xml->product->ean13,
+            $xml->product->upc,
+            $xml->product->cache_is_pack,
+            $xml->product->cache_has_attachments,
+            $xml->product->is_virtual,
+            $xml->product->on_sale,
+            $xml->product->online_only,
+            $xml->product->ecotax,
+            $xml->product->minimal_quantity,
+            $xml->product->wholesale_price,
+            $xml->product->unity,
+            $xml->product->unit_price_ratio,
+            $xml->product->additional_shipping_cost,
+            $xml->product->customizable,
+            $xml->product->text_fields,
+            $xml->product->uploadable_files,
+            $xml->product->redirect_type,
+            $xml->product->id_product_redirected,
+            $xml->product->available_for_order,
+            $xml->product->available_date,
+            $xml->product->condition,
+            $xml->product->show_price,
+            $xml->product->indexed,
+            $xml->product->visibility,
+            $xml->product->advanced_stock_management,
+            $xml->product->date_add,
+            $xml->product->date_upd,
+            $xml->product->meta_description,
+            $xml->product->pack_stock_type,
+            $xml->product->meta_keywords,
+            $xml->product->meta_title,
+            $xml->product->description,
+            $xml->product->description_short,
+            $xml->product->available_now,
+            $xml->product->available_later,
+            $xml->product->associations
+            );
+
+        return $xml;
+    }
+
+    /**
+     * @return \SimpleXMLElement
+     * @throws PrestaShopWebserviceException
+     */
+    private function obtenerNuevoSchemaCreateProduct()
+    {
+        $client = $this->getPsClient();
+        $opt = array('resource' => 'products');
+        $opt['schema'] = 'blank';
+
+        return $client->get($opt);
+    }
+
+    /**
+     * @param $id_prestashop
+     * @param $quantity
+     * @throws PrestaShopWebserviceException
+     */
+    private function getAndUpdateStock($id_prestashop, $quantity) {
+        $client = $this->getPsClient();
+        $opt = array('resource' => 'products');
+        $opt['id'] = $id_prestashop;
+        $xml = $client->get($opt);
+
+        $this->editStock($xml, $quantity);
+    }
+
+    /**
+     * @param $xml
+     * @param $quantity
+     * @return string
+     * @throws PrestaShopWebserviceException
+     */
+    private function editStock($xml, $quantity)
+    {
+        $stockId = $xml->product->associations->stock_availables->stock_available->id;
+
+        $xml = $this->obtenerSchemaUpdateStock($stockId);
+        $xml->stock_available->quantity = $quantity;
+        $opt = array('resource' => 'stock_availables');
+        $opt['id'] = $stockId;
+        $opt['putXml'] = $xml->asXML();
+
+        $this->getPsClient()->edit($opt);
+    }
+
+
+    /**
+     * @param $id
+     * @return \SimpleXMLElement
+     * @throws PrestaShopWebserviceException
+     */
+    private function obtenerSchemaUpdateStock($id)
+    {
+        $client = $this->getPsClient();
+        $opt = array('resource' => 'stock_availables');
+        $opt['id'] = $id;
+        return $client->get($opt);
+    }
 
 }

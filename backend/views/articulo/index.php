@@ -126,19 +126,11 @@ SwalAsset::register($this);
                                                         'mergeHeader' => true,
                                                         'content'=>function($data) use ($dollar) {
 
-                                                        return  ($data->moneda == 'USD') ? Yii::$app->formatter->asCurrency($data->precio * $dollar) : Yii::$app->formatter->asCurrency($data->precio) ;
+                                                        return  ($data->moneda == 'USD') ? Yii::$app->formatter->asCurrency($data->precio * $dollar) . ' MN'  . '<i>USD ('.$data->precio.')</i>'  : Yii::$app->formatter->asCurrency($data->precio)  . ' MN';
 
                                                         }
                                                     ],
 
-                                                    [
-                                                        'attribute'=>'moneda',
-                                                        'mergeHeader' => true,
-                                                        'content'=>function($data) {
-                                                        return  ($data->moneda == 'USD') ? 'USD (' .  Yii::$app->formatter->asCurrency($data->precio) . ')' :$data->moneda ;
-
-                                                        }
-                                                     ],
                                                      [
                                                          'class' => 'kartik\grid\EditableColumn',
                                                          'attribute'=>'tipo_utilidad_ml',
@@ -411,7 +403,9 @@ SwalAsset::register($this);
 
                                                                     [
                                                                     'attribute'=>'existencia',
-                                                                    'header'=>'PCH',
+                                                                    'class' => 'kartik\grid\EditableColumn',
+                                                                    'refreshGrid' => true,
+                                                                    'header'=>'ST',
                                                                     'mergeHeader' => true,
                                                                     'content'=>function($data){
                                                                     return        $data->existencia;
@@ -425,7 +419,7 @@ SwalAsset::register($this);
                                                                         'header'=>'MLibre',
                                                                         'mergeHeader' => true,
                                                                         'content'=>function($data){
-                                                                        return     $data->existencia_ml;
+                                                                            return     $data->existencia_ml;
                                                                         },
                                                                         'contentOptions' =>['style' => 'border: 1px solid #FFF159'],
                                                                         'headerOptions' => ['style' => 'border: 1px solid #FFF159'],
@@ -467,7 +461,7 @@ SwalAsset::register($this);
                                                 'beforeHeader'=>[
                                                     [
                                                         'columns'=>[
-                                                            ['content'=>'<i class="fa fa-mixcloud"></i> Super Tienda', 'options'=>['colspan'=>4, 'class'=>'text text-center',]],
+                                                            ['content'=>'<i class="fa fa-mixcloud"></i> Super Tienda', 'options'=>['colspan'=>3, 'class'=>'text text-center',]],
                                                             ['content'=>'<i class="fa fa-truck"></i> Me Libre', 'options'=>['colspan'=>4, 'class'=>'text text-left','style' => 'border: 1px solid #FFF159']],
                                                             ['content'=>'<i class="fa fa-sellsy"></i> PrestaShop', 'options'=>['colspan'=>3, 'class'=>'text text-left','style' => 'border: 1px solid #FF95C5']],
                                                             ['content'=>'<i class="fa fa-database"></i> Existencias', 'options'=>['colspan'=>3, 'class'=>'text text-center' ,'style' => 'border: 2px solid']],
