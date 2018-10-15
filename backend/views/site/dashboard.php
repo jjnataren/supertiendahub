@@ -2,11 +2,11 @@
 
 use backend\assets\SwalAsset;
 use common\models\KeyStorageItem;
-use kartik\editable\Editable;
-use kartik\grid\GridView;
 use richardfan\widget\JSRegister;
 use yii\helpers\Html;
 use yii\web\View;
+use yii\widgets\ActiveForm;
+use backend\models\Articulo;
 
 
 $this->title = '  SUPER TIENDA HUB';
@@ -126,10 +126,15 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
              		<small id="bag_count_phc" class="label label-danger"><i class="fa fa-spinner fa-spin"></i></small> SUPER TIENDA - PCH
              	</a>
              </li>
+             <li>
+             	<a data-toggle="tab" href="#tab_new"><i class="fa fa-cart-arrow-down"></i> PCH Importar</a>
+
+             </li>
              <li class="active">
              	<a data-toggle="tab" href="#tab_super_tienda"><i class="fa fa-database"></i> SUPER TIENDA</a>
 
              </li>
+
 
 
                 <li class="pull-left header"><i class="fa fa-mixcloud"></i> SUPER TIENDA HUB</li>
@@ -138,21 +143,14 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 
                 <div id="tab_super_tienda" class="tab-pane active">
 
-
-
 					<?php echo $this->render('_dashboard',
                     ['dollar'=>$dollar,
                     'pchItems'=>$pchItems,
                     'psItems'=>$psItems,
-
-                        'searchModel'=>$searchModel,
-                        'dataProvider'=>$dataProvider,
+                    'searchModel'=>$searchModel,
+                    'dataProvider'=>$dataProvider,
 
                     ]);?>
-
-
-
-
 
                     <p class="text-left">
                         <button id="help1" tabindex="0" type="button" class="btn" data-toggle="popover-ayuda" title="Ayuda"
@@ -163,11 +161,161 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                                 data-content="Actualizar tablero"><i class="fa fa-refresh"></i>
                         </button>
 
-                        <?= Html::a('<i class="fa fa-mixcloud"></i> Administrar hub', ['articulo/index',], ['class' => 'btn btn-default btn-flat btn-sm']) ?>
-                    	<?= Html::a('<i class="fa fa-sellsy"></i> Administrar PrestaShop', ['articulo-prestashop-to-hub/index',], ['class' => 'btn btn-flat btn-sm bg-purple']) ?>
 
                     </p>
                 </div><!-- /.tab-pane -->
+
+
+				 <div id="tab_new" class="tab-pane">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel">
+                                <div class="panel-body">
+                                    <div id="newItem">
+
+
+                                    	<table class="table table-hover table-bordered" id="new_product"   style="width:100%">
+					<thead>
+						<tr>
+
+								<th>sku</th>
+								<th>Descripción</th>
+								<th><i class="fa fa-dollar"></i> Precio</th>
+								<th>Moneda</th>
+								<th><i class="fa fa-cubes"></i> Existencia</th>
+								<th />
+						</tr>
+					</thead>
+					<tbody>
+
+						<?php if($pchItemsAll): ?>
+						<?php    foreach($pchItemsAll as $item): ?>
+
+						<?php if (  !array_key_exists($item->sku, $hubItems)  ) :?>
+
+
+    						<tr >
+
+    						     <td><?= $item->sku; ?> </td>
+    						     <td><?= $item->descripcion; ?></td>
+								<td><?= $item->precio;?></td>
+								<td><?= $item->moneda;?></td>
+    						     <!-- TODO: Asignar el valod de moneda en variable global -->
+    						      <td> <?=$item->inventario[0]->existencia;?></td>
+    						     <td>
+
+    							<?php
+    							$modelItem = new Articulo();
+    							$form = ActiveForm::begin(['action' => ['/articulo-mayorista/sync-phc-resume-save'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$item->sku ]]); ?>
+
+
+    						     	 <?php echo $form->field($modelItem, 'sku')->hiddenInput(['value'=>$item->sku])->label(false); ?>
+    						     	 <?php echo $form->field($modelItem, 'precio')->hiddenInput(['value'=>$item->precio])->label(false); ?>
+									 <?php echo $form->field($modelItem, 'existencia')->hiddenInput(['value'=>$item->inventario[0]->existencia])->label(false); ?>
+									 <?php echo $form->field($modelItem, 'descripcion')->hiddenInput(['value'=>$item->descripcion])->label(false); ?>
+    						     	 <?php echo $form->field($modelItem, 'serie')->hiddenInput(['value'=>$item->serie])->label(false); ?>
+									 <?php echo $form->field($modelItem, 'peso')->hiddenInput(['value'=>$item->peso])->label(false); ?>
+									  <?php echo $form->field($modelItem, 'moneda')->hiddenInput(['value'=>$item->moneda])->label(false); ?>
+									  <?php echo $form->field($modelItem, 'seccion')->hiddenInput(['value'=>$item->seccion])->label(false); ?>
+									  <?php echo $form->field($modelItem, 'alto')->hiddenInput(['value'=>$item->alto])->label(false); ?>
+									  <?php echo $form->field($modelItem, 'largo')->hiddenInput(['value'=>$item->largo])->label(false); ?>
+									  <?php echo $form->field($modelItem, 'ancho')->hiddenInput(['value'=>$item->ancho])->label(false); ?>
+										<?php echo $form->field($modelItem, 'marca')->hiddenInput(['value'=>$item->marca])->label(false); ?>
+									 <?php echo $form->field($modelItem, 'linea')->hiddenInput(['value'=>$item->linea])->label(false); ?>
+
+    						      <?=  Html::submitButton(('<i class="fa fa-cloud-download"></i> Importar' ),  ['class' =>'btn btn-primary','id'=>'new_item_button'.$item->sku ,'onclick'=>'$("#phcform_'.$item->sku.'").submit(function(e) {
+
+                                            var form = $(this);
+                                           var formData = form.serialize();
+
+                                           $.ajax({
+                                               url: form.attr("action"),
+                                               type: "POST",//form.attr("post"),
+                                               data: formData,
+                                               beforeSend: function () {
+                                               	form.find(":submit")
+                                                       .html(\'Aplicando <i class="fa fa-spinner fa-spin"></i>\')
+                                                       .prop("disabled", true);
+                                               },
+                                               success: function (data) {
+
+                                             	  var table = $("#new_product").DataTable();
+                         	                          table
+                         	                             .row( form.parents("tr") )
+                         	                             .remove()
+                         	                             .draw();
+
+                                               },
+                                               error: function () {
+                                             	  console.log(msg);
+                                                   swal({
+                                                       title: "Servicio no disponible por el momento.",
+                                                       text: "Por favor consulte a su proveedor",
+                                                       type: "error"
+                                                   });
+                                               },
+                                               complete: function () {
+                                               	let timerInterval
+                                               	swal({
+                                               	  title: "Correcto",
+                                               	  html: \'<h1><i class="fa fa-thumbs-up"></i></h1>\',
+                                               	  timer: 1500,
+                                               	  onClose: () => {
+                                               	    clearInterval(timerInterval)
+                                               	  }
+                                               	}).then((result) => {
+                                               	  if (
+                                               	    // Read more about handling dismissals
+                                               	    result.dismiss === swal.DismissReason.timer
+                                               	  ) {
+                                               	    console.log("I was closed by the timer")
+                                               	  }
+                                               	})
+                                               }
+                                           });
+
+                                        e.preventDefault();
+
+                                        });' ])  ?>
+
+    						    <?php ActiveForm::end(); ?>
+
+
+
+    						       </td>
+
+
+
+    						</tr>
+
+    					<?php endif;?>
+
+						<?php endforeach;?>
+
+					 <?php else:?>
+
+
+					 	<tr class="info" >
+
+    						     <td colspan="6"><h4>Sin cambios.</h4></td>
+
+    					</tr>
+
+					 <?php endif;?>
+					</tbody>
+				</table>
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
 
                 <div id="tab_sync" class="tab-pane">
 
@@ -815,6 +963,19 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                 'infoFiltered': '(filtered from _MAX_ total records)'
             }
         });
+
+        $('#new_product').DataTable({
+            'scrollX': false,
+            'language': {
+                'lengthMenu': 'Display _MENU_ records per page',
+                'zeroRecords': 'Nothing found - sorry',
+                'info': 'Showing page _PAGE_ of _PAGES_',
+                'infoEmpty': 'No records available',
+                'infoFiltered': '(filtered from _MAX_ total records)'
+            }
+        });
+
+
 
 
 

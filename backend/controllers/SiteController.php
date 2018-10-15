@@ -225,11 +225,15 @@ class SiteController extends \yii\web\Controller
             }
 
 
+            $hubItems = [];
+
             foreach ($models as $mod){
 
 
                 if (isset  ($pchItemsTmp[$mod->sku]) )
                     $pchItems [$mod->sku] =  $pchItemsTmp[$mod->sku];
+
+                $hubItems[$mod->sku] = 1;
 
             }
 
@@ -244,6 +248,8 @@ class SiteController extends \yii\web\Controller
             'dollar'=>$dollar,
             'pchItems'=>$pchItems,
             'psItems'=>$psItems,
+            'hubItems'=>$hubItems,
+            'pchItemsAll'=>$pchItemsTmp
 
         ]);
     }
