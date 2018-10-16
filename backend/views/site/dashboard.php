@@ -98,8 +98,8 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         <!-- small box -->
         <div class="small-box bg-purple">
             <div class="inner">
-                <h3><i class="fa fa-sellsy"></i> 7 </h3>
-                <p>Cambios en PrestaShop</p>
+                <h3><i class="fa fa-sellsy"></i><?= count($psItems) ?></h3>
+                <p>Articulos en PrestaShop</p>
             </div>
             <div class="icon">
                 <i class="ion ion-person-add"></i>
@@ -157,9 +157,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                                 data-content="Articulos guardados e base de datos"><i class="fa fa-question-circle"></i>
                         </button>
 
-                        <button id="dashboard_refresh" tabindex="0" type="button" class="btn btn-primary" data-toggle="popover" title="Actualizar tablero"
-                                data-content="Actualizar tablero"><i class="fa fa-refresh"></i>
-                        </button>
+
 
 
                     </p>
@@ -190,7 +188,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 					<tbody>
 
 						<?php if($pchItemsAll): ?>
-						<?php    foreach($pchItemsAll as $item): ?>
+						<?php foreach($pchItemsAll as $item): ?>
 
 						<?php if (  !array_key_exists($item->sku, $hubItems)  ) :?>
 
@@ -944,6 +942,8 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         });
     }
 
+
+
     $(document).ready(function () {
 
     	//$('#dashboard_refreshss').trigger('click');
@@ -951,6 +951,8 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         $('#ml_syncrequest').trigger('click');
        // $('#ps_syncrequest').trigger('click');
         //$('#request_paridad').trigger('click');
+
+
 
 
         $('#ps_data_grid').DataTable({
@@ -974,8 +976,6 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                 'infoFiltered': '(filtered from _MAX_ total records)'
             }
         });
-
-
 
 
 

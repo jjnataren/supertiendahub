@@ -8,9 +8,12 @@ use Yii;
 use backend\models\search\ArticuloSearch;
 use backend\models\search\ArticuloMeliSearch;
 use backend\models\search\ArticuloPrestashopSearch;
+use backend\models\util\Util;
 use backend\models\Articulo;
+use backend\models\client\PchClient;
 use backend\models\client\PrestaShopWebserviceException;
 use backend\models\client\PrestashopClient;
+use backend\models\constants\Constantes;
 use yii\web\BadRequestHttpException;
 use yii\base\Model;
 use backend\models\ArticuloComp;
@@ -159,26 +162,10 @@ class SiteController extends \yii\web\Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 
-        $wsdl =
-        \Yii::$app->keyStorage->get('config.phc.webservice.endpoint', 'http://localhost:8089/servidor.php?wsdl');
-
-        $cliente =
-        \Yii::$app->keyStorage->get('config.phc.webservice.cliente', '50527');
-
-        $llave =
-        \Yii::$app->keyStorage->get('config.phc.webservice.llave', '487478');
-
-        $params = "<cliente>$cliente</cliente><llave>$llave</llave>";
-
-        $client = new \SoapClient($wsdl);
-        //$valores = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
-
-        $dollar =  (float)$client->ObtenerParidad(new \SoapVar($params, XSD_ANYXML))->datos;
-        //$dollar =  (float)$client->ObtenerParidad(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+        $dollar =  PchClient::ObtenerParidad(null,null);
 
 
-        $soap_response = $client->ObtenerListaArticulos( new \SoapVar($params, XSD_ANYXML))->datos;
-        //$soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+
 
 
         $pchItems = [];
@@ -211,19 +198,7 @@ class SiteController extends \yii\web\Controller
 
             $models = $dataProvider->getModels();
 
-            $pchItemsTmp = [];
-
-            foreach ($soap_response as $articulo){
-
-
-                //  $model =  new Articulo();
-                //  $model->attributes = get_object_vars($articulo);
-                //   $model->existencia = $articulo->inventario[0]->existencia;
-
-                $pchItemsTmp[$articulo->sku] = $articulo;
-
-            }
-
+            $pchItemsTmp = PchClient::ObtenerListaArticulos(null,null);
 
             $hubItems = [];
 
@@ -307,6 +282,121 @@ class SiteController extends \yii\web\Controller
         }
 
         return $this->render('settings', ['model' => $model]);
+    }
+
+
+    public function actionTest(){
+
+        $numeroCambios = 0;
+
+
+        $pchItems = PchClient::ObtenerListaArticulos(null,null);
+        $dollar = PchClient::ObtenerParidad(null,null);
+
+        $psClient = $this->getPsClient();
+
+        $xml = $psClient->get(['resource' => 'products',
+            'display' => '[id,name,reference,price,quantity]'
+        ]);
+
+        $items = json_decode(json_encode((array)$xml)
+            , TRUE)
+            ['products']['product'];
+
+            $quantities = $this->getQuantity();
+
+            $psItems = [];
+
+            $toChangeItems = [];
+
+
+
+            $hubItemsDb = Articulo::find()->all();
+
+            $hubItems = [];
+            foreach ($hubItemsDb as $hubItem)
+                $hubItems[$hubItem->sku] = $hubItem;
+
+                foreach ($items as $item) {
+
+                    $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
+                    $psItems[$item['reference']] = $item;
+                    $sku = $item['reference'];
+                    $priceChange = false;
+                    $quantityChange = false;
+
+
+                    if(isset($pchItems[$sku]) && isset($hubItems[$sku])){
+
+                        $precioPs = round(Util::getPSFinalprice($pchItems[$sku]->precio, $hubItems[$sku]->utilidad_ps, $dollar, ($pchItems[$sku]->moneda == 'USD')?Constantes::CURRENCY_US:Constantes::CURRENCY_MX  ,$hubItems[$sku]->tipo_utilidad_ps),2);
+
+                        if($precioPs !==  round($item['price'],2) ){
+
+                            $estatus = $precioPs > round($item['price'],2);
+
+                            $priceChange = true;
+
+                            $hubItems[$sku]->precio = $pchItems[$sku]->precio;
+
+
+                        }
+
+                        if($pchItems[$sku]->inventario[0]->existencia*1 !==$item['quantity']*1 ) {
+
+                            $hubItems[$sku]->existencia = $pchItems[$sku]->inventario[0]->existencia*1;
+                            $hubItems[$sku]->existencia_ps = $pchItems[$sku]->inventario[0]->existencia*1;
+
+                            $quantityChange = true;
+
+                        }
+
+                        if ($priceChange || $quantityChange){
+
+                            $toChangeItems[$sku] = ['psItem'=> $item,'quantityChange'=>$quantityChange,'priceChange'=>$priceChange, 'hubItem'=>$hubItems[$sku]];
+
+                        }
+
+
+                    }
+
+                }
+
+
+                foreach ($toChangeItems as $sku=>$changes){
+
+
+                    $articuloComp = new ArticuloComp();
+                    $articuloComp->idPs = $changes['psItem']['id'];
+                    $articuloComp->precioPsOriginal = $changes['psItem']['price'];
+                    $articuloComp->precioPs = round(Util::getPSFinalprice( $changes['hubItem']->precio, $changes['hubItem']->utilidad_ps, $dollar, ($changes['hubItem']->moneda == 'USD')?Constantes::CURRENCY_US:Constantes::CURRENCY_MX  ,$changes['hubItem']->tipo_utilidad_ps),2);
+                    $articuloComp->sku = $sku;
+                    $articuloComp->existencia_ps = $changes['hubItem']->existencia;;
+
+                    if($changes['priceChange']){
+
+
+                        $this->savePsPrice($articuloComp);
+                        $changes['hubItem']->save();
+
+
+                    }
+                    if($changes['quantityChange']){
+
+
+                        $this->updatePsQuantity($articuloComp);
+                        $changes['hubItem']->save();
+
+
+                    }
+
+
+
+                }
+
+
+
+                return json_encode(['toChangeItems'=>$toChangeItems]);
+
     }
 
 /**
@@ -417,7 +507,7 @@ class SiteController extends \yii\web\Controller
         $xml->product->id_shop_default = 1;
         $xml->product->reference = $articuloComp->sku;
         $xml->product->price = $articuloComp->precioPs;
-        $xml->product->active = 0;
+        $xml->product->active = 1;
 
         $xml->product->link_rewrite->language[0] = str_replace(';', ' ', $articuloComp->descripcion);
         $xml->product->link_rewrite->language[1] = str_replace(';', ' ', $articuloComp->descripcion);
