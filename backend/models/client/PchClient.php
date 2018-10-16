@@ -29,8 +29,8 @@ class PchClient
 
         // $dollar = (float)$client->ObtenerParidad(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
 
-        //$soap_response = $client->ObtenerListaArticulos(new \SoapVar($params, XSD_ANYXML))->datos;
-         $soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
+        $soap_response = $client->ObtenerListaArticulos(new \SoapVar($params, XSD_ANYXML))->datos;
+         //$soap_response = $client->ObtenerListaArticulos(['cliente'=>'50527', 'llave'=>'487478' ])->datos;
 
         }catch(\Exception  $e){
 
