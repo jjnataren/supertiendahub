@@ -54,13 +54,11 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
             <div class="inner">
                 <h3>
                    <i class="fa fa-cart-arrow-down"></i>
-                                       <label id="label_phc"></label>
+                                       <label id="label_phc"><?= count($pchItemsAll) ?></label>
                                        <label id="label_phc_estatus"></label>
-                                       <i id="phc_icon" class="fa fa-spinner fa-spin"></i>
                 </h3>
                 <p>
-                    Cambios en PCH
-
+                    Nuevos Productos en PCH
                 </p>
             </div>
             <div class="icon">

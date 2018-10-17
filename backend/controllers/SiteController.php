@@ -422,11 +422,15 @@ class SiteController extends \yii\web\Controller
 
          //   $json_items['sku'] =  $item->sku ['sku'=>$item->sku,'description'=>$item->descripcion, 'price'=>$item->precio,'currency'=>$item->moneda,'avaliable'=>$item->inventario[0]->existencia,'action'=>''];
 
+
+            if(!isset($hubItems[$item->sku])){
+
             $json_items =  [$item->sku,$item->descripcion, $item->precio,$item->moneda,$item->inventario[0]->existencia,''];
 
 
             $data [] = $json_items;
 
+            }
         }
 
 

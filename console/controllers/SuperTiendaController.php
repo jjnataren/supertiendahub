@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use yii\console\Controller;
+use yii\console\widgets\Table;
 use common\commands\AddToTimelineCommand;
 use Yii;
 use common\commands\SendEmailCommand;
@@ -48,6 +49,129 @@ class SuperTiendaController extends Controller {
         if ($current_hour%6) {
             // every six hours
         }
+
+
+    }
+
+
+    public function actionSyncPrestaShop() {
+        // every hour
+       /* echo Table::widget([
+            'headers' => ['Project', 'Status', 'Participant'],
+            'rows' => [
+                ['Yii', 'OK', '@samdark'],
+                ['Yii', 'OK', '@cebe'],
+            ],
+        ]);*/
+
+
+
+        $pchItems = PchClient::ObtenerListaArticulos(null,null);
+        $dollar = PchClient::ObtenerParidad(null,null);
+
+        $psClient = $this->getPsClient();
+
+        $xml = $psClient->get(['resource' => 'products',
+            'display' => '[id,name,reference,price,quantity]'
+        ]);
+
+        $items = json_decode(json_encode((array)$xml)
+            , TRUE)
+            ['products']['product'];
+
+            $quantities = $this->getQuantity();
+
+            $psItems = [];
+
+            $toChangeItems = [];
+
+
+
+            $hubItemsDb = Articulo::find()->all();
+
+            $hubItems = [];
+            foreach ($hubItemsDb as $hubItem)
+                $hubItems[$hubItem->sku] = $hubItem;
+
+                foreach ($items as $item) {
+
+                    $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
+                    $psItems[$item['reference']] = $item;
+                    $sku = $item['reference'];
+                    $priceChange = false;
+                    $quantityChange = false;
+
+
+                    if(isset($pchItems[$sku]) && isset($hubItems[$sku])){
+
+                        $precioPs = round(Util::getPSFinalprice($pchItems[$sku]->precio, $hubItems[$sku]->utilidad_ps, $dollar, ($pchItems[$sku]->moneda == 'USD')?Constantes::CURRENCY_US:Constantes::CURRENCY_MX  ,$hubItems[$sku]->tipo_utilidad_ps),2);
+
+                        if($precioPs !==  round($item['price'],2) ){
+
+                            $estatus = $precioPs > round($item['price'],2);
+
+                            $priceChange = true;
+
+                            $hubItems[$sku]->precio = $pchItems[$sku]->precio;
+
+
+                        }
+
+                        if($pchItems[$sku]->inventario[0]->existencia*1 !==$item['quantity']*1 ) {
+
+                            $hubItems[$sku]->existencia = $pchItems[$sku]->inventario[0]->existencia*1;
+                            $hubItems[$sku]->existencia_ps = $pchItems[$sku]->inventario[0]->existencia*1;
+
+                            $quantityChange = true;
+
+                        }
+
+                        if ($priceChange || $quantityChange){
+
+                            $toChangeItems[$sku] = ['psItem'=> $item,'quantityChange'=>$quantityChange,'priceChange'=>$priceChange, 'hubItem'=>$hubItems[$sku]];
+
+                        }
+
+
+                    }
+
+                }
+
+
+                foreach ($toChangeItems as $sku=>$changes){
+
+
+                    $articuloComp = new ArticuloComp();
+                    $articuloComp->idPs = $changes['psItem']['id'];
+                    $articuloComp->precioPsOriginal = $changes['psItem']['price'];
+                    $articuloComp->precioPs = round(Util::getPSFinalprice( $changes['hubItem']->precio, $changes['hubItem']->utilidad_ps, $dollar, ($changes['hubItem']->moneda == 'USD')?Constantes::CURRENCY_US:Constantes::CURRENCY_MX  ,$changes['hubItem']->tipo_utilidad_ps),2);
+                    $articuloComp->sku = $sku;
+                    $articuloComp->existencia_ps = $changes['hubItem']->existencia;;
+
+                    if($changes['priceChange']){
+
+
+                        $this->savePsPrice($articuloComp);
+                        $changes['hubItem']->save();
+
+
+                    }
+                    if($changes['quantityChange']){
+
+
+                        $this->updatePsQuantity($articuloComp);
+                        $changes['hubItem']->save();
+
+
+                    }
+
+
+
+                }
+
+
+                echo  json_encode(['toChangeItems'=>$toChangeItems]);
+
 
 
     }
