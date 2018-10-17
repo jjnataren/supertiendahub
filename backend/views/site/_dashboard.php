@@ -12,6 +12,7 @@ use backend\models\ArticuloComp;
 ?>
  <?php
                         echo GridView::widget([
+                            'id'=>'st_dashboard',
                             'dataProvider' => $dataProvider,
                             'filterModel' => $searchModel,
 
@@ -460,7 +461,7 @@ use backend\models\ArticuloComp;
                             ],
                             'toolbar' => [
                                 ['content' =>
-                                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['site/dashboard'], ['class' => 'btn btn-default', 'title' => 'Reiniciar grid'])
+                                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['site/dashboard'], ['class' => 'btn btn-default', 'id'=>'reset_st_dashboard','title' => 'Reiniciar grid'])
                                 ],
                                 '{export}',
                                 '{toggleData}'

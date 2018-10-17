@@ -22,6 +22,13 @@ SwalAsset::register($this);
 $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 
 
+$this->registerJs('
+    setInterval(function(){
+
+     $("#reset_st_dashboard").trigger("click");
+    }, 120000);', \yii\web\VIEW::POS_HEAD);
+
+
 ?>
 <!-- Small boxes (Stat box) -->
 <div class="row">

@@ -215,6 +215,9 @@ class SiteController extends \yii\web\Controller
             }
 
 
+            $this->syncPchSt($pchItems, $dollar,$items,$quantities);
+
+
         return $this->render('dashboard', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -287,15 +290,15 @@ class SiteController extends \yii\web\Controller
     }
 
 
-    public function actionTest(){
+    private function syncPchSt($pchItems,$dollar,$items,$quantities){
 
         $numeroCambios = 0;
 
 
-        $pchItems = PchClient::ObtenerListaArticulos(null,null);
-        $dollar = PchClient::ObtenerParidad(null,null);
+       // $pchItems = PchClient::ObtenerListaArticulos(null,null);
+       // $dollar = PchClient::ObtenerParidad(null,null);
 
-        $psClient = $this->getPsClient();
+       /* $psClient = $this->getPsClient();
 
         $xml = $psClient->get(['resource' => 'products',
             'display' => '[id,name,reference,price,quantity]'
@@ -305,7 +308,7 @@ class SiteController extends \yii\web\Controller
             , TRUE)
             ['products']['product'];
 
-            $quantities = $this->getQuantity();
+            $quantities = $this->getQuantity();*/
 
             $psItems = [];
 
@@ -396,8 +399,9 @@ class SiteController extends \yii\web\Controller
                 }
 
 
+                Yii::debug('Cambios realizados:' . json_encode(['toChangeItems'=>$toChangeItems]));
 
-                return json_encode(['toChangeItems'=>$toChangeItems]);
+               // return json_encode(['toChangeItems'=>$toChangeItems]);
 
     }
 
