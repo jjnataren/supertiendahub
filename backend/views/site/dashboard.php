@@ -3,10 +3,7 @@
 use backend\assets\SwalAsset;
 use common\models\KeyStorageItem;
 use richardfan\widget\JSRegister;
-use yii\helpers\Html;
 use yii\web\View;
-use yii\widgets\ActiveForm;
-use backend\models\Articulo;
 
 
 $this->title = '  SUPER TIENDA HUB';
@@ -121,11 +118,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs pull-right">
 
-             <li>
-             	<a data-toggle="tab" href="#tab_sync">
-             		<small id="bag_count_phc" class="label label-danger"><i class="fa fa-spinner fa-spin"></i></small> SUPER TIENDA - PCH
-             	</a>
-             </li>
+
              <li>
              	<a data-toggle="tab" href="#tab_new"><i class="fa fa-cart-arrow-down"></i> PCH Importar</a>
 
@@ -172,141 +165,36 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                                 <div class="panel-body">
                                     <div id="newItem">
 
+									<table id="new_pch_items" class="display table table-bordered" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                               <th>sku</th>
+                								<th>Descripción</th>
+                								<th><i class="fa fa-dollar"></i> Precio</th>
+                								<th>Moneda</th>
+                								<th><i class="fa fa-cubes"></i> Existencia</th>
+                								<th />
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                               <th>sku</th>
+                								<th>Descripción</th>
+                								<th><i class="fa fa-dollar"></i> Precio</th>
+                								<th>Moneda</th>
+                								<th><i class="fa fa-cubes"></i> Existencia</th>
+                                            	<th />
+                                            </tr>
+                                        </tfoot>
 
-                                    	<table class="table table-hover table-bordered" id="new_product"   style="width:100%">
-					<thead>
-						<tr>
-
-								<th>sku</th>
-								<th>Descripción</th>
-								<th><i class="fa fa-dollar"></i> Precio</th>
-								<th>Moneda</th>
-								<th><i class="fa fa-cubes"></i> Existencia</th>
-								<th />
-						</tr>
-					</thead>
-					<tbody>
-
-						<?php if($pchItemsAll): ?>
-						<?php foreach($pchItemsAll as $item): ?>
-
-						<?php if (  !array_key_exists($item->sku, $hubItems)  ) :?>
-
-
-    						<tr >
-
-    						     <td><?= $item->sku; ?> </td>
-    						     <td><?= $item->descripcion; ?></td>
-								<td><?= $item->precio;?></td>
-								<td><?= $item->moneda;?></td>
-    						     <!-- TODO: Asignar el valod de moneda en variable global -->
-    						      <td> <?=$item->inventario[0]->existencia;?></td>
-    						     <td>
-
-    							<?php
-    							$modelItem = new Articulo();
-    							$form = ActiveForm::begin(['action' => ['/articulo-mayorista/sync-phc-resume-save'], 'method'=>'post', 'options' => ['id'=>'phcform_'.$item->sku ]]); ?>
-
-
-    						     	 <?php echo $form->field($modelItem, 'sku')->hiddenInput(['value'=>$item->sku])->label(false); ?>
-    						     	 <?php echo $form->field($modelItem, 'precio')->hiddenInput(['value'=>$item->precio])->label(false); ?>
-									 <?php echo $form->field($modelItem, 'existencia')->hiddenInput(['value'=>$item->inventario[0]->existencia])->label(false); ?>
-									 <?php echo $form->field($modelItem, 'descripcion')->hiddenInput(['value'=>$item->descripcion])->label(false); ?>
-    						     	 <?php echo $form->field($modelItem, 'serie')->hiddenInput(['value'=>$item->serie])->label(false); ?>
-									 <?php echo $form->field($modelItem, 'peso')->hiddenInput(['value'=>$item->peso])->label(false); ?>
-									  <?php echo $form->field($modelItem, 'moneda')->hiddenInput(['value'=>$item->moneda])->label(false); ?>
-									  <?php echo $form->field($modelItem, 'seccion')->hiddenInput(['value'=>$item->seccion])->label(false); ?>
-									  <?php echo $form->field($modelItem, 'alto')->hiddenInput(['value'=>$item->alto])->label(false); ?>
-									  <?php echo $form->field($modelItem, 'largo')->hiddenInput(['value'=>$item->largo])->label(false); ?>
-									  <?php echo $form->field($modelItem, 'ancho')->hiddenInput(['value'=>$item->ancho])->label(false); ?>
-										<?php echo $form->field($modelItem, 'marca')->hiddenInput(['value'=>$item->marca])->label(false); ?>
-									 <?php echo $form->field($modelItem, 'linea')->hiddenInput(['value'=>$item->linea])->label(false); ?>
-
-    						      <?=  Html::submitButton(('<i class="fa fa-cloud-download"></i> Importar' ),  ['class' =>'btn btn-primary','id'=>'new_item_button'.$item->sku ,'onclick'=>'$("#phcform_'.$item->sku.'").submit(function(e) {
-
-                                            var form = $(this);
-                                           var formData = form.serialize();
-
-                                           $.ajax({
-                                               url: form.attr("action"),
-                                               type: "POST",//form.attr("post"),
-                                               data: formData,
-                                               beforeSend: function () {
-                                               	form.find(":submit")
-                                                       .html(\'Aplicando <i class="fa fa-spinner fa-spin"></i>\')
-                                                       .prop("disabled", true);
-                                               },
-                                               success: function (data) {
-
-                                             	  var table = $("#new_product").DataTable();
-                         	                          table
-                         	                             .row( form.parents("tr") )
-                         	                             .remove()
-                         	                             .draw();
-
-                                               },
-                                               error: function () {
-                                             	  console.log(msg);
-                                                   swal({
-                                                       title: "Servicio no disponible por el momento.",
-                                                       text: "Por favor consulte a su proveedor",
-                                                       type: "error"
-                                                   });
-                                               },
-                                               complete: function () {
-                                               	let timerInterval
-                                               	swal({
-                                               	  title: "Correcto",
-                                               	  html: \'<h1><i class="fa fa-thumbs-up"></i></h1>\',
-                                               	  timer: 1500,
-                                               	  onClose: () => {
-                                               	    clearInterval(timerInterval)
-                                               	  }
-                                               	}).then((result) => {
-                                               	  if (
-                                               	    // Read more about handling dismissals
-                                               	    result.dismiss === swal.DismissReason.timer
-                                               	  ) {
-                                               	    console.log("I was closed by the timer")
-                                               	  }
-                                               	})
-                                               }
-                                           });
-
-                                        e.preventDefault();
-
-                                        });' ])  ?>
-
-    						    <?php ActiveForm::end(); ?>
-
-
-
-    						       </td>
-
-
-
-    						</tr>
-
-    					<?php endif;?>
-
-						<?php endforeach;?>
-
-					 <?php else:?>
-
-
-					 	<tr class="info" >
-
-    						     <td colspan="6"><h4>Sin cambios.</h4></td>
-
-    					</tr>
-
-					 <?php endif;?>
-					</tbody>
-				</table>
-
+                                    </table>
 
                                     </div>
                                 </div>
+
+								<div class="panel-footer">
+							     	<a class="btn btn-primary" id="get_pch_items"><i class="fa fa-refresh"></i> Actualizar </a>
+								</div>
 
                             </div>
                         </div>
@@ -315,29 +203,7 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
                 </div>
 
 
-                <div id="tab_sync" class="tab-pane">
 
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="panel">
-                                <div class="panel-body">
-                                    <div id="phcMayoristaSync">
-
-                                        <img src="/img/loading.gif"/>
-                                        <p class="text text-info">Consultando servicio PCH Mayorista ....</p>
-
-                                    </div>
-                                </div>
-                                <div class="panel-footer">
-
-                                    <a href="/articulo-mayorista/index" class="btn btn-primary"
-                                       id="syncrequest">Actualizar </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
 
             </div><!-- /.tab-content -->
         </div><!-- nav-tabs-custom -->
@@ -710,6 +576,15 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
 <script>
 
 
+
+
+$('#syncrequest').click(function () {
+
+    doAjaxPCHItems("/site/get-pch-items");
+
+});
+
+
     $('#syncrequest').click(function () {
 
         doAjaxPHC("/articulo/sync-phc-resume?dashboard=true");
@@ -947,8 +822,9 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
     $(document).ready(function () {
 
     	//$('#dashboard_refreshss').trigger('click');
-        $('#syncrequest').trigger('click');
-        $('#ml_syncrequest').trigger('click');
+       // $('#syncrequest').trigger('click');
+       // $('#ml_syncrequest').trigger('click');
+        $('#get_pch_items').trigger('click');
        // $('#ps_syncrequest').trigger('click');
         //$('#request_paridad').trigger('click');
 
@@ -978,7 +854,75 @@ $this->registerJsFile('@web/js/dashboard.js', ['depends' => [\yii\web\JqueryAsse
         });
 
 
+        var table =  $('#new_pch_items').DataTable( {
+            "ajax": {
+                "url": "/site/get-pch-items"
 
+
+            },
+            "columnDefs": [ {
+                "targets": -1,
+                "data": null,
+                "defaultContent": "<button class='btn btn-primary'><i class='fa fa-cloud-download'></i>Importar</button>"
+            } ]
+
+        } );
+
+
+        $('#new_pch_items tbody').on( 'click', 'button', function () {
+            var button = $(this);
+            var data = table.row( $(this).parents('tr') ).data();
+
+            $.ajax({
+                url: '/articulo-mayorista/sync-phc-resume-save',
+                method: 'POST',
+                data: {'Articulo[sku]':data[0],'Articulo[descripcion]':data[1],'Articulo[precio]':data[2],'Articulo[moneda]':data[3],'Articulo[existencia]':data[4],'Articulo[existencia_ps]':data[4]},
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+
+                    $(this)
+                        .html('Importar Cantidad')
+                        .prop('disabled', false);
+
+                    swal({
+                        title: 'Ocurrió un error.',
+                        text: 'Por favor consulte a su proveedor',
+                        type: 'error'
+                    });
+                },
+                success: function (data) {
+                    console.log(data);
+                    table.row(button.parents("tr")).remove().draw();
+
+
+                    let timerInterval
+                	swal({
+                	  title: "Correcto",
+                	  html: '<h1><i class="fa fa-thumbs-up"></i></h1>',
+                	  timer: 1500,
+                	  onClose: () => {
+                	    clearInterval(timerInterval)
+                	  }
+                	}).then((result) => {
+                	  if (
+                	    // Read more about handling dismissals
+                	    result.dismiss === swal.DismissReason.timer
+                	  ) {
+                	    console.log("I was closed by the timer")
+                	  }
+                	});
+
+
+
+
+
+                }
+            });
+
+
+        } );
 
 
     });

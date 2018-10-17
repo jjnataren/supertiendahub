@@ -493,12 +493,55 @@ class ArticuloPrestashopController extends Controller
                 , TRUE)
             ['products']['product'];
 
+
+
+            $quantities = $this->getQuantity();
+
+            $psItems = [];
+
+            foreach ($items as $item) {
+
+
+                $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
+                $psItems[$item['reference']] = $item;
+
+            }
+
+
+
         } catch (PrestaShopWebserviceException $e) {
             throw $e;
         }
 
-        return $this->renderPartial('_get_items_view', ['items' => $items]);
+        return $this->renderPartial('_get_items_view', ['items' => $psItems]);
     }
+
+
+    /**
+     * @param $id_product
+     * @return array
+     * @throws \backend\models\client\PrestaShopWebserviceException
+     */
+    private function getQuantity()
+    {
+        $client = $this->getClient();
+
+        $xml = $client->get(['resource' => 'stock_availables',
+            'display' => '[quantity,id_product]'
+        ]);
+
+        $items = json_decode(json_encode((array)$xml), TRUE)
+        ['stock_availables']['stock_available'];
+
+        $responses = array();
+
+        foreach ($items as $item) {
+            $responses[(string)$item['id_product']] = $item['quantity'];
+        }
+
+        return $responses;
+    }
+
 
     /**
      * Lists all ArticuloPrestashop models.

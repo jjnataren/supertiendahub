@@ -210,6 +210,8 @@ class SiteController extends \yii\web\Controller
 
                 $hubItems[$mod->sku] = 1;
 
+                unset($pchItemsTmp[$mod->sku]);
+
             }
 
 
@@ -398,6 +400,50 @@ class SiteController extends \yii\web\Controller
                 return json_encode(['toChangeItems'=>$toChangeItems]);
 
     }
+
+
+
+    public function actionGetPchItems(){
+
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $hubItems = Articulo::find()->select(['sku'])->indexBy('sku')->column();
+
+        $pchItems = PchClient::ObtenerListaArticulos();
+
+        $json_items = [];
+
+
+        $data = [];
+
+        foreach ($pchItems as $item){
+
+
+         //   $json_items['sku'] =  $item->sku ['sku'=>$item->sku,'description'=>$item->descripcion, 'price'=>$item->precio,'currency'=>$item->moneda,'avaliable'=>$item->inventario[0]->existencia,'action'=>''];
+
+            $json_items =  [$item->sku,$item->descripcion, $item->precio,$item->moneda,$item->inventario[0]->existencia,''];
+
+
+            $data [] = $json_items;
+
+        }
+
+
+        return  ['data'=>$data];
+
+     /*   { "data": "sku" },
+        { "data": "description" },
+        { "data": "price" },
+        { "data": "currency" },
+        { "data": "avaliable" },
+        { "data": "action" }
+*/
+
+
+    }
+
+
 
 /**
  * Gets PrestashopClient by own
