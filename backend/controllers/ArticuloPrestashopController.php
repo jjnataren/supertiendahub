@@ -502,9 +502,11 @@ class ArticuloPrestashopController extends Controller
             foreach ($items as $item) {
 
 
-                $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
-                $psItems[$item['reference']] = $item;
+                if (!is_array($item['reference']) ){
 
+                    $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
+                    $psItems[$item['reference']] = $item;
+                }
             }
 
 

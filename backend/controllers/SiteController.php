@@ -189,9 +189,10 @@ class SiteController extends \yii\web\Controller
             foreach ($items as $item) {
 
 
-                $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
-                $psItems[$item['reference']] = $item;
-
+                if (isset($item['reference']) && $item['reference'] !== null  && !is_array($item['reference']) && trim($item['reference']) !== ''  ){
+                    $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
+                    $psItems[$item['reference']] = $item;
+                }
             }
 
 
@@ -324,6 +325,8 @@ class SiteController extends \yii\web\Controller
 
                 foreach ($items as $item) {
 
+                    if (!is_array($item['reference'])){
+
                     $item['quantity'] = isset($quantities[$item['id']])?$quantities[$item['id']]:0;
                     $psItems[$item['reference']] = $item;
                     $sku = $item['reference'];
@@ -355,15 +358,30 @@ class SiteController extends \yii\web\Controller
 
                         }
 
-                        if ($priceChange || $quantityChange){
 
-                            $toChangeItems[$sku] = ['psItem'=> $item,'quantityChange'=>$quantityChange,'priceChange'=>$priceChange, 'hubItem'=>$hubItems[$sku]];
-
-                        }
 
 
                     }
 
+                    if(!isset($pchItems[$sku]) && isset($hubItems[$sku])  && ($item['quantity']*1) > 0){
+
+
+                        $hubItems[$sku]->existencia = 0;
+                        $hubItems[$sku]->existencia_ps =0;
+
+                        $quantityChange = true;
+
+
+                    }
+
+
+                    if ($priceChange || $quantityChange){
+
+                        $toChangeItems[$sku] = ['psItem'=> $item,'quantityChange'=>$quantityChange,'priceChange'=>$priceChange, 'hubItem'=>$hubItems[$sku]];
+
+                    }
+
+                    }
                 }
 
 
@@ -377,14 +395,14 @@ class SiteController extends \yii\web\Controller
                     $articuloComp->sku = $sku;
                     $articuloComp->existencia_ps = $changes['hubItem']->existencia;;
 
-                    if($changes['priceChange']){
+                    /*if($changes['priceChange']){
 
 
                         $this->savePsPrice($articuloComp);
                         $changes['hubItem']->save();
 
 
-                    }
+                    }*/
                     if($changes['quantityChange']){
 
 
@@ -509,7 +527,7 @@ class SiteController extends \yii\web\Controller
         $children = $xml->children()->children();
         unset($children->manufacturer_name, $children->quantity);
 
-        $children->price = $article->precioPs;
+       // $children->price = $article->precioPs;
 
         if(!($articuloPrestashop = ArticuloPrestashop::findOne($article->sku))){
              $articuloPrestashop = new ArticuloPrestashop();
