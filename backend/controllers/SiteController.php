@@ -342,7 +342,7 @@ class SiteController extends \yii\web\Controller
 
                             $estatus = $precioPs > round($item['price'],2);
 
-                            $priceChange = true;
+                            $priceChange = false;
 
                             $hubItems[$sku]->precio = $pchItems[$sku]->precio;
 
@@ -527,7 +527,7 @@ class SiteController extends \yii\web\Controller
         $children = $xml->children()->children();
         unset($children->manufacturer_name, $children->quantity);
 
-       // $children->price = $article->precioPs;
+        $children->price = $article->precioPs;
 
         if(!($articuloPrestashop = ArticuloPrestashop::findOne($article->sku))){
              $articuloPrestashop = new ArticuloPrestashop();
